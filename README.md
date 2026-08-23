@@ -38,11 +38,11 @@ pnpm preview    # sirve dist/ en local
 
 ## Despliegue en Hostinger
 
-Hostinger compila el proyecto en su lado en cada push a `main`; no hay GitHub Actions
+Hostinger compila el proyecto en su lado en cada push a `master`; no hay GitHub Actions
 ni rama de build que mantener.
 
 1. En hPanel: **Deploy Your Web App → Import Git repository → Connect with GitHub**.
-2. Autorizar, elegir este repositorio y la rama `main`.
+2. Autorizar, elegir este repositorio y la rama `master`.
 3. En la pantalla de *build settings*:
    - **Output directory**: `dist` (es el que viene prellenado)
    - **Build command**: cambiarlo por
@@ -50,7 +50,7 @@ ni rama de build que mantener.
      corepack enable && pnpm install --frozen-lockfile && pnpm build
      ```
      El comando prellenado es `npm run build`, que fallaría porque el proyecto usa pnpm.
-4. **Deploy**. Desde ahí cada push a `main` despliega solo.
+4. **Deploy**. Desde ahí cada push a `master` despliega solo.
 
 Las rutas van por hash (`#s1/bloque-1`), así que no hace falta ninguna regla de rewrite
 en el servidor. `public/.htaccess` solo añade compresión y caché.
