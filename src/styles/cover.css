@@ -1,0 +1,53 @@
+/* Ported from shell.template.html — cover page and course index. */
+
+.cover{padding:0 0 110px}
+.cover .masthead h1{max-width:18ch}
+.cover .stats{
+  display:flex;flex-wrap:wrap;gap:8px 26px;margin:26px 0 0;
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;color:var(--ink-3)
+}
+.cover .stats b{color:var(--ink-2);font-weight:600}
+
+.index{display:flex;flex-direction:column;border-top:1px solid var(--line);margin-top:44px}
+
+.row{
+  appearance:none;background:transparent;color:inherit;font:inherit;text-align:left;
+  width:100%;border:0;border-bottom:1px solid var(--line-soft);
+  display:grid;grid-template-columns:64px 1fr;gap:4px 22px;align-items:start;
+  padding:26px 16px 26px 0;margin:0;
+  transition:background .16s ease,padding .16s ease
+}
+@media(min-width:900px){.row{grid-template-columns:64px 1fr 28px}}
+
+.row .n{
+  font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.1em;
+  color:var(--reveal);font-variant-numeric:tabular-nums;padding-top:6px
+}
+.row .body{display:flex;flex-direction:column;gap:10px;min-width:0}
+.row .t{
+  font-family:var(--display);font-size:clamp(23px,2.7vw,31px);line-height:1.16;
+  letter-spacing:-.01em;color:var(--ink);max-width:26ch;text-wrap:balance
+}
+.row .o{margin:0;font-size:17px;line-height:1.5;color:var(--ink-2);max-width:64ch}
+.row .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.row .chips span{
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);border:1px solid var(--line);padding:4px 9px
+}
+.row .go{
+  display:none;font-family:var(--mono);font-size:19px;color:var(--ask);
+  padding-top:6px;text-align:right
+}
+@media(min-width:900px){.row .go{display:block}}
+
+button.row{cursor:pointer}
+button.row:hover{background:rgba(91,200,206,.05);padding-left:10px}
+button.row:hover .t{color:#fff}
+button.row:focus-visible{outline:2px solid var(--ask);outline-offset:-2px}
+
+.row.pending{opacity:.4}
+.row.pending .n{color:var(--ink-3)}
+.row.pending .status{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3)
+}

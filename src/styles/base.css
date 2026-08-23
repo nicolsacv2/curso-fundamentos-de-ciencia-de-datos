@@ -1,0 +1,111 @@
+/* Ported verbatim from shell.template.html — tokens, typography, text elements.
+   Only the class names were translated to English; every value is untouched, so the
+   rendered design is identical to curso.html.
+
+   Class name map (original → here):
+     portada → cover      indice → index      ses → row        cuerpo → body
+     pendiente → pending  estado → status     ir → go          cifras → stats
+     objetivo → subtitle  volver → back       railses → rail-session
+     prosa → prose        lista → list        consigna → task  rot → label
+     grande → big         pasos → steps       quien → who      diagrama → diagram
+     marco → frame        par → pair          retrato → portrait
+     medio → medium       fuente → source     rojo → red       noes → nots
+     historia → story     lugar → place       hitos → milestones
+     hito → milestone     cargando → loading                                        */
+
+:root{
+  /* Dark room: blue-black, not neutral grey */
+  --ground:#0D1420;
+  --ground-2:#131D2B;
+  --panel:#18232F;
+  --line:#2A3A4E;
+  --line-soft:#1F2C3C;
+
+  --ink:#E9EFF5;
+  --ink-2:#9EB0C3;
+  --ink-3:#6D8096;
+
+  /* Projected paper: only used to mount images */
+  --paper:#EDE7DB;
+  --paper-ink:#231E18;
+  --paper-ink-2:#5C5245;
+
+  /* Two accents with fixed meaning:
+     cyan = what the group does · red = the datum being revealed */
+  --ask:#5BC8CE;
+  --ask-dim:#2E5C63;
+  --reveal:#DC4B3E;
+
+  --display:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+  --body:'Avenir Next',Avenir,'Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:Menlo,'SFMono-Regular',Consolas,ui-monospace,monospace;
+
+  --measure:62ch;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:20px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  /* Safety net: nothing may push the page sideways. Diagrams scroll inside
+     their own .frame instead. */
+  overflow-x:hidden;
+}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+[hidden]{display:none !important}
+
+/* ── Masthead ───────────────────────────────── */
+.masthead{padding:56px 0 26px}
+.eyebrow{
+  font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 18px
+}
+.masthead h1{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(38px,6.4vw,68px);line-height:1.02;letter-spacing:-.02em;
+  margin:0 0 20px;max-width:15ch;text-wrap:balance
+}
+.masthead .subtitle{
+  margin:0;max-width:56ch;color:var(--ink-2);font-size:20px
+}
+
+/* ── Text ───────────────────────────────────── */
+h2{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.02em;
+  margin:0;max-width:18ch;text-wrap:balance
+}
+h3{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(24px,3vw,33px);line-height:1.18;letter-spacing:-.01em;
+  margin:0;max-width:24ch;text-wrap:balance
+}
+h4{
+  font-family:var(--mono);font-size:12.5px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);
+  margin:0;padding-bottom:10px;border-bottom:1px solid var(--line)
+}
+p{margin:0 0 16px}
+p:last-child{margin-bottom:0}
+b,strong{font-weight:600;color:#fff}
+em{font-style:italic}
+
+.prose{max-width:var(--measure)}
+.lead{font-size:23px;color:var(--ink-2);max-width:54ch}
+
+/* ── Footer ─────────────────────────────────── */
+.foot{
+  border-top:1px solid var(--line);padding:26px 0 70px;
+  font-family:var(--mono);font-size:12.5px;line-height:1.8;color:var(--ink-3)
+}
+.foot a{color:var(--ink-2)}
+
+:focus-visible{outline:2px solid var(--ask);outline-offset:3px}

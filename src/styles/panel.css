@@ -1,0 +1,147 @@
+/* Ported from shell.template.html — the whole content vocabulary: panels, tasks,
+   ideas, figures, cards, stories and the timeline. */
+
+.panel{padding:52px 0 110px;display:flex;flex-direction:column;gap:44px}
+.panel[hidden]{display:none}
+@media(prefers-reduced-motion:no-preference){
+  .panel{animation:rise .3s cubic-bezier(.2,.7,.3,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+}
+
+.panel > *{margin:0}
+
+ul.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;max-width:var(--measure)}
+ul.list li{position:relative;padding-left:26px}
+ul.list li::before{
+  content:"";position:absolute;left:0;top:.72em;width:12px;height:1px;background:var(--line)
+}
+
+/* ── Task: what the group has to do ── */
+.task{
+  border-left:3px solid var(--ask);
+  background:linear-gradient(90deg,rgba(91,200,206,.07),transparent 70%);
+  padding:24px 26px;max-width:70ch
+}
+.task .label{
+  font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ask);margin:0 0 12px
+}
+.task .big{
+  font-family:var(--display);font-size:clamp(24px,3.2vw,34px);line-height:1.22;
+  color:var(--ink);margin:0 0 14px;letter-spacing:-.01em;text-wrap:balance
+}
+.task p:last-child{margin-bottom:0;color:var(--ink-2);font-size:18px}
+.task ol{
+  margin:14px 0 0;padding:0;list-style:none;counter-reset:op;
+  display:flex;flex-direction:column;gap:10px
+}
+.task ol li{
+  position:relative;padding-left:34px;counter-increment:op;font-size:19px;color:var(--ink-2)
+}
+.task ol li::before{
+  content:counter(op,upper-alpha);position:absolute;left:0;top:0;
+  font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ask);
+  border:1px solid var(--ask-dim);width:22px;height:22px;
+  display:grid;place-items:center;margin-top:.25em
+}
+/* Numbered variant: steps of a procedure, not options in a vote */
+.task ol.steps li::before{content:counter(op,decimal-leading-zero)}
+
+/* ── The idea that sticks ───────────────────── */
+.idea{
+  font-family:var(--display);font-size:clamp(23px,3vw,32px);line-height:1.26;
+  letter-spacing:-.01em;max-width:30ch;
+  border-top:2px solid var(--reveal);padding-top:20px;text-wrap:balance
+}
+.idea .who{color:var(--reveal)}
+
+/* ── Figures ────────────────────────────────── */
+figure{margin:0;display:flex;flex-direction:column;gap:12px}
+figure img{display:block;width:100%;height:auto}
+.plate{max-width:920px}
+.plate .mount{
+  background:var(--paper);padding:18px;
+  box-shadow:0 24px 60px -30px rgba(0,0,0,.9)
+}
+.plate.portrait{max-width:420px}
+.plate.medium{max-width:620px}
+figcaption{
+  font-family:var(--mono);font-size:12.5px;line-height:1.65;color:var(--ink-3);
+  max-width:64ch
+}
+figcaption b{color:var(--ink-2);font-weight:600}
+figcaption .source{display:block;margin-top:4px;color:var(--ink-3);opacity:.85}
+figcaption a{color:var(--ink-2)}
+
+.diagram{max-width:1000px}
+.diagram .frame{
+  background:var(--ground-2);border:1px solid var(--line-soft);padding:22px;
+  overflow-x:auto
+}
+.diagram svg{display:block;width:100%;height:auto;min-width:520px}
+.pair{
+  display:grid;gap:26px;grid-template-columns:1fr;align-items:start
+}
+/* Un hijo de grid trae min-width:auto, así que no puede encogerse por debajo de su
+   contenido: un diagrama con svg{min-width:520px} dentro de un .pair ensanchaba la
+   columna a 544px y empujaba la página entera de lado en móvil. Con min-width:0 la
+   columna sí se encoge y el scroll se queda dentro del .frame, que es donde debe
+   estar. No cambia nada por encima de 900px, donde las columnas ya son más anchas. */
+.pair > *{min-width:0}
+@media(min-width:900px){.pair{grid-template-columns:1fr 1fr}}
+
+/* ── Cards ──────────────────────────────────── */
+.cards{display:grid;gap:1px;background:var(--line-soft);grid-template-columns:1fr}
+@media(min-width:720px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.cards.c4{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:820px){.cards.c3{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--ground);padding:24px 22px;display:flex;flex-direction:column;gap:8px}
+.card .k{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ask)
+}
+.card .t{font-family:var(--display);font-size:23px;line-height:1.2;color:var(--ink)}
+.card .d{font-size:17px;color:var(--ink-2);line-height:1.5}
+.card.red .k{color:var(--reveal)}
+
+/* ── What it is not ─────────────────────────── */
+.nots{display:flex;flex-wrap:wrap;gap:10px}
+.nots span{
+  font-family:var(--mono);font-size:13px;letter-spacing:.04em;
+  border:1px solid var(--line);color:var(--ink-3);padding:8px 14px;
+  text-decoration:line-through;text-decoration-color:var(--reveal);text-decoration-thickness:1.5px
+}
+
+/* ── Stories ────────────────────────────────── */
+.story{
+  display:flex;flex-direction:column;gap:32px;
+  padding-top:40px;border-top:1px solid var(--line)
+}
+.story:first-of-type{border-top:0;padding-top:0}
+.story-head{display:flex;flex-direction:column;gap:10px}
+.story-head .num{
+  font-family:var(--mono);font-size:13px;letter-spacing:.2em;color:var(--reveal)
+}
+.story-head .place{
+  font-family:var(--mono);font-size:13px;letter-spacing:.1em;color:var(--ink-3)
+}
+
+/* ── Timeline ───────────────────────────────── */
+.milestones{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.milestone{
+  display:grid;grid-template-columns:76px 1fr;gap:20px;align-items:baseline;
+  padding:16px 0;border-bottom:1px solid var(--line-soft)
+}
+@media(min-width:820px){.milestone{grid-template-columns:76px 22ch 1fr}}
+.milestone .y{
+  font-family:var(--mono);font-size:15px;font-weight:600;color:var(--reveal);
+  font-variant-numeric:tabular-nums
+}
+.milestone .t{font-family:var(--display);font-size:21px;line-height:1.25;color:var(--ink)}
+.milestone .d{font-size:17px;color:var(--ink-2);line-height:1.5}
+
+/* ── Block loading state ────────────────────── */
+.loading{
+  padding:80px 0;color:var(--ink-3);
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase
+}

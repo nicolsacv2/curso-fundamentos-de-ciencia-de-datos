@@ -1,0 +1,67 @@
+/* Ported from shell.template.html — sticky bar with the back-to-index button and the
+   block tabs. One deliberate change from the original: .back is no longer faint grey
+   text but a solid cyan button. */
+
+.rail-holder{
+  position:sticky;top:0;z-index:30;
+  background:var(--ground);
+  border-bottom:1px solid var(--line);
+  padding-top:10px
+}
+.rail-top{
+  display:flex;align-items:center;gap:16px;padding-bottom:8px;min-width:0
+}
+
+/* ── Back to index ──────────────────────────────
+   Before: 12px mono text in --ink-3, no background — easy to miss.
+   Now: solid cyan block on the dark ground. Contrast ratio ~10:1. */
+.back{
+  appearance:none;
+  background:var(--ask);
+  color:var(--ground);
+  border:0;border-radius:2px;
+  padding:10px 16px;
+  cursor:pointer;flex:0 0 auto;
+  font-family:var(--mono);font-size:12.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;line-height:1;
+  display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 2px 14px -6px rgba(91,200,206,.9);
+  transition:background .16s ease,transform .16s ease,box-shadow .16s ease
+}
+.back:hover{
+  background:#7FDCE1;
+  transform:translateX(-2px);
+  box-shadow:0 4px 18px -6px rgba(91,200,206,1)
+}
+.back:active{transform:translateX(-2px) scale(.98)}
+.back:focus-visible{outline:2px solid var(--ask);outline-offset:3px}
+.back .arrow{font-size:14px;line-height:1}
+/* The short label only shows on narrow screens (see mobile.css). */
+.back .short{display:none}
+
+.rail-session{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--ink-3);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0
+}
+.rail-session b{color:var(--ink-2);font-weight:600}
+
+.rail{display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail button{
+  flex:0 0 auto;appearance:none;background:transparent;border:0;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  padding:12px 20px 13px;cursor:pointer;color:var(--ink-3);
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+  display:flex;flex-direction:column;gap:4px;align-items:flex-start;white-space:nowrap;
+  transition:color .16s ease,border-color .16s ease
+}
+.rail button .rname{
+  font-family:var(--body);font-size:15px;letter-spacing:0;text-transform:none;
+  color:var(--ink-3);transition:color .16s ease
+}
+.rail button:first-child{padding-left:0}
+.rail button:hover{color:var(--ink-2)}
+.rail button:hover .rname{color:var(--ink-2)}
+.rail button[aria-selected="true"]{color:var(--ask);border-bottom-color:var(--ask)}
+.rail button[aria-selected="true"] .rname{color:var(--ink)}
+.rail button:focus-visible{outline:2px solid var(--ask);outline-offset:2px}
