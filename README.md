@@ -29,7 +29,7 @@ Requiere Node 20+ y pnpm (vía corepack). Todo vive dentro del proyecto: no hace
 instalar nada de forma global.
 
 ```sh
-corepack enable
+corepack enable   # pnpm
 pnpm install
 pnpm dev        # servidor de desarrollo
 pnpm build      # compila a dist/
@@ -43,21 +43,42 @@ ni rama de build que mantener.
 
 1. En hPanel: **Deploy Your Web App → Import Git repository → Connect with GitHub**.
 2. Autorizar, elegir este repositorio y la rama `master`.
-3. En la pantalla de *build settings*:
-   - **Output directory**: `dist` (es el que viene prellenado)
-   - **Build command**: cambiarlo por
-     ```
-     corepack enable && pnpm install --frozen-lockfile && pnpm build
-     ```
-     El comando prellenado es `npm run build`, que fallaría porque el proyecto usa pnpm.
-4. **Deploy**. Desde ahí cada push a `master` despliega solo.
+3. En **Change build and output settings**:
+
+   | Campo | Valor |
+   |---|---|
+   | Build command | `pnpm run build` |
+   | Package manager | `pnpm` |
+   | **Output directory** | **`dist`** |
+
+   El único que hay que tocar es el último: Hostinger lo trae en `build`, y Vite
+   compila a `dist`. Si se queda en `build`, el despliegue no encuentra nada.
+
+4. **Finish** y **Deploy**. Desde ahí cada push a `master` despliega solo.
+
+### Por qué el proyecto está configurado así
+
+Hostinger instala las dependencias con el gestor que se elija en esa pantalla. De ahí
+dos decisiones que si no, parecen arbitrarias:
+
+- **`package.json` no fija versión de pnpm.** Un `packageManager` clavado pelearía con
+  la selección del panel: si Hostinger corre pnpm 11 y aquí dijera `pnpm@9`, intentaría
+  descargarse el 9 en mitad del build.
+- **El permiso de build de esbuild está declarado por triplicado.** esbuild necesita su
+  postinstall para enlazar el binario de la plataforma; pnpm 10+ bloquea los scripts de
+  instalación por defecto y pnpm 11 además falla la instalación entera si queda alguno
+  sin declarar. La opción cambió de sitio y de nombre entre versiones, así que está en
+  `pnpm-workspace.yaml` (`allowBuilds` para pnpm 11, `onlyBuiltDependencies` para
+  pnpm 10) y en `package.json` (`pnpm.onlyBuiltDependencies`, para pnpm 9). Cada versión
+  ignora en silencio los sitios que no le corresponden.
+
+Si aun así el build fallara por algo de pnpm, la salida limpia es cambiar a npm: borrar
+`pnpm-lock.yaml` y `pnpm-workspace.yaml`, correr `npm install`, quitar el bloque `pnpm`
+de `package.json`, y elegir **npm** en el desplegable. npm no bloquea los scripts de
+instalación, así que ninguno de estos ajustes hace falta.
 
 Las rutas van por hash (`#s1/bloque-1`), así que no hace falta ninguna regla de rewrite
 en el servidor. `public/.htaccess` solo añade compresión y caché.
-
-Si el builder de Hostinger no permitiera editar el comando o no expusiera corepack,
-la salida es migrar a npm: `rm pnpm-lock.yaml && npm install`, quitar `packageManager`
-de `package.json` y dejar el comando prellenado.
 
 ## Estructura
 

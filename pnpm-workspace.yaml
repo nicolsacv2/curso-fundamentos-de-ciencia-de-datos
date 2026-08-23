@@ -1,0 +1,16 @@
+# esbuild necesita ejecutar su postinstall para enlazar el binario de su plataforma.
+# pnpm 10+ bloquea los scripts de instalación por defecto y, desde pnpm 11, además
+# falla la instalación entera si queda alguno sin declarar.
+#
+# Cada versión de pnpm busca esto en un sitio distinto, y todas ignoran en silencio
+# el que no les toca. Como no sabemos qué versión usa el builder de Hostinger, está
+# declarado en los tres:
+#
+#   pnpm 11  → allowBuilds, aquí
+#   pnpm 10  → onlyBuiltDependencies, aquí
+#   pnpm 9   → pnpm.onlyBuiltDependencies, en package.json
+allowBuilds:
+  esbuild: true
+
+onlyBuiltDependencies:
+  - esbuild
