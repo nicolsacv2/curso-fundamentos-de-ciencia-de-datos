@@ -170,7 +170,7 @@ export default function Block3({ id, tabId }) {
 
         <Task
           label="Encuesta abierta"
-          big="Tienes el tercer presupuesto más bajo de la liga y juegas contra equipos que gastan tres veces más. ¿Qué comprarías?"
+          big="Tienes el tercer presupuesto más bajo de la liga de baseball y juegas contra equipos que gastan tres veces más. ¿Qué comprarías?"
         >
           <p>Una sola cosa, en el chat. ¿Qué característica de un jugador buscarías?</p>
         </Task>

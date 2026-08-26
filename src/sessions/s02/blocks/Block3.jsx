@@ -21,15 +21,8 @@ export default function Block3({ id, tabId }) {
             Cada propuesta pasa por el filtro de hace un rato: <em>¿está bien formulada?</em> y{' '}
             <em>¿qué tipo de dato produce?</em> Varias se van a corregir en vivo, y eso es parte
             del ejercicio.</li>
-          <li><b>Todos responden · 7 min.</b> Formulario abierto, música de fondo, micrófonos
-            cerrados. Responde con la verdad y sin pensarlo mucho: el dato que sirve es el real,
+          <li><b>Todos responden · 7 min.</b> Formulario abierto. Responde con la verdad y sin pensarlo mucho: el dato que sirve es el real,
             no el que queda bonito.</li>
-          <li><b>Se proyecta la hoja en vivo · 20 min.</b> Vemos aparecer las filas en tiempo real
-            y le ponemos nombre a lo que ya sabemos: <b>esta fila eres tú, esta columna es una
-            variable, esta celda es tu valor</b>. Es la figura del bloque 1, ahora con nuestros
-            datos dentro.</li>
-          <li><b>Discusión guiada · 8 min.</b> Qué quedó cuantitativo, qué es subjetivo, quién
-            exageró, y quiénes hoy no se conectaron.</li>
         </Options>
       </Task>
 

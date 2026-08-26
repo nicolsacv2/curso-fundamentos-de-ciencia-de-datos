@@ -79,6 +79,43 @@ figcaption a{color:var(--ink-2)}
   overflow-x:auto
 }
 .diagram svg{display:block;width:100%;height:auto;min-width:520px}
+/* ── DataTable: the class's own table, printed ──────────
+   Same frame as .diagram, and the same rule: the scroll stays inside the frame
+   and never reaches the page. The row numbers and the header stick, because the
+   activities are answered with a coordinate and a coordinate is useless if you
+   have scrolled its letter off screen. */
+.dtable{max-width:1000px}
+.dtable .frame{
+  background:var(--ground-2);border:1px solid var(--line-soft);
+  overflow:auto;max-height:74vh
+}
+.dtable table{
+  border-collapse:separate;border-spacing:0;font-family:var(--mono);font-size:12.5px;
+  white-space:nowrap;font-variant-numeric:tabular-nums
+}
+.dtable th,.dtable td{
+  border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);
+  padding:7px 12px;text-align:left;font-weight:400;color:var(--ink-2)
+}
+.dtable thead th{
+  position:sticky;top:0;z-index:2;background:var(--ground-2);vertical-align:bottom;
+  border-bottom-color:var(--line)
+}
+.dtable thead .l{display:block;color:var(--ask);font-size:11px;letter-spacing:.16em}
+.dtable thead .h{display:block;color:var(--ink-3);font-size:11.5px;margin-top:3px}
+.dtable .n{
+  position:sticky;left:0;z-index:1;background:var(--ground-2);
+  color:var(--ink-3);text-align:right;border-right-color:var(--line)
+}
+.dtable thead .n{z-index:3}
+/* Una celda vacía no se ve; y en esta sesión el hueco es el dato. */
+.dtable td.empty{background:rgba(220,75,62,.07)}
+.dtable td.mk{color:var(--reveal);background:rgba(220,75,62,.13)}
+.dtable .ws{font-style:normal;color:var(--reveal)}
+/* Revelar: se apaga todo menos lo señalado. */
+.dtable.focus td:not(.mk){opacity:.3}
+.dtable td.w{white-space:normal;max-width:32ch}
+
 .pair{
   display:grid;gap:26px;grid-template-columns:1fr;align-items:start
 }

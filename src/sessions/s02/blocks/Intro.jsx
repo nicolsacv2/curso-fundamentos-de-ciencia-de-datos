@@ -14,13 +14,8 @@ export default function Intro({ id, tabId }) {
 
       <h3>La cifra del día</h3>
       <p className="lead">El reto de la sesión pasada era traer un número publicado y, al lado, una
-        pregunta incómoda sobre ese número. Hoy lo cobramos: <b>tres personas</b> exponen el suyo
+        pregunta incómoda sobre ese número. <b>Tres personas</b> exponen el suyo
         y el resto del salón lo interroga.</p>
-
-      <Prose>
-        <p>Son doce minutos y tres turnos, así que cada turno dura <b>cuatro</b>: un minuto de
-          exposición y tres de interrogatorio. Cuento el tiempo en voz alta.</p>
-      </Prose>
 
       <Task label="Si te toca exponer · un minuto · 10–22" big="En ese minuto caben exactamente tres cosas.">
         <Options steps>

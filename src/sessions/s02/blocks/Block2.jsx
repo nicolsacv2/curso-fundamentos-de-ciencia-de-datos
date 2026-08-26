@@ -40,7 +40,7 @@ export default function Block2({ id, tabId }) {
 
       <h3>Población y muestra</h3>
       <Prose>
-        <p>A casi nadie se le puede preguntar a todos. La <b>población</b> es el conjunto entero
+        <p>Casi nunca se le puede preguntar a todos. La <b>población</b> es el conjunto entero
           sobre el que quieres concluir; la <b>muestra</b>, el pedazo al que de verdad le
           preguntaste.</p>
         <p>La pregunta no es si tu muestra es grande. Es si se parece a la población.</p>
@@ -147,12 +147,6 @@ export default function Block2({ id, tabId }) {
           <span className="who">Solo se vuelve más segura de estar equivocada.</span></Idea>
       </Story>
 
-      <Task label="Cascada de chat · 3 casos · 82–96" big="¿Quién no está en esta muestra?">
-        <p>Proyecto tres estudios reales, uno a la vez, con su método de muestreo escrito en
-          pantalla. Tienes <b>noventa segundos por caso</b> para escribir una frase en el chat. Es
-          la misma pregunta de los aviones de Wald, aplicada tres veces seguidas.</p>
-      </Task>
-
       <h4>Los tres casos, y por dónde empezar a mirar</h4>
       <Cards cols="c3">
         <Card k="Caso 1 · Encuesta telefónica" t="«Llamamos a 2.000 hogares entre las 9 y las 5»">
@@ -203,7 +197,7 @@ export default function Block2({ id, tabId }) {
         label="Trabajo individual · 8 minutos · 96–108"
         big="Te toca una pregunta mal formulada. Diagnostícala y reescríbela."
       >
-        <p>En tu zona del tablero tienes <b>una</b>, distinta a la del vecino. Escribe debajo{' '}
+        <p>En tu zona del tablero tienes <b>una</b>. Escribe debajo{' '}
           <b>tres líneas</b>, en este orden:</p>
         <Options steps>
           <li><b>Qué defecto tiene.</b> Usa el nombre de las cuatro tarjetas de arriba. Si tiene

@@ -80,6 +80,69 @@ export function Card({ red, k, t, children }) {
   );
 }
 
+/* ── DataTable: the class's own spreadsheet, printed ──
+   Session 3 audits a real 23 × 10 table, and every one of its activities depends
+   on being able to point at a single cell: the group answers in the chat with a
+   coordinate. So rows carry their number and columns carry a letter, the way a
+   spreadsheet does.
+
+   Cells are printed exactly as they arrived. A trailing space gets a visible ␣
+   and an empty cell gets its own tint, because in this session the whitespace
+   and the holes are the subject, not noise to tidy away before publishing.
+
+   `pick` and `only` narrow the table to some columns or some rows without
+   renumbering: a panel can zoom into one column and the coordinates still match
+   the full table the group has been looking at all morning. */
+export function DataTable({ cols, rows, pick, only, mark, wrap, focus, caption }) {
+  const keep = pick ? cols.filter(c => pick.includes(c[0])) : cols;
+  const at = keep.map(c => cols.findIndex(o => o[0] === c[0]));
+  const nums = only || rows.map((_, i) => i + 1);
+  const marked = new Set(mark || []);
+  const wraps = new Set(wrap || []);
+
+  return (
+    <figure className={focus ? 'dtable focus' : 'dtable'}>
+      <div className="frame">
+        <table>
+          <thead>
+            <tr>
+              <th className="n" scope="col"><span className="l">#</span></th>
+              {keep.map(([letter, , label]) => (
+                <th key={letter} scope="col">
+                  <span className="l">{letter}</span>
+                  <span className="h">{label}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {nums.map(n => (
+              <tr key={n}>
+                <th className="n" scope="row">{n}</th>
+                {keep.map(([letter], j) => {
+                  const v = rows[n - 1][at[j]];
+                  const cls = [
+                    v === '' ? 'empty' : '',
+                    marked.has(letter + n) ? 'mk' : '',
+                    wraps.has(letter) ? 'w' : ''
+                  ].filter(Boolean).join(' ');
+                  return (
+                    <td key={letter} className={cls || undefined}>
+                      {v}
+                      {/ $/.test(v) && <i className="ws" title="espacio al final">␣</i>}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  );
+}
+
 /* ── Two columns from 900px up ── */
 export function Pair({ children, style }) {
   return <div className="pair" style={style}>{children}</div>;

@@ -43,12 +43,6 @@ export default function Block1({ id, tabId }) {
         modo de ejemplo.
       </Diagram>
 
-      <Prose>
-        <p>Son veintiséis minutos en dos tiempos: <b>diez</b> clasificando cada quien en su zona
-          del tablero, y <b>dieciséis</b> discutiendo en plenaria. No vamos a revisar las
-          veinticuatro tarjetas: solo las que nos dividan.</p>
-      </Prose>
-
       <Task label="Trabajo individual · 10 minutos · 36–62" big="Veinticuatro tarjetas, cuatro cuadrantes.">
         <p>Cada tarjeta trae el nombre de una variable —edad, ciudad, temperatura, satisfacción,
           placa del auto, emoji más usado, número de hermanos…—. Arrástrala al cuadrante que le
