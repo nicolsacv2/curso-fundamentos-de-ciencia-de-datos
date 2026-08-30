@@ -1,10 +1,10 @@
 import { C, SERIF, svg, txt, wrap } from '../../../svg/kit.js';
 import { box, cell } from './shared.js';
 
-/* ═══════════ B1 · los tres sabores del faltante ═══════════
-   Tres celdas vacías, idénticas en la hoja, con tres causas que no se parecen en
-   nada. La hoja de cálculo las guarda igual: la única que puede distinguirlas es
-   la persona que sabe cómo se preguntó. */
+/* ═══════════ B1 · the three flavours of a missing value ═══════════
+   Three empty cells, identical in the sheet, with three causes that have nothing in
+   common. The spreadsheet stores them the same way: the only one who can tell them
+   apart is the person who knows how the question was asked. */
 export function faltantes() {
   const W = 980, H = 400;
   let b = '';

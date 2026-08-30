@@ -1,0 +1,85 @@
+{
+  "_comment": [
+    "The course plates no longer live in the repository: they are requested from",
+    "Wikimedia Commons, where they came from, and the GCS bucket is the backup copy.",
+    "",
+    "Each entry holds the EXACT Commons filename and the dimensions of the original.",
+    "The dimensions are not used to draw -- the CSS stretches the image to the width of",
+    "its frame -- but to reserve the aspect ratio before the image arrives.",
+    "",
+    "This file is JSON rather than JS because two worlds read it: the Vite bundle and",
+    "scripts/mirror_assets.py, which downloads the copies uploaded to the bucket."
+  ],
+
+  "kit-harington": {
+    "commons": "Kit Harington SDCC 2013 (cropped).jpg",
+    "ext": "jpg",
+    "w": 1206,
+    "h": 1224,
+    "credit": "Gage Skidmore · CC BY-SA 2.0"
+  },
+  "john-snow": {
+    "commons": "John Snow.jpg",
+    "ext": "jpg",
+    "w": 1712,
+    "h": 2516,
+    "credit": "Autotipia de 1856, Wellcome Collection · Dominio público"
+  },
+  "snow-cholera-map": {
+    "commons": "Snow-cholera-map-1.jpg",
+    "ext": "jpg",
+    "w": 20124,
+    "h": 18877,
+    "credit": "John Snow, 1854 · Dominio público"
+  },
+  "snow-pump": {
+    "commons": "John Snow memorial and pub.jpg",
+    "ext": "jpg",
+    "w": 1920,
+    "h": 2560,
+    "credit": "Justinc · CC BY-SA 2.0"
+  },
+  "survivorship-bias": {
+    "commons": "Survivorship-bias.svg",
+    "ext": "svg",
+    "vector": true,
+    "w": 1338,
+    "h": 997,
+    "credit": "McGeddon, vectorizada por Martin Grandjean · CC BY-SA 4.0"
+  },
+  "abraham-wald": {
+    "commons": "Abraham Wald.jpg",
+    "ext": "jpg",
+    "w": 512,
+    "h": 800,
+    "credit": "Konrad Jacobs, MFO · CC BY-SA 2.0 de"
+  },
+  "billy-beane": {
+    "commons": "Billy Beane - General Manager Oakland As (5964095428).jpg",
+    "ext": "jpg",
+    "w": 326,
+    "h": 378,
+    "credit": "Leaders Event, Londres 2010 · CC BY 2.0"
+  },
+  "alf-landon": {
+    "commons": "Alf Landon, Repub. nominee for presidency in 1936, facing a battery of cameras when he arrived at White House for luncheon conference with Pres. Roosevelt LCCN2016877639.jpg",
+    "ext": "jpg",
+    "w": 8146,
+    "h": 10191,
+    "credit": "Harris & Ewing, 1936 · Library of Congress · Dominio público"
+  },
+  "fdr": {
+    "commons": "FDR in 1933.jpg",
+    "ext": "jpg",
+    "w": 2488,
+    "h": 2928,
+    "credit": "Elias Goldensky, 1933 · Dominio público"
+  },
+  "migrant-mother": {
+    "commons": "Lange-MigrantMother02.jpg",
+    "ext": "jpg",
+    "w": 6205,
+    "h": 8066,
+    "credit": "Dorothea Lange, 1936 · Dominio público"
+  }
+}

@@ -54,8 +54,8 @@ body{
   font-size:20px;
   line-height:1.65;
   -webkit-font-smoothing:antialiased;
-  /* Safety net: nothing may push the page sideways. Diagrams scroll inside
-     their own .frame instead. */
+  /* Safety net: nothing may push the page sideways. What is wide — the class's own
+     table — scrolls inside its own .frame instead. */
   overflow-x:hidden;
 }
 

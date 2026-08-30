@@ -1,12 +1,8 @@
 import {
-  Panel, Task, Options, Diagram, Plate, Source, Pair, Prose,
+  Panel, Task, Options, Diagram, Plate, Source, CommonsLink, Pair, Prose,
   Cards, Card, Idea, Story, StoryHead
 } from '../../../components/content/index.jsx';
 import { population, digest, metadata } from '../figures/block2.js';
-
-import alfLandon from '../../../assets/s02/alf-landon.jpg';
-import fdr from '../../../assets/s02/fdr.jpg';
-import migrantMother from '../../../assets/s02/migrant-mother.jpg';
 
 export default function Block2({ id, tabId }) {
   return (
@@ -71,25 +67,21 @@ export default function Block2({ id, tabId }) {
         <Pair>
           <Plate
             variant="portrait"
-            src={alfLandon}
+            asset="alf-landon"
             alt="Alf Landon, candidato republicano de 1936, ante un grupo de fotógrafos a la entrada de la Casa Blanca."
-            width={607}
-            height={760}
           >
             <b>Alf Landon</b>, gobernador de Kansas y candidato republicano. El hombre
             que, según dos millones de respuestas, iba a ser presidente.
-            <Source>Harris &amp; Ewing, 1936 · Library of Congress · Dominio público · Wikimedia Commons</Source>
+            <Source>Harris &amp; Ewing, 1936 · Library of Congress · Dominio público · <CommonsLink asset="alf-landon">Wikimedia Commons</CommonsLink></Source>
           </Plate>
           <Plate
             variant="portrait"
-            src={fdr}
+            asset="fdr"
             alt="Retrato fotográfico de Franklin Delano Roosevelt."
-            width={645}
-            height={760}
           >
             <b>Franklin D. Roosevelt.</b> Ganó 46 de los 48 estados. Es la mayor
             derrota electoral del siglo en Estados Unidos.
-            <Source>Retrato de Elias Goldensky, 1933 · Dominio público · Wikimedia Commons</Source>
+            <Source>Retrato de Elias Goldensky, 1933 · Dominio público · <CommonsLink asset="fdr">Wikimedia Commons</CommonsLink></Source>
           </Plate>
         </Pair>
 
@@ -125,15 +117,13 @@ export default function Block2({ id, tabId }) {
               <b>se multiplicó por dos millones</b>.</p>
           </Prose>
           <Plate
-            src={migrantMother}
+            asset="migrant-mother"
             alt="Fotografía de Dorothea Lange de una madre trabajadora migrante con sus hijos en un campamento de California, 1936."
-            width={584}
-            height={760}
           >
             <b>Estos son los que no estaban en la lista.</b> Marzo de 1936, el mismo
             año de la encuesta. Sin teléfono, sin automóvil y sin suscripción: invisibles para el{' '}
             <i>Digest</i>, y mayoría en las urnas.
-            <Source>Dorothea Lange, «Migrant Mother», Nipomo, California · Farm Security Administration · Dominio público · Wikimedia Commons</Source>
+            <Source>Dorothea Lange, «Migrant Mother», Nipomo, California · Farm Security Administration · Dominio público · <CommonsLink asset="migrant-mother">Wikimedia Commons</CommonsLink></Source>
           </Plate>
         </Pair>
 

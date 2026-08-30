@@ -1,5 +1,5 @@
-/* Sesión 3. A diferencia de las dos anteriores, esta no viene de un panels.html
-   original: se escribió aquí, sobre las 23 respuestas que produjo la sesión 2. */
+/* Session 3. Unlike the two before it, this one does not come from an original
+   panels.html: it was written here, on the 23 answers session 2 produced. */
 export default {
   n: 3,
   title: 'Datos sucios: el trabajo invisible',

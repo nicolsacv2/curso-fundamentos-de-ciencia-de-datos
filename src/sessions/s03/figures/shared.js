@@ -1,9 +1,9 @@
 import { C } from '../../../svg/kit.js';
 
-/* Mismos ayudantes que la sesión 2: una caja con filo de color a la izquierda y
-   un codo para colgar hijos de un padre. Se repiten aquí en vez de importarse de
-   s02 porque cada sesión es un chunk independiente y no debe arrastrar el de
-   otra sesión para dibujar un rectángulo. */
+/* The same helpers as session 2: a box with a coloured edge on the left, and an
+   elbow for hanging children off a parent. They are repeated here instead of being
+   imported from s02 because each session is its own chunk and must not drag in
+   another session's just to draw a rectangle. */
 export function box(x, y, w, h, col, o) {
   o = o || {};
   let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${o.fill || C.ground2}"
@@ -18,8 +18,8 @@ export function elbow(x1, y1, x2, y2, marker) {
     stroke-width="1.2" opacity=".8" marker-end="url(#${marker})"/>`;
 }
 
-/* Una celda de hoja de cálculo. `ghost` la deja vacía y sombreada: en esta
-   sesión el hueco es el dato, así que tiene que verse. */
+/* A spreadsheet cell. `ghost` leaves it empty and shaded: in this session the hole
+   is the datum, so it has to be visible. */
 export function cell(x, y, w, h, text, o) {
   o = o || {};
   let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}"

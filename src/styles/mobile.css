@@ -66,16 +66,19 @@
   .lead{font-size:19px;max-width:none}
   .prose{max-width:none}
 
-  /* Diagrams: the frame bleeds to the screen edges so the horizontal scroll is
-     visible and legible. The SVG itself is untouched — same viewBox, same drawing. */
-  .diagram .frame{
+  /* Diagrams already fit the width, so all this reclaims is the room that was going
+     into padding. The table does still scroll — its ten columns fit on no phone — and
+     that is why it bleeds to the edges: every pixel of width is one more visible cell,
+     and the scroll becomes visible too. */
+  .diagram .frame{padding:16px}
+  .dtable .frame{
     margin-left:-16px;margin-right:-16px;
-    padding:16px;
     border-left:0;border-right:0;
-    scroll-padding-left:16px;
     -webkit-overflow-scrolling:touch
   }
-  .diagram figcaption{max-width:none}
+  /* In landscape, 74vh left the table two rows tall. */
+  .dtable .frame{max-height:max(74vh, 320px)}
+  .diagram figcaption,.dtable figcaption{max-width:none}
 
   .plate,.plate.portrait,.plate.medium{max-width:100%}
   .plate .mount{padding:12px}
@@ -98,7 +101,7 @@
 
 /* ══════════ Narrow phone ══════════ */
 @media(max-width:400px){
-  .diagram .frame{padding:14px 12px}
+  .diagram .frame{padding:12px}
   .rail button{padding:12px 12px}
   .task{padding:16px 14px}
 }

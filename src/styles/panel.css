@@ -71,14 +71,30 @@ figcaption{
 }
 figcaption b{color:var(--ink-2);font-weight:600}
 figcaption .source{display:block;margin-top:4px;color:var(--ink-3);opacity:.85}
-figcaption a{color:var(--ink-2)}
+/* The credit links to the file page on Commons, which is what the CC licences ask for.
+   It stays in the caption's own greys — the cyan and the red mean specific things in
+   this course and a credit is neither — and just separates itself from the text around
+   it with a thin rule. */
+figcaption a{
+  color:var(--ink-2);
+  text-decoration-thickness:1px;text-underline-offset:2px;
+  text-decoration-color:var(--line)
+}
+figcaption a:hover,figcaption a:focus-visible{
+  color:var(--ink);text-decoration-color:var(--ink-3)
+}
 
 .diagram{max-width:1000px}
 .diagram .frame{
   background:var(--ground-2);border:1px solid var(--line-soft);padding:22px;
-  overflow-x:auto
+  position:relative
 }
-.diagram svg{display:block;width:100%;height:auto;min-width:520px}
+/* With a viewBox, width:100% and height:auto the SVG takes its own aspect ratio: it
+   fits any width without distorting, without overflowing and without reserving the
+   wrong space while it loads. There used to be a min-width:520px here that forced
+   horizontal scrolling on a phone and still left the labels under 6px. The detail is
+   now read by zooming instead. */
+.diagram svg{display:block;width:100%;height:auto}
 /* ── DataTable: the class's own table, printed ──────────
    Same frame as .diagram, and the same rule: the scroll stays inside the frame
    and never reaches the page. The row numbers and the header stick, because the
@@ -87,7 +103,7 @@ figcaption a{color:var(--ink-2)}
 .dtable{max-width:1000px}
 .dtable .frame{
   background:var(--ground-2);border:1px solid var(--line-soft);
-  overflow:auto;max-height:74vh
+  overflow:auto;max-height:74vh;position:relative
 }
 .dtable table{
   border-collapse:separate;border-spacing:0;font-family:var(--mono);font-size:12.5px;
@@ -108,22 +124,22 @@ figcaption a{color:var(--ink-2)}
   color:var(--ink-3);text-align:right;border-right-color:var(--line)
 }
 .dtable thead .n{z-index:3}
-/* Una celda vacía no se ve; y en esta sesión el hueco es el dato. */
+/* An empty cell is invisible; and in this session the hole is the datum. */
 .dtable td.empty{background:rgba(220,75,62,.07)}
 .dtable td.mk{color:var(--reveal);background:rgba(220,75,62,.13)}
 .dtable .ws{font-style:normal;color:var(--reveal)}
-/* Revelar: se apaga todo menos lo señalado. */
+/* Reveal: everything dims except what is being pointed at. */
 .dtable.focus td:not(.mk){opacity:.3}
 .dtable td.w{white-space:normal;max-width:32ch}
 
 .pair{
   display:grid;gap:26px;grid-template-columns:1fr;align-items:start
 }
-/* Un hijo de grid trae min-width:auto, así que no puede encogerse por debajo de su
-   contenido: un diagrama con svg{min-width:520px} dentro de un .pair ensanchaba la
-   columna a 544px y empujaba la página entera de lado en móvil. Con min-width:0 la
-   columna sí se encoge y el scroll se queda dentro del .frame, que es donde debe
-   estar. No cambia nada por encima de 900px, donde las columnas ya son más anchas. */
+/* A grid child comes with min-width:auto, so it cannot shrink below its content: a
+   wide table inside a .pair would stretch the column and push the whole page sideways
+   on mobile. With min-width:0 the column does shrink and the scroll stays inside the
+   .frame, which is where it belongs. Nothing changes above 900px, where the columns
+   are already wider. */
 .pair > *{min-width:0}
 @media(min-width:900px){.pair{grid-template-columns:1fr 1fr}}
 
@@ -182,3 +198,54 @@ figcaption a{color:var(--ink-2)}
   padding:80px 0;color:var(--ink-3);
   font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase
 }
+
+/* ── Zoom: the figure at its real size ────────────────────
+   The page shows the whole, fitted to the width of its column. This button opens the
+   same figure unshrunk, which is where the 11px labels can be read and where the ten
+   columns of the class's table actually fit.
+
+   The button anchors to the <figure>, not to the frame: the table's frame scrolls
+   inside itself and would carry the button away with it. */
+.diagram,.dtable{position:relative}
+.zoom{
+  position:absolute;top:8px;right:8px;z-index:4;
+  background:var(--ground-2);border:1px solid var(--line);color:var(--ink-3);
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  padding:7px 11px;cursor:pointer;opacity:.55;transition:opacity .15s,color .15s
+}
+.zoom:hover,.zoom:focus-visible{opacity:1;color:var(--ask);border-color:var(--ask)}
+figure:hover > .zoom{opacity:1}
+
+/* position:fixed + inset:0 instead of 100vw/100dvh: 100vw counts the scrollbar, so the
+   dialog came out wider than the viewport and pushed the page sideways. */
+.zoomed{
+  position:fixed;inset:0;width:auto;height:auto;max-width:none;max-height:none;
+  margin:0;padding:0;border:0;background:var(--ground);color:var(--ink);
+  flex-direction:column
+}
+/* Only when open. An author `display` beats the browser's own dialog:not([open])
+   rule whatever its specificity, so writing display:flex on .zoomed laid every closed
+   dialog out on the page — one per figure. */
+.zoomed[open]{display:flex}
+.zoomed::backdrop{background:rgba(6,12,20,.92)}
+.zoom-bar{
+  flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:10px 14px;border-bottom:1px solid var(--line-soft);background:var(--ground-2)
+}
+.zoom-bar p{
+  margin:0;font-family:var(--mono);font-size:11.5px;line-height:1.45;color:var(--ink-3);
+  /* The label describes the whole figure and can be long; it is clipped before it can
+     push the close button off screen. */
+  overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2
+}
+.zoom-bar button{
+  flex:0 0 auto;min-height:44px;padding:10px 16px;cursor:pointer;
+  background:none;border:1px solid var(--line);color:var(--ink-2);
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase
+}
+.zoom-bar button:hover,.zoom-bar button:focus-visible{color:var(--ask);border-color:var(--ask)}
+/* Pans on both axes, and the browser keeps its own pinch-to-zoom.
+   The <dialog> is still a child of its .diagram or .dtable in the DOM — it is only
+   painted in the top layer — so the zoomed table inherits the same borders, the same
+   sticky headers and the same reveal state without repeating a single rule. */
+.zoom-body{flex:1 1 auto;overflow:auto;padding:14px;touch-action:pinch-zoom}

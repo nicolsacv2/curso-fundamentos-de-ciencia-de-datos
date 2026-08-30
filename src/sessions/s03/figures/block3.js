@@ -1,10 +1,10 @@
 import { C, SERIF, svg, txt, arrow, wrap } from '../../../svg/kit.js';
 import { box } from './shared.js';
 
-/* ═══════════ B3 · el original no se toca ═══════════
-   La regla de oro del bloque, y la única de la sesión que es un hábito y no una
-   idea: limpiar no es corregir la tabla, es escribir otra al lado y dejar dicho
-   cómo se pasó de una a la otra. */
+/* ═══════════ B3 · the original is never touched ═══════════
+   The block's golden rule, and the only one in the session that is a habit rather
+   than an idea: cleaning is not correcting the table, it is writing another one
+   beside it and leaving a record of how you got from one to the other. */
 export function versiones() {
   const W = 980, H = 340;
   let b = arrow('ar-s3-ver');
@@ -22,7 +22,7 @@ export function versiones() {
       b += txt(x + 20, 148 + k * 19, l, { fs: 12, fill: C.ink2 }));
   });
 
-  /* En medio, lo que convierte una copia en un método. */
+  /* In between, what turns a copy into a method. */
   b += box(370, 96, 250, 126, C.ink3);
   b += txt(384, 124, 'LA BITÁCORA', { fs: 10.5, fill: C.ink3, ls: 1.6 });
   wrap('Una fila por decisión. Sin ella, la copia limpia es una tabla sin explicación.', 30)

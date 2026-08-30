@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-/* base:'./' — sirve igual desde la raíz del dominio o desde un subdirectorio.
-   Los nombres de chunk se fijan a mano para poder reconocer en la pestaña Network
-   qué sesión y qué bloque bajó cada vez: s01-bloque-1-<hash>.js */
+/* base:'./' — serves the same from the domain root or from a subdirectory.
+   Chunk names are pinned by hand so the Network tab shows which session and which
+   block came down each time: s01-bloque-1-<hash>.js */
 export default defineConfig({
   base: './',
   plugins: [react()],

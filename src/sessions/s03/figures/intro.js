@@ -1,9 +1,9 @@
 import { C, svg, txt, arrow } from '../../../svg/kit.js';
 import { box } from './shared.js';
 
-/* ═══════════ Entrada · las seis escrituras de una sola ciudad ═══════════
-   El embudo del día: seis valores distintos en la columna del municipio, trece
-   personas, un solo lugar. Ninguna celda está mal escrita. */
+/* ═══════════ Intro · the six spellings of a single city ═══════════
+   The funnel of the day: six different values in the municipality column, thirteen
+   people, one single place. Not one cell is misspelled. */
 export function bogota() {
   const W = 980, H = 420;
   let b = arrow('ar-s3-bog', C.reveal);
@@ -26,7 +26,7 @@ export function bogota() {
       stroke-width="1" opacity=".75"/>`;
   });
 
-  /* La espina que junta las seis en una. */
+  /* The spine that folds the six into one. */
   const yPrim = y0 + 20, yUlt = y0 + 5 * paso + 20, yMed = (yPrim + yUlt) / 2;
   b += `<path d="M575,${yPrim} V${yUlt}" fill="none" stroke="${C.reveal}"
     stroke-width="1.4"/>`;

@@ -1,9 +1,9 @@
 import { C, SERIF, svg, txt, wrap } from '../../../svg/kit.js';
 
-/* ═══════════ B2 · la bitácora de limpieza ═══════════
-   Cuatro columnas y una fila resuelta como modelo. La cuarta es la que casi nadie
-   escribe y la única que convierte la bitácora en algo más que una lista de
-   tareas: obliga a nombrar la conclusión que se estaba comprando. */
+/* ═══════════ B2 · the cleaning log ═══════════
+   Four columns and one worked row as a model. The fourth is the one almost nobody
+   writes and the only one that turns the log into more than a to-do list: it forces
+   you to name the conclusion you were buying. */
 export function bitacora() {
   const W = 980, H = 330;
   const x0 = 30, cols = [200, 200, 240, 280], y0 = 62, alto = 168;

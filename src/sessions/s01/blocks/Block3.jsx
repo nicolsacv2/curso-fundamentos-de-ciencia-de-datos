@@ -1,15 +1,8 @@
 import {
-  Panel, Task, Options, Diagram, Plate, Source, Pair, Prose, Idea, Story, StoryHead
+  Panel, Task, Options, Diagram, Plate, Source, CommonsLink,
+  Pair, Prose, Idea, Story, StoryHead
 } from '../../../components/content/index.jsx';
 import { snowMap, fluTrends } from '../figures/block3.js';
-
-import kitHarington from '../../../assets/s01/kit-harington.jpg';
-import johnSnow from '../../../assets/s01/john-snow.jpg';
-import choleraMap from '../../../assets/s01/snow-cholera-map.jpg';
-import snowPump from '../../../assets/s01/snow-pump.jpg';
-import survivorshipBias from '../../../assets/s01/survivorship-bias.svg';
-import abrahamWald from '../../../assets/s01/abraham-wald.jpg';
-import billyBeane from '../../../assets/s01/billy-beane.jpg';
 
 export default function Block3({ id, tabId }) {
   return (
@@ -39,26 +32,22 @@ export default function Block3({ id, tabId }) {
 
         <Plate
           variant="medium"
-          src={kitHarington}
+          asset="kit-harington"
           alt="Retrato del actor Kit Harington en una convención."
-          width={808}
-          height={820}
         >
           <b>No. Este John Snow no.</b> Este no sabe nada, y llegó 157 años tarde.
-          <Source>Kit Harington, Comic-Con 2013. Foto de Gage Skidmore · CC BY-SA 2.0 · Wikimedia Commons</Source>
+          <Source>Kit Harington, Comic-Con 2013. Foto de Gage Skidmore · CC BY-SA 2.0 · <CommonsLink asset="kit-harington">Wikimedia Commons</CommonsLink></Source>
         </Plate>
 
         <Pair>
           <Plate
             variant="portrait"
-            src={johnSnow}
+            asset="john-snow"
             alt="Retrato fotográfico del médico británico John Snow."
-            width={517}
-            height={760}
           >
             <b>Este.</b> John Snow (1813–1858), médico anestesista. En 1854 nadie
             creía en los gérmenes: la teoría oficial era que las epidemias viajaban en el aire.
-            <Source>Autotipia de 1856, Wellcome Collection · Dominio público · Wikimedia Commons</Source>
+            <Source>Autotipia de 1856, Wellcome Collection · Dominio público · <CommonsLink asset="john-snow">Wikimedia Commons</CommonsLink></Source>
           </Plate>
           <Prose>
             <p>Snow no discutió la teoría del aire. Hizo algo más simple y más terco:
@@ -76,25 +65,21 @@ export default function Block3({ id, tabId }) {
         </Diagram>
 
         <Plate
-          src={choleraMap}
+          asset="snow-cholera-map"
           alt="Mapa original de John Snow de 1854 mostrando las muertes por cólera en el Soho londinense."
-          width={1100}
-          height={1032}
         >
           El mapa original. Cada trazo negro apilado sobre una fachada es una persona.
-          <Source>John Snow, <em>On the Mode of Communication of Cholera</em>, 1854 · Dominio público · Wikimedia Commons</Source>
+          <Source>John Snow, <em>On the Mode of Communication of Cholera</em>, 1854 · Dominio público · <CommonsLink asset="snow-cholera-map">Wikimedia Commons</CommonsLink></Source>
         </Plate>
 
         <Pair>
           <Plate
             variant="portrait"
-            src={snowPump}
+            asset="snow-pump"
             alt="Réplica de la bomba de agua de Broad Street en Londres, junto al pub John Snow."
-            width={615}
-            height={820}
           >
             La bomba de Broad Street, hoy una réplica sin manija en Broadwick Street.
-            <Source>Foto de Justinc · CC BY-SA 2.0 · Wikimedia Commons</Source>
+            <Source>Foto de Justinc · CC BY-SA 2.0 · <CommonsLink asset="snow-pump">Wikimedia Commons</CommonsLink></Source>
           </Plate>
           <Prose>
             <p>Snow convenció a las autoridades de <b>quitarle la manija a la bomba</b>. Los casos
@@ -122,13 +107,11 @@ export default function Block3({ id, tabId }) {
         </Prose>
 
         <Plate
-          src={survivorshipBias}
+          asset="survivorship-bias"
           alt="Diagrama de un bombardero cubierto de puntos rojos que marcan los impactos recibidos, concentrados en alas, fuselaje y cola."
-          width={1427}
-          height={1063}
         >
           Dónde recibieron impactos los aviones que volvieron.
-          <Source>Ilustración de McGeddon, vectorizada por Martin Grandjean · CC BY-SA 4.0 · Wikimedia Commons</Source>
+          <Source>Ilustración de McGeddon, vectorizada por Martin Grandjean · CC BY-SA 4.0 · <CommonsLink asset="survivorship-bias">Wikimedia Commons</CommonsLink></Source>
         </Plate>
 
         <Task label="Anotación colectiva · 45 segundos" big="Marca con una X dónde pondrías el blindaje.">
@@ -138,14 +121,12 @@ export default function Block3({ id, tabId }) {
         <Pair>
           <Plate
             variant="portrait"
-            src={abrahamWald}
+            asset="abraham-wald"
             alt="Retrato fotográfico del matemático Abraham Wald."
-            width={332}
-            height={520}
           >
             Abraham Wald (1902–1950), del Grupo de Investigación Estadística de
             Columbia. Húngaro, judío, refugiado. Le tocó resolver esto.
-            <Source>Foto de Konrad Jacobs, Mathematisches Forschungsinstitut Oberwolfach · CC BY-SA 2.0 DE · Wikimedia Commons</Source>
+            <Source>Foto de Konrad Jacobs, Mathematisches Forschungsinstitut Oberwolfach · CC BY-SA 2.0 DE · <CommonsLink asset="abraham-wald">Wikimedia Commons</CommonsLink></Source>
           </Plate>
           <Prose>
             <p>Wald hizo una sola observación, y da vuelta al problema entero:
@@ -178,13 +159,11 @@ export default function Block3({ id, tabId }) {
         <Pair>
           <Plate
             variant="portrait"
-            src={billyBeane}
+            asset="billy-beane"
             alt="Billy Beane, gerente general de los Oakland Athletics, hablando en un evento."
-            width={448}
-            height={520}
           >
             Billy Beane, gerente general de Oakland.
-            <Source>Foto de Leaders (Executive Sport Ltd.), Londres, 2010 · CC BY 2.0 · Wikimedia Commons</Source>
+            <Source>Foto de Leaders (Executive Sport Ltd.), Londres, 2010 · CC BY 2.0 · <CommonsLink asset="billy-beane">Wikimedia Commons</CommonsLink></Source>
           </Plate>
           <Prose>
             <p>Los ojeadores compraban lo que se ve: velocidad, potencia, si el muchacho

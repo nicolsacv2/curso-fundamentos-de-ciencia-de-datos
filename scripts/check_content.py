@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Compara el texto visible del curso original con el de los componentes React.
+"""Compare the visible text of the original course with that of the React components.
 
-Comprueba que la traduccion de panels.html + figuras.js a JSX no perdio ni cambio
-contenido. La comparacion es por MULTICONJUNTO DE PALABRAS, no por frases: el HTML y
-el JSX envuelven las lineas en sitios distintos y reparten el mismo texto entre hijos
-y props, asi que cualquier frontera de frase seria un falso positivo. A nivel de
-palabra, en cambio, una omision o un cambio de redaccion salta de inmediato.
+Checks that porting panels.html + figuras.js to JSX lost or changed no content. The
+comparison is by MULTISET OF WORDS, not by sentence: the HTML and the JSX wrap lines in
+different places and split the same text between children and props, so any sentence
+boundary would be a false positive. At the word level, by contrast, an omission or a
+rewording shows up immediately.
 """
 import html
 import re
@@ -17,7 +17,7 @@ from pathlib import Path
 ORIG = Path("/Users/niacevedo/Documents/unal/fundamentos_ciencia_de_datos/sesiones")
 REACT = Path("/Users/niacevedo/Documents/unal/curso-fundamentos-de-ciencia-de-datos/src/sessions")
 
-# props de los componentes que llevan contenido visible
+# component props that carry visible content
 CONTENT_PROPS = ("label", "big", "k", "t", "alt", "num", "place")
 
 
@@ -26,7 +26,7 @@ def words(text):
     text = text.replace(" ", " ")
     text = unicodedata.normalize("NFC", text)
     text = text.lower()
-    # se conservan letras, digitos y el guion interno; el resto es puntuacion
+    # letters, digits and the internal hyphen are kept; the rest is punctuation
     toks = re.findall(r"[0-9a-záéíóúüñç]+(?:[-–][0-9a-záéíóúüñç]+)*", text)
     return Counter(toks)
 
@@ -34,14 +34,14 @@ def words(text):
 def from_html(path):
     s = path.read_text(encoding="utf-8")
     s = re.sub(r"<!--.*?-->", " ", s, flags=re.S)
-    alts = re.findall(r'\balt="([^"]*)"', s)          # alt = contenido visible
+    alts = re.findall(r'\balt="([^"]*)"', s)          # alt = visible content
     s = re.sub(r"\{\{IMG:[^}]+\}\}", " ", s)
     s = re.sub(r"<[^>]+>", " ", s)
     return words(s + " " + " ".join(alts))
 
 
 def from_figures_js(path):
-    """Texto dibujado dentro de los SVG: cadenas y aria-labels."""
+    """Text drawn inside the SVGs: strings and aria-labels."""
     s = path.read_text(encoding="utf-8")
     s = re.sub(r"^\s*import .*?;\s*$", " ", s, flags=re.M)
     s = re.sub(r"/\*.*?\*/", " ", s, flags=re.S)
@@ -55,58 +55,59 @@ def from_jsx(path):
     s = path.read_text(encoding="utf-8")
     s = re.sub(r"^\s*import .*?;\s*$", " ", s, flags=re.M)
     s = re.sub(r"\{/\*.*?\*/\}", " ", s, flags=re.S)
-    # el andamiaje del componente: firma, return y cierre. Se quita explicitamente
-    # porque su llave de apertura y la final forman un par que, si se borrara como
-    # expresion JSX, se llevaria por delante todo el cuerpo.
+    # the component's scaffolding: signature, return and closing. Removed explicitly
+    # because its opening brace and the final one form a pair that, if deleted as a
+    # JSX expression, would take the whole body with it.
     s = re.sub(r"export default function \w+\([^)]*\)\s*\{", " ", s)
     s = re.sub(r"\breturn \(", " ", s)
     s = re.sub(r"\);\s*\}\s*$", " ", s)
 
-    # 1) props con texto: en comillas, o como fragmento JSX  big={<>…</>}
-    #    El \b es imprescindible: sin el, t=" casa dentro de alt=" y de variant=",
-    #    y esos textos se contarian dos veces.
+    # 1) props holding text: quoted, or as a JSX fragment  big={<>…</>}
+    #    The \b is essential: without it, t=" matches inside alt=" and variant=",
+    #    and those texts would be counted twice.
     props = []
     for name in CONTENT_PROPS:
         props += re.findall(r"\b" + name + r'="([^"]*)"', s)
         for frag in re.findall(r"\b" + name + r"=\{<>(.*?)</>\}", s, flags=re.S):
             props.append(re.sub(r"<[^>]+>", " ", frag))
 
-    # items={['Magia', 'Una bola de cristal', …]} de <Nots> tambien es contenido
+    # items={['Magia', 'Una bola de cristal', …]} on <Nots> is content too
     for arr in re.findall(r"\bitems=\{\[(.*?)\]\}", s, flags=re.S):
         props += re.findall(r"'([^']*)'", arr)
 
-    # 2) texto entre etiquetas
+    # 2) text between tags
     s = re.sub(r"style=\{\{.*?\}\}", " ", s, flags=re.S)
     s = re.sub(r"\{' '\}", " ", s)
     s = re.sub(r"=\{[^{}]*\}", " ", s)          # ={fig} ={808} ={MILESTONES}
     s = re.sub(r"<[^>]+>", " ", s)
-    # las llaves sueltas que queden no importan: words() solo conserva letras y digitos
+    # leftover stray braces do not matter: words() keeps only letters and digits
     return words(s + " " + " ".join(props))
 
 
-# Tokens que difieren por razones de CODIGO, no de contenido. Se listan uno a uno
-# a proposito: cualquier palabra que no este aqui y aparezca en la comparacion es un
-# cambio real de contenido y debe hacer fallar la comprobacion.
+# Tokens that differ for reasons of CODE, not of content. They are listed one by one
+# on purpose: any word not here that turns up in the comparison is a real content
+# change and must fail the check.
 CODE_NOISE = {
-    # andamiaje del modulo
+    # module scaffolding
     "export", "default", "function", "return", "const", "true", "false", "null",
     "id", "tabid", "classname", "import", "from", "components", "content",
     "index", "jsx", "js",
-    # nombres de los componentes de contenido
+    # names of the content components
     "panel", "task", "options", "diagram", "plate", "source", "pair", "prose",
     "cards", "card", "nots", "idea", "story", "storyhead", "milestones", "list",
-    # identificadores renombrados al traducir figuras.js  (original -> ingles)
+    "commonslink",
+    # identifiers renamed when porting figuras.js  (original -> English)
     "cierre", "closes", "foco", "focus", "curva", "curve", "brecha", "gap",
     "proy", "projection", "fila", "row", "dentro", "inside",
     "anchotabla", "tablew", "altotabla", "tableh", "borde", "stroke",
     "fondo", "fill", "marcador", "marker", "cx", "cy", "gx", "gy", "y", "t", "d",
-    # ids de marcador SVG, renombrados con el resto
+    # SVG marker ids, renamed along with the rest
     "ar-s1-ciclo", "ar-s1-cycle", "ar-s1-vuelta", "ar-s1-loop",
     "ar-s1-esc", "ar-s1-ladder", "ar-s2-tipos", "ar-s2-types",
-    # el markup que figuras.js generaba a mano para la linea de tiempo y que ahora
-    # emite el componente <Milestones>
+    # the markup figuras.js hand-built for the timeline, now emitted by the
+    # <Milestones> component
     "div", "class", "hito",
-    # ids que consumia pintar('s1-nube', …); ya no existen: cada figura es un import
+    # ids pintar('s1-nube', …) consumed; gone now: each figure is an import
     "s1", "s2",
     "s1-nube", "s1-rastro", "s1-escalera", "s1-interseccion", "s1-ciclo",
     "s1-tiempo", "s1-mapasnow", "s1-flu", "s1-curva", "s1-hitos",
