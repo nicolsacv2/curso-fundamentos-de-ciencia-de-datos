@@ -214,6 +214,10 @@ export default function TriangleActivity() {
       : subscribeCanvas(handle, opts);
   }, [tri, player]);
 
+  const finish = () => run(async () => {
+    await finishActivity('triangle', player.id);
+  });
+
   const begin = () => run(async () => {
     await startPlayingTriangle(player.id);
     setPlaying(true);
