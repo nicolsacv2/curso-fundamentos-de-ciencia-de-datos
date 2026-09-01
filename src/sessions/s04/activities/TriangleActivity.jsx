@@ -168,7 +168,7 @@ export default function TriangleActivity() {
      current» before that — which is how a student who did not build the triangle sees
      it at all, and how the admin, who never builds one, sees anything. */
   useEffect(() => {
-    if (!playing || !player) return undefined;
+    if (!player) return undefined;
     const handle = (data, reset) => {
       if (data.triangle && (!tri || tri.id !== data.triangle.id)) setTri(data.triangle);
       if (reset) {
@@ -873,20 +873,24 @@ export default function TriangleActivity() {
       )}
 
       {/* Registered, waiting for the person running the class to say go. */}
-      {player && !playing && (
+      {/* Before the go-ahead. The admin chooses the triangle FIRST — there is nothing
+          to start until the room has something to work on — and only then can begin. */}
+      {player && player.is_admin && !playing && (
+        <p className="hint">{player.name}, tú diriges esta clase.{' '}
+          {tri
+            ? 'Cuando el salón esté listo, empieza.'
+            : 'Elige el triángulo sobre el que va a trabajar la clase.'}</p>
+      )}
+
+      {player && !player.is_admin && !playing && (
+        <p className="hint">Esperando que inicie la actividad…</p>
+      )}
+
+      {player && player.is_admin && !playing && tri && (
         <div className="controls">
-          {player.is_admin ? (
-            <>
-              <p className="hint">
-                {player.name}, tú diriges esta clase. Cuando el salón esté listo, empieza.
-              </p>
-              <button type="button" className="act" disabled={busy} onClick={begin}>
-                Comenzar actividad
-              </button>
-            </>
-          ) : (
-            <p className="hint">Esperando que inicie la actividad…</p>
-          )}
+          <button type="button" className="act" disabled={busy} onClick={begin}>
+            Comenzar actividad
+          </button>
         </div>
       )}
 
@@ -907,13 +911,8 @@ export default function TriangleActivity() {
           quién es. Nadie más ve estas cruces hasta que envía la suya.</p>
       )}
 
-      {/* Students wait for it: one canvas per class is the premise, so the triangle is
-          chosen once, by whoever is directing. */}
-      {player && !player.is_admin && playing && !tri && (
-        <p className="hint">Esperando a que se construya el triángulo…</p>
-      )}
-
-      {player && player.is_admin && playing && !tri && (
+      {/* Students never see this form: one canvas per class is the premise. */}
+      {player && player.is_admin && !tri && (
         <form className="controls" onSubmit={e => { e.preventDefault(); create(); }}>
           <label>Lado, ángulo, lado</label>
           <input className="num" inputMode="decimal" value={form.l1} aria-label="primer lado"
@@ -926,6 +925,10 @@ export default function TriangleActivity() {
             Construir triángulo
           </button>
         </form>
+      )}
+
+      {player && !player.is_admin && playing && !tri && (
+        <p className="hint">Esperando a que se construya el triángulo…</p>
       )}
 
       {tri && !isAdmin && !choosing && (
