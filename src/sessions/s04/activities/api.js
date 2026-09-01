@@ -101,7 +101,7 @@ async function call(activity, path, opts, mockFn) {
    activity stopped — the screen throws away what it had and starts over.
 
    In mock mode there is nothing shared to poll, so subscribing is a no-op. */
-function poll(activity, path, onEvent, interval) {
+function poll(activity, path, onEvent, interval, extra) {
   if (degraded[activity]) return () => {};
   let version = -1;
   let code = null;
@@ -115,6 +115,11 @@ function poll(activity, path, onEvent, interval) {
       const q = [];
       if (version >= 0) q.push(`since=${version}`);
       if (code) q.push(`session=${encodeURIComponent(code)}`);
+      /* Read fresh on every tick, not captured once: it carries what this screen is
+         currently showing — its own last round — which changes as the student throws. */
+      Object.entries(extra ? extra() : {}).forEach(([k, v]) => {
+        if (v != null && v !== '') q.push(`${k}=${encodeURIComponent(v)}`);
+      });
       const url = q.length ? `${path}${path.includes('?') ? '&' : '?'}${q.join('&')}` : path;
       const data = await real(activity, url);
       if (data && !stopped) {
@@ -139,8 +144,13 @@ function poll(activity, path, onEvent, interval) {
   };
 }
 
-export const subscribeSummary = (onEvent, { interval = 2000 } = {}) =>
-  poll('demere', '/v1/games/summary', onEvent, interval);
+/* `round` is a function so the poll always sends the round the screen is showing right
+   now. Without it the next tick, two seconds after a throw, would replace the student's
+   dice with a board that has no round on it. */
+export const subscribeSummary = (onEvent, { interval = 2000, round } = {}) =>
+  poll('demere', '/v1/games/summary', onEvent, interval, () => ({
+    round: round ? round() : null
+  }));
 
 export const subscribeTriangle = (triId, onEvent, { interval = 2000 } = {}) =>
   poll('triangle', `/v1/triangles/${triId}`, onEvent, interval);

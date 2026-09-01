@@ -3,7 +3,7 @@
    truth for the whole class — and every answer comes back with the SVG already drawn
    (sixes and double sixes in red). See docs/apis/. */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   registerPlayer, chooseGame, throwRound, getGamesSummary,
   subscribeSummary, isMock, isNonProd, ENV
@@ -35,14 +35,19 @@ export default function DiceActivity() {
      activity or opens a new one, this screen throws away its player and its board and
      goes back to the name, instead of carrying a stale player into a class it does not
      belong to. */
+  /* The round this screen is showing. A ref, not state: the poll reads it on every tick
+     and must not restart the subscription every time it changes. */
+  const lastRound = useRef(null);
+
   useEffect(() => subscribeSummary((data, reset) => {
     if (reset) {
+      lastRound.current = null;
       setPlayer(null);
       setName('');
       setError(data.session ? '' : 'La actividad terminó.');
     }
     setRender(data.render);
-  }), []);
+  }, { round: () => lastRound.current }), []);
 
   const run = async fn => {
     setBusy(true);
@@ -67,11 +72,15 @@ export default function DiceActivity() {
   });
 
   const throwOnce = () => run(async () => {
-    const { render: r } = await throwRound(player.chosen_game, player.id);
+    const { render: r, round } = await throwRound(player.chosen_game, player.id);
+    /* Remembered so the poll keeps drawing it: otherwise the next tick, two seconds
+       from now, would replace these dice with a board that has no round on it. */
+    lastRound.current = round.id;
     setRender(r);
   });
 
   const marcador = () => run(async () => {
+    lastRound.current = null;
     const { render: r } = await getGamesSummary();
     setRender(r);
   });
