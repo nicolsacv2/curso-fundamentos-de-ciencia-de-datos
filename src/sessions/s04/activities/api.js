@@ -102,7 +102,9 @@ async function call(activity, path, opts, mockFn) {
 
    In mock mode there is nothing shared to poll, so subscribing is a no-op. */
 function poll(activity, path, onEvent, interval, extra) {
-  if (degraded[activity]) return () => {};
+  /* Runs whenever there is a backend configured at all — even while degraded, which is
+     how a screen finds its way back. */
+  if (!BASES[activity]) return () => {};
   let version = -1;
   let code = null;
   let seen = false;
@@ -122,6 +124,10 @@ function poll(activity, path, onEvent, interval, extra) {
       });
       const url = q.length ? `${path}${path.includes('?') ? '&' : '?'}${q.join('&')}` : path;
       const data = await real(activity, url);
+      /* Back in touch: whatever knocked this screen into local mode is over, so undo
+         it. Cheap to check, and it is the difference between «the class kept working»
+         and «that laptop stopped sharing halfway through and nobody noticed». */
+      degraded[activity] = false;
       if (data && !stopped) {
         const next = data.session ? data.session.code : null;
         /* Not on the first answer: arriving to a running class is not a reset. */
@@ -131,8 +137,12 @@ function poll(activity, path, onEvent, interval, extra) {
         seen = true;
         onEvent(data, reset);
       }
-    } catch (e) {
-      if (!e.userFacing) degraded[activity] = true;
+    } catch {
+      /* Deliberately does NOT degrade. A heartbeat every two seconds will meet a
+         redeploy, a sleeping laptop or a moment of bad wifi sooner or later, and the
+         fallback is sticky by design — so letting the poll trip it would drop a
+         classroom into local mode for good over a blip it is about to recover from.
+         Only what a student actually pressed is allowed to make that call. */
     }
     if (!stopped) timer = setTimeout(tick, interval);
   };
