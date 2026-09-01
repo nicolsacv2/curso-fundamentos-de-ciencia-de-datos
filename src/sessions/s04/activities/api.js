@@ -1,35 +1,82 @@
 /* The one client the two session-4 activities talk to.
 
-   The real backend is the Actividades API (docs/apis/actividades-api.md): it stores
-   every action in Supabase, asks the Render API for the SVG and answers
-   { state…, render }. Its base URL arrives at build time:
+   The real backend is verquo, and each activity is its OWN deployment with its own
+   database: the dice API and the triangle API are separate services and separate base
+   URLs. Both arrive at build time:
 
-     VITE_ACTIVITIES_API=https://…  pnpm build
+     VITE_DEMERE_API=https://…  VITE_TRIANGLE_API=https://…  pnpm build
 
    Same standard as the Plates (Commons → bucket): a projected class must survive the
-   external service falling over. With no base URL, or the moment any request fails,
-   the client degrades to a local mock with the same interface — dice from
-   Math.random, geometry computed here, SVG assembled with the session's own drawing
-   helpers. The activity keeps working; a small notice says the class marcador is no
-   longer shared. */
+   external service falling over. With no base URL, or the moment any request fails, the
+   client degrades to a local mock with the same interface — dice from Math.random,
+   geometry computed here, SVG assembled with the session's own drawing helpers. The
+   activity keeps working; a small notice says the class marcador is no longer shared. */
 
 import { C, MONO, svg, txt } from '../../../svg/kit.js';
 import { die, dot, pline } from '../figures/shared.js';
 
-const BASE = import.meta.env.VITE_ACTIVITIES_API || null;
+const BASES = {
+  demere: import.meta.env.VITE_DEMERE_API || null,
+  triangle: import.meta.env.VITE_TRIANGLE_API || null
+};
 
-/* Whether the last answer came from the mock. The components read it to show the
-   notice; it flips once and stays: retrying the network on every throw would hang the
-   activity exactly when it is being projected. */
-let degraded = !BASE;
-export const isMock = () => degraded;
+/* Whether the last answer for an activity came from the mock. The components read it to
+   show the notice; it flips once and stays: retrying the network on every throw would
+   hang the activity exactly when it is being projected. */
+const degraded = { demere: !BASES.demere, triangle: !BASES.triangle };
+export const isMock = activity =>
+  activity ? degraded[activity] : degraded.demere || degraded.triangle;
 
-async function real(path, { method = 'GET', body } = {}) {
-  const res = await fetch(BASE + path, {
+/* The code from the link the instructor projected: …/?s=K3F9QA#s4/entrada. It lives in
+   the SEARCH string, not inside the hash, because the router rewrites the hash on every
+   navigation and would take the code with it. */
+export function joinCode() {
+  if (typeof location === 'undefined') return null; /* prerender, tests, tooling */
+  return new URLSearchParams(location.search).get('s') || null;
+}
+
+/* One player per activity, remembered across reloads. In a classroom people refresh,
+   lose the tab, or come back on another device; the server recovers the same player from
+   the name, and this saves them retyping it. */
+const stored = key => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null; /* private windows and blocked site data */
+  }
+};
+const store = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* nothing to do: the name is one keystroke away */
+  }
+};
+
+export const savedPlayer = activity => {
+  const raw = stored(`verquo:${activity}:player`);
+  try {
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+const savePlayer = (activity, player) =>
+  store(`verquo:${activity}:player`, JSON.stringify(player));
+
+async function real(activity, path, { method = 'GET', body, playerId } = {}) {
+  const headers = {};
+  if (body) headers['Content-Type'] = 'application/json';
+  /* Who is asking, for the server's per-player spacing. Never used to identify anyone:
+     it is the id the server itself handed out. */
+  if (playerId) headers['X-Player-Id'] = playerId;
+
+  const res = await fetch(BASES[activity] + path, {
     method,
-    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    headers: Object.keys(headers).length ? headers : undefined,
     body: body ? JSON.stringify(body) : undefined
   });
+  if (res.status === 304) return null;
   if (!res.ok) {
     /* 4xx carries a message meant for the class («ese triángulo no cierra»); it is a
        real answer, not a reason to degrade. 5xx and network errors are. */
@@ -42,17 +89,56 @@ async function real(path, { method = 'GET', body } = {}) {
   return res.json();
 }
 
-async function call(path, opts, mockFn) {
-  if (!degraded) {
+async function call(activity, path, opts, mockFn) {
+  if (!degraded[activity]) {
     try {
-      return await real(path, opts);
+      return await real(activity, path, opts);
     } catch (e) {
       if (e.userFacing) throw e;
-      degraded = true;
+      degraded[activity] = true;
     }
   }
   return mockFn();
 }
+
+/* ═══════════════════ Sharing the canvas ═══════════════════
+   Every mutation moves a version counter on the server, and every screen in the room
+   asks «anything new?» a couple of times a second. Without this a student's stroke would
+   only ever appear on the screen that drew it — and the shared marcador, the whole point
+   of both activities, would not exist. Unchanged state answers 304 and costs nothing.
+
+   In mock mode there is nothing shared to poll, so subscribing is a no-op. */
+function poll(activity, url, onUpdate, interval) {
+  if (degraded[activity]) return () => {};
+  let version = -1;
+  let stopped = false;
+
+  const tick = async () => {
+    if (stopped) return;
+    try {
+      const data = await real(activity, url(version));
+      if (data && !stopped && data.version !== version) {
+        version = data.version;
+        onUpdate(data);
+      }
+    } catch (e) {
+      if (!e.userFacing) degraded[activity] = true;
+    }
+    if (!stopped) timer = setTimeout(tick, interval);
+  };
+
+  let timer = setTimeout(tick, 0);
+  return () => {
+    stopped = true;
+    clearTimeout(timer);
+  };
+}
+
+export const subscribeSummary = (onUpdate, { interval = 2000 } = {}) =>
+  poll('demere', v => `/v1/games/summary${v >= 0 ? `?since=${v}` : ''}`, onUpdate, interval);
+
+export const subscribeTriangle = (triId, onUpdate, { interval = 2000 } = {}) =>
+  poll('triangle', v => `/v1/triangles/${triId}${v >= 0 ? `?since=${v}` : ''}`, onUpdate, interval);
 
 /* ═══════════════════ Mock state ═══════════════════
    In-memory and per-browser: enough to run the whole class offline, minus the shared
@@ -68,8 +154,9 @@ const id = () => mock.nextId++;
 const d6 = () => 1 + Math.floor(Math.random() * 6);
 
 /* ═══════════════════ Players ═══════════════════ */
-export function registerPlayer(name) {
-  return call('/v1/players', { method: 'POST', body: { name } }, () => {
+export function registerPlayer(name, activity = 'demere') {
+  const code = joinCode();
+  return call(activity, '/v1/players', { method: 'POST', body: { name, code } }, () => {
     const clean = name.trim();
     let p = mock.players.find(x => x.name.toLowerCase() === clean.toLowerCase());
     if (!p) {
@@ -77,11 +164,16 @@ export function registerPlayer(name) {
       mock.players.push(p);
     }
     return { player: p };
+  }).then(res => {
+    savePlayer(activity, res.player);
+    return res;
   });
 }
 
 export function chooseGame(playerId, game) {
-  return call(`/v1/players/${playerId}`, { method: 'PATCH', body: { chosen_game: game } }, () => {
+  return call('demere', `/v1/players/${playerId}`, {
+    method: 'PATCH', body: { chosen_game: game }, playerId
+  }, () => {
     const p = mock.players.find(x => x.id === playerId);
     if (p) p.chosen_game = game;
     return { player: p };
@@ -115,7 +207,9 @@ function summary() {
 }
 
 export function throwRound(game, playerId) {
-  return call(`/v1/games/${game}/rounds`, { method: 'POST', body: { player_id: playerId } }, () => {
+  return call('demere', `/v1/games/${game}/rounds`, {
+    method: 'POST', body: { player_id: playerId }, playerId
+  }, () => {
     const p = mock.players.find(x => x.id === playerId);
     const rolls = game === 'one-die-4'
       ? Array.from({ length: 4 }, d6)
@@ -131,7 +225,7 @@ export function throwRound(game, playerId) {
 }
 
 export function getGamesSummary() {
-  return call('/v1/games/summary', {}, () => {
+  return call('demere', '/v1/games/summary', {}, () => {
     const s = summary();
     return { summary: s, render: renderDice(null, null, s) };
   });
@@ -140,7 +234,9 @@ export function getGamesSummary() {
 /* ═══════════════════ Triangle ═══════════════════
    Side–angle–side: the two sides meet at A with the given angle between them. */
 export function createTriangle(side1, angle, side2, playerId) {
-  return call('/v1/triangles', { method: 'POST', body: { side1, angle, side2, player_id: playerId } }, () => {
+  return call('triangle', '/v1/triangles', {
+    method: 'POST', body: { side1, angle, side2, player_id: playerId }, playerId
+  }, () => {
     for (const l of [side1, side2]) {
       if (!(l > 0)) throw Object.assign(new Error('Los dos lados tienen que ser mayores que cero.'), { userFacing: true });
     }
@@ -181,9 +277,10 @@ function record(t, gesture, type, entId) {
 }
 
 export function addPoint(triId, x, y, label, playerId, gesture) {
-  return call(`/v1/triangles/${triId}/points`, {
+  return call('triangle', `/v1/triangles/${triId}/points`, {
     method: 'POST',
-    body: { x, y, label, player_id: playerId, gesture }
+    body: { x, y, label, player_id: playerId, gesture },
+    playerId
   }, () => {
     const t = mock.triangle;
     const point = { id: id(), label: label || `P${t.points.filter(p => p.kind !== 'vertex').length + 1}`, x, y, kind: 'point' };
@@ -196,7 +293,7 @@ export function addPoint(triId, x, y, label, playerId, gesture) {
 /* Undo: pops the last gesture and removes everything it created. Vertices are not
    gestures, so the triangle itself is never undone. */
 export function undoLast(triId) {
-  return call(`/v1/triangles/${triId}/undo`, { method: 'POST' }, () => {
+  return call('triangle', `/v1/triangles/${triId}/undo`, { method: 'POST' }, () => {
     const t = mock.triangle;
     const last = t.history.pop();
     if (last) {
@@ -214,8 +311,13 @@ export function undoLast(triId) {
    `parent` (the segment's endpoints): it is what lets the frontend test, later, if a
    stroke leaving this midpoint is perpendicular to the segment it bisects. */
 export function midpoint(triId, p, q, playerId, gesture) {
-  const qs = `x1=${p.x}&y1=${p.y}&x2=${q.x}&y2=${q.y}&player_id=${encodeURIComponent(playerId ?? '')}&gesture=${encodeURIComponent(gesture ?? '')}`;
-  return call(`/v1/triangles/${triId}/midpoint?${qs}`, { method: 'GET' }, () => {
+  /* POST, not the older GET: a request with a side effect is a trap in front of any
+     cache or proxy. The server keeps the GET as an alias, but this is the real one. */
+  return call('triangle', `/v1/triangles/${triId}/midpoints`, {
+    method: 'POST',
+    body: { x1: p.x, y1: p.y, x2: q.x, y2: q.y, player_id: playerId, gesture },
+    playerId
+  }, () => {
     const t = mock.triangle;
     /* Compact labels only when the parents have single-letter names — a midpoint of
        midpoints would otherwise be called M(M(AB)M(BC)). */
@@ -241,9 +343,10 @@ export function midpoint(triId, p, q, playerId, gesture) {
    convention `from` is the end that touches the base segment — the midpoint, or the
    foot of the perpendicular — which is where the render puts the signal. */
 export function addSegment(triId, p, q, { ortho = false, bisector = false, gesture } = {}, playerId) {
-  return call(`/v1/triangles/${triId}/segments`, {
+  return call('triangle', `/v1/triangles/${triId}/segments`, {
     method: 'POST',
-    body: { from: [p.x, p.y], to: [q.x, q.y], ortho, bisector, player_id: playerId, gesture }
+    body: { from: [p.x, p.y], to: [q.x, q.y], ortho, bisector, player_id: playerId, gesture },
+    playerId
   }, () => {
     const t = mock.triangle;
     const segment = { id: id(), from: [p.x, p.y], to: [q.x, q.y], ortho, bisector };
@@ -282,7 +385,7 @@ function removeSegmentsCascade(t, doomed) {
 }
 
 export function deletePoint(triId, pointId) {
-  return call(`/v1/triangles/${triId}/points/${pointId}`, { method: 'DELETE' }, () => {
+  return call('triangle', `/v1/triangles/${triId}/points/${pointId}`, { method: 'DELETE' }, () => {
     const t = mock.triangle;
     const p = t.points.find(x => String(x.id) === String(pointId));
     if (!p) return { points: t.points, segments: t.segments, centers: t.centers, render: renderTriangle(t) };
@@ -296,7 +399,7 @@ export function deletePoint(triId, pointId) {
 }
 
 export function deleteSegment(triId, segId) {
-  return call(`/v1/triangles/${triId}/segments/${segId}`, { method: 'DELETE' }, () => {
+  return call('triangle', `/v1/triangles/${triId}/segments/${segId}`, { method: 'DELETE' }, () => {
     const t = mock.triangle;
     removeSegmentsCascade(t, t.segments.filter(s => String(s.id) === String(segId)));
     return { points: t.points, segments: t.segments, centers: t.centers, render: renderTriangle(t) };
@@ -306,9 +409,10 @@ export function deleteSegment(triId, segId) {
 /* Each player's answer to «¿cuál es el centro?» — one bet per player (upsert): the
    shared canvas shows everyone's crosses, ready to compare against the real three. */
 export function chooseCenter(triId, x, y, playerId, gesture) {
-  return call(`/v1/triangles/${triId}/center`, {
+  return call('triangle', `/v1/triangles/${triId}/center`, {
     method: 'POST',
-    body: { x, y, player_id: playerId, gesture }
+    body: { x, y, player_id: playerId, gesture },
+    playerId
   }, () => {
     const t = mock.triangle;
     const p = mock.players.find(pl => pl.id === playerId);

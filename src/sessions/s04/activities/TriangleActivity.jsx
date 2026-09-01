@@ -79,7 +79,7 @@ export default function TriangleActivity() {
   };
 
   const enter = () => run(async () => {
-    const { player: p } = await registerPlayer(name);
+    const { player: p } = await registerPlayer(name, 'triangle');
     setPlayer(p);
   });
 
@@ -908,7 +908,7 @@ export default function TriangleActivity() {
         </div>
       )}
 
-      {isMock() && (
+      {isMock('triangle') && (
         <p className="mode">Modo local: sin conexión con la API de la clase, este lienzo solo existe en esta pantalla.</p>
       )}
     </div>

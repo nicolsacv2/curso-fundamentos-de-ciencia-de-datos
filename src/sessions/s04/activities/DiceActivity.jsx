@@ -39,7 +39,7 @@ export default function DiceActivity() {
   };
 
   const enter = () => run(async () => {
-    const { player: p } = await registerPlayer(name);
+    const { player: p } = await registerPlayer(name, 'demere');
     setPlayer(p);
   });
 
@@ -108,7 +108,7 @@ export default function DiceActivity() {
         <div className="canvas" dangerouslySetInnerHTML={{ __html: render }} />
       )}
 
-      {isMock() && (
+      {isMock('demere') && (
         <p className="mode">Modo local: sin conexión con la API de la clase, el marcador solo cuenta lo lanzado en esta pantalla.</p>
       )}
     </div>
