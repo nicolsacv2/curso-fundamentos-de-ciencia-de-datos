@@ -901,13 +901,19 @@ export default function TriangleActivity() {
 
       {/* The admin projects; they do not build. Their own answer on the shared canvas
           would anchor the room before anyone had committed to theirs. */}
-      {player && player.is_admin && playing && (
+      {player && player.is_admin && playing && tri && (
         <p className="hint">Estás proyectando. A medida que el salón envía su centro,
           aparece aquí una <b>✕</b> de su color; pasa el cursor por encima para ver de
           quién es. Nadie más ve estas cruces hasta que envía la suya.</p>
       )}
 
+      {/* Students wait for it: one canvas per class is the premise, so the triangle is
+          chosen once, by whoever is directing. */}
       {player && !player.is_admin && playing && !tri && (
+        <p className="hint">Esperando a que se construya el triángulo…</p>
+      )}
+
+      {player && player.is_admin && playing && !tri && (
         <form className="controls" onSubmit={e => { e.preventDefault(); create(); }}>
           <label>Lado, ángulo, lado</label>
           <input className="num" inputMode="decimal" value={form.l1} aria-label="primer lado"
