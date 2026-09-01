@@ -531,6 +531,14 @@ function sendCenter(triId, x, y, playerId, gesture) {
   });
 }
 
+/* Text that came from a person, on its way into markup. Student names are free text
+   and land in <text>, in <title> and in an attribute; without this, someone typing a
+   quote or an angle bracket breaks the drawing for the whole room. Mirrors
+   verquo-render's kit.esc. */
+const esc = s => String(s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
 /* ═══════════════════ Local rendering ═══════════════════
    The mock's drawings double as the reference implementation of the Render API's
    contract (docs/apis/render-api.md): same palette, same viewBox, same highlights. */
@@ -541,7 +549,7 @@ function renderDice(game, round, s) {
   let y = 40;
 
   if (round) {
-    const who = round.player_name ? `${round.player_name} · ` : '';
+    const who = round.player_name ? `${esc(round.player_name)} · ` : '';
     b += txt(30, y, `${who}${round.win ? 'GANA CHEVALIER' : 'GANA EL OPONENTE'}`, {
       fs: 12, fill: round.win ? C.reveal : C.ink3, ls: 1.6, fw: 600
     });
@@ -782,13 +790,18 @@ function renderTriangle(t) {
     const [x, y] = P(cn.x, cn.y);
     const cross = `<path d="M${x - 6},${y - 6} L${x + 6},${y + 6} M${x - 6},${y + 6} L${x + 6},${y - 6}" stroke="${cn.color || C.ask}" stroke-width="2" fill="none"/>`;
     if (cn.color) {
-      /* A generous transparent disc, so the hover target is the cross and not its
+      /* The name rides in an attribute as well as a <title>: the frontend reads the
+         attribute to show it the moment the cursor arrives, rather than waiting on the
+         browser's own tooltip — about a second, drawn by the operating system, in the
+         wrong place for a projector.
+         A generous transparent disc, so the hover target is the cross and not its
          two-pixel strokes. */
-      b += `<g data-bet="${i}"><title>${cn.player_name || ''}</title>${cross}`
+      const who = esc(cn.player_name || '');
+      b += `<g data-bet="${who}"><title>${who}</title>${cross}`
         + `<circle cx="${x}" cy="${y}" r="14" fill="transparent"/></g>`;
     } else {
       b += cross;
-      if (cn.player_name) b += `<text x="${x + 10}" y="${y + 4}" data-ax="${x}" data-ay="${y}" data-ox="10" data-oy="4" fill="${C.ink3}" font-family="${MONO}" font-size="10">${cn.player_name}</text>`;
+      if (cn.player_name) b += `<text x="${x + 10}" y="${y + 4}" data-ax="${x}" data-ay="${y}" data-ox="10" data-oy="4" fill="${C.ink3}" font-family="${MONO}" font-size="10">${esc(cn.player_name)}</text>`;
     }
   });
 

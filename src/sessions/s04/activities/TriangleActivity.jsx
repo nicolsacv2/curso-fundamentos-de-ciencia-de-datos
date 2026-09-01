@@ -47,6 +47,10 @@ export default function TriangleActivity() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [playing, setPlaying] = useState(false);
+  /* Whose cross the cursor is on. Shown as a caption rather than left to the browser's
+     own <title> tooltip, which takes about a second and is drawn by the operating
+     system — the wrong place and the wrong moment when a room is watching. */
+  const [overBet, setOverBet] = useState(null);
   /* «Elegir el centro»: choosing arms the mode, pick holds the provisional bet, and
      sent closes the game — one center per player, and after Enviar the drawing turns
      read-only (only the lens keeps working). */
@@ -985,6 +989,10 @@ export default function TriangleActivity() {
 
       {error && <p className="err" role="alert">{error}</p>}
 
+      {render && overBet && (
+        <p className="mode">Centro de <b>{overBet}</b></p>
+      )}
+
       {render && (
         <div
           className={`canvas${sent ? ' done' : ''}${choosing ? ' choosing' : ''}`}
@@ -992,6 +1000,12 @@ export default function TriangleActivity() {
           style={choosing ? { cursor: 'pointer' } : viewT.s > 1 && !sent ? { cursor: 'grab' } : undefined}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
+          onMouseMove={e => {
+            const g = e.target.closest && e.target.closest('[data-bet]');
+            const who = g && g.getAttribute('data-bet');
+            setOverBet(prev => (prev === (who || null) ? prev : who || null));
+          }}
+          onMouseLeave={() => setOverBet(null)}
           onPointerUp={onPointerUp}
           onPointerLeave={onPointerLeave}
           onPointerCancel={onPointerCancel}
