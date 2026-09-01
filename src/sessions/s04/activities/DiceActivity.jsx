@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   registerPlayer, chooseGame, throwRound, getGamesSummary,
-  subscribeSummary, isMock, isNonProd, ENV
+  subscribeSummary, startPlaying, isMock, isNonProd, ENV
 } from './api.js';
 
 const GAMES = [
@@ -28,6 +28,8 @@ export default function DiceActivity() {
   const [render, setRender] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  /* Whether the person running the class has said go. Until then everyone waits. */
+  const [playing, setPlaying] = useState(false);
 
   /* The shared marcador. Every screen in the room polls, so a round thrown by anyone
      shows up here within a couple of seconds — which is the whole reason the backend
@@ -46,6 +48,7 @@ export default function DiceActivity() {
       setName('');
       setError(data.session ? '' : 'La actividad terminó.');
     }
+    setPlaying(Boolean(data.session && data.session.playing));
     setRender(data.render);
   }, { round: () => lastRound.current }), []);
 
@@ -69,6 +72,11 @@ export default function DiceActivity() {
   const pick = game => run(async () => {
     const { player: p } = await chooseGame(player.id, game);
     setPlayer(p);
+  });
+
+  const begin = () => run(async () => {
+    await startPlaying(player.id);
+    setPlaying(true);
   });
 
   const throwOnce = () => run(async () => {
@@ -103,7 +111,26 @@ export default function DiceActivity() {
         </form>
       )}
 
-      {player && !player.chosen_game && (
+      {/* Registered, but the class has not been started yet. The admin gets the
+          button; everyone else gets the wait. */}
+      {player && !playing && (
+        <div className="choice">
+          {player.is_admin ? (
+            <>
+              <p className="hint">
+                {player.name}, tú diriges esta clase. Cuando el salón esté listo, empieza.
+              </p>
+              <button type="button" className="act" disabled={busy} onClick={begin}>
+                Comenzar actividad
+              </button>
+            </>
+          ) : (
+            <p className="hint">Esperando que inicie la actividad…</p>
+          )}
+        </div>
+      )}
+
+      {player && playing && !player.chosen_game && (
         <div className="choice">
           <p className="hint">{player.name}, apuesta una moneda: ¿con cuál juego te la jugarías?</p>
           <div className="pickers">
@@ -117,7 +144,7 @@ export default function DiceActivity() {
         </div>
       )}
 
-      {chosen && (
+      {playing && chosen && (
         <div className="controls">
           <p className="hint"><b>{player.name}</b> apuesta con el <b>{chosen.name.toLowerCase()}</b>. {chosen.rule}</p>
           <button type="button" className="act" disabled={busy} onClick={throwOnce}>

@@ -147,13 +147,45 @@ function poll(activity, path, onEvent, interval, extra) {
 /* `round` is a function so the poll always sends the round the screen is showing right
    now. Without it the next tick, two seconds after a throw, would replace the student's
    dice with a board that has no round on it. */
+/* The admin says go. Only they may: the server checks, this is just the button. */
+export function startPlaying(playerId) {
+  return call('demere', '/v1/sessions/play', {
+    method: 'POST', body: { player_id: playerId }, playerId
+  }, () => ({ session: { playing: true } }));
+}
+
+export function startPlayingTriangle(playerId) {
+  return call('triangle', '/v1/sessions/play', {
+    method: 'POST', body: { player_id: playerId }, playerId
+  }, () => ({ session: { playing: true } }));
+}
+
+/* The class itself, independent of any canvas. The triangle needs this: its own poll
+   only exists once a triangle does, so without it a waiting screen would never learn
+   that the activity had been started. */
+export const subscribeSession = (activity, onEvent, { interval = 2000 } = {}) =>
+  poll(activity, '/v1/sessions/current', onEvent, interval);
+
 export const subscribeSummary = (onEvent, { interval = 2000, round } = {}) =>
   poll('demere', '/v1/games/summary', onEvent, interval, () => ({
     round: round ? round() : null
   }));
 
-export const subscribeTriangle = (triId, onEvent, { interval = 2000 } = {}) =>
-  poll('triangle', `/v1/triangles/${triId}`, onEvent, interval);
+/* `player` rides along because the centre bets are not for everyone: the server
+   reveals them to the admin, and to a student only once they have sent their own. */
+export const subscribeTriangle = (triId, onEvent, { interval = 2000, player } = {}) =>
+  poll('triangle', `/v1/triangles/${triId}`, onEvent, interval, () => ({
+    player_id: player ? player() : null
+  }));
+
+/* The canvas the class is on RIGHT NOW, without having to know its id. It is what lets
+   a student who did not build the triangle see it at all — and the admin, who never
+   builds one, see anything. Whoever polls this adopts the shared canvas instead of
+   starting a second one of their own. */
+export const subscribeCanvas = (onEvent, { interval = 2000, player } = {}) =>
+  poll('triangle', '/v1/triangles', onEvent, interval, () => ({
+    player_id: player ? player() : null
+  }));
 
 /* ═══════════════════ Mock state ═══════════════════
    In-memory and per-browser: enough to run the whole class offline, minus the shared

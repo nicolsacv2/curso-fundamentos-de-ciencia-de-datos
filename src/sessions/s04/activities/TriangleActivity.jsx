@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   registerPlayer, createTriangle, addPoint, midpoint, addSegment,
   deletePoint, deleteSegment, chooseCenter, undoLast, subscribeTriangle,
-  isMock, isNonProd, ENV
+  startPlayingTriangle, subscribeSession, subscribeCanvas, isMock, isNonProd, ENV
 } from './api.js';
 
 /* |cos| of the angle between stroke and base ≤ cos(75°) ⇒ within 15° of perpendicular. */
@@ -45,6 +45,7 @@ export default function TriangleActivity() {
   const [render, setRender] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [playing, setPlaying] = useState(false);
   /* «Elegir el centro»: choosing arms the mode, pick holds the provisional bet, and
      sent closes the game — one center per player, and after Enviar the drawing turns
      read-only (only the lens keeps working). */
@@ -147,9 +148,29 @@ export default function TriangleActivity() {
      class is running: when the instructor stops the activity or starts a new one, the
      whole canvas is dropped and the student is sent back to the name, rather than left
      drawing on a triangle that no longer exists. */
+  /* The class, whether or not a triangle exists yet — this is what moves a waiting
+     screen on when the admin says go, and what tells it the activity ended. */
+  useEffect(() => subscribeSession('triangle', (data, reset) => {
+    setPlaying(Boolean(data.session && data.session.playing));
+    if (reset) {
+      setPlayer(null);
+      setName('');
+      setTri(null);
+      setPoints([]);
+      setSegments([]);
+      setRender('');
+      setSent(false);
+      setError(data.session ? '' : 'La actividad terminó.');
+    }
+  }), []);
+
+  /* The canvas the class is on. Polled by id once we know it, and by «whatever is
+     current» before that — which is how a student who did not build the triangle sees
+     it at all, and how the admin, who never builds one, sees anything. */
   useEffect(() => {
-    if (!tri) return undefined;
-    return subscribeTriangle(tri.id, (data, reset) => {
+    if (!playing || !player) return undefined;
+    const handle = (data, reset) => {
+      if (data.triangle && (!tri || tri.id !== data.triangle.id)) setTri(data.triangle);
       if (reset) {
         setPlayer(null);
         setName('');
@@ -169,8 +190,17 @@ export default function TriangleActivity() {
       if (data.points) setPoints(data.points);
       if (data.segments) setSegments(data.segments);
       if (data.render) setRender(data.render);
-    });
-  }, [tri]);
+    };
+    const opts = { player: () => (player ? player.id : null) };
+    return tri
+      ? subscribeTriangle(tri.id, handle, opts)
+      : subscribeCanvas(handle, opts);
+  }, [tri, player, playing]);
+
+  const begin = () => run(async () => {
+    await startPlayingTriangle(player.id);
+    setPlaying(true);
+  });
 
   const apply = res => {
     if (res.points) setPoints(res.points);
@@ -513,7 +543,9 @@ export default function TriangleActivity() {
 
   /* ── Pointer gestures ── */
   const onPointerDown = e => {
-    if (!tri || busy) return;
+    /* The admin only watches. Refused server-side too — this just keeps the projected
+       screen from drawing rubber bands nobody asked for. */
+    if (!tri || busy || (player && player.is_admin)) return;
     const hitP = !choosing && !sent && e.target.closest('[data-point-id]');
     if (!hitP) {
       /* Anywhere off a point: hold and move to PAN (also while choosing a center —
@@ -818,6 +850,8 @@ export default function TriangleActivity() {
     hideGhost();
   };
 
+  const isAdmin = Boolean(player && player.is_admin);
+
   return (
     <div className="activity">
       {!player && (
@@ -834,7 +868,33 @@ export default function TriangleActivity() {
         </form>
       )}
 
-      {player && !tri && (
+      {/* Registered, waiting for the person running the class to say go. */}
+      {player && !playing && (
+        <div className="controls">
+          {player.is_admin ? (
+            <>
+              <p className="hint">
+                {player.name}, tú diriges esta clase. Cuando el salón esté listo, empieza.
+              </p>
+              <button type="button" className="act" disabled={busy} onClick={begin}>
+                Comenzar actividad
+              </button>
+            </>
+          ) : (
+            <p className="hint">Esperando que inicie la actividad…</p>
+          )}
+        </div>
+      )}
+
+      {/* The admin projects; they do not build. Their own answer on the shared canvas
+          would anchor the room before anyone had committed to theirs. */}
+      {player && player.is_admin && playing && (
+        <p className="hint">Estás proyectando. A medida que el salón envía su centro,
+          aparece aquí una <b>✕</b> de su color; pasa el cursor por encima para ver de
+          quién es. Nadie más ve estas cruces hasta que envía la suya.</p>
+      )}
+
+      {player && !player.is_admin && playing && !tri && (
         <form className="controls" onSubmit={e => { e.preventDefault(); create(); }}>
           <label>Lado, ángulo, lado</label>
           <input className="num" inputMode="decimal" value={form.l1} aria-label="primer lado"
@@ -849,7 +909,7 @@ export default function TriangleActivity() {
         </form>
       )}
 
-      {tri && !choosing && (
+      {tri && !isAdmin && !choosing && (
         <p className="hint">Aquí solo se construyen los caminos a un centro. <b>Punto medio</b>:
           pasa por la mitad de un lado y toca la marca. <b>Mediana</b>: arrastra de un vértice
           al punto medio del lado opuesto. <b>Mediatriz</b>: desde un punto medio, arrastra al
@@ -861,17 +921,17 @@ export default function TriangleActivity() {
           solo. Toca un punto o segmento y bórralo con <b>Supr</b> o con la papelera;{' '}
           <b>Ctrl/Cmd+Z</b> deshace.</p>
       )}
-      {tri && choosing && (
+      {tri && !isAdmin && choosing && (
         <p className="hint">Toca el lienzo donde creas que está <b>el centro</b> del triángulo.
           Puedes corregir tocando otra vez; cuando estés, dale <b>Enviar</b>.</p>
       )}
 
-      {tri && sent && (
+      {tri && !isAdmin && sent && (
         <p className="hint">Tu centro quedó enviado — el lienzo ya solo se mira (y se navega
           con el zoom). En un momento lo comparamos con los de todo el salón.</p>
       )}
 
-      {tri && (
+      {tri && !isAdmin && (
         <div className="controls">
           <button type="button" className={choosing ? 'ghost' : 'act'} disabled={busy || sent} onClick={toggleChoosing}>
             {sent ? 'Centro enviado ✓' : choosing ? 'Cancelar' : 'Elegir el centro'}
