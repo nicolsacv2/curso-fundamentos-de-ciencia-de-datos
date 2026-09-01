@@ -17,7 +17,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   registerPlayer, createTriangle, addPoint, midpoint, addSegment,
-  deletePoint, deleteSegment, chooseCenter, undoLast, isMock
+  deletePoint, deleteSegment, chooseCenter, undoLast, isMock, isNonProd, ENV
 } from './api.js';
 
 /* |cos| of the angle between stroke and base ≤ cos(75°) ⇒ within 15° of perpendicular. */
@@ -908,6 +908,9 @@ export default function TriangleActivity() {
         </div>
       )}
 
+      {isNonProd() && (
+        <p className="mode">Entorno {ENV}: este lienzo no es el de la clase real.</p>
+      )}
       {isMock('triangle') && (
         <p className="mode">Modo local: sin conexión con la API de la clase, este lienzo solo existe en esta pantalla.</p>
       )}

@@ -4,7 +4,7 @@
    (sixes and double sixes in red). See docs/apis/. */
 
 import { useState } from 'react';
-import { registerPlayer, chooseGame, throwRound, getGamesSummary, isMock } from './api.js';
+import { registerPlayer, chooseGame, throwRound, getGamesSummary, isMock, isNonProd, ENV } from './api.js';
 
 const GAMES = [
   {
@@ -108,6 +108,9 @@ export default function DiceActivity() {
         <div className="canvas" dangerouslySetInnerHTML={{ __html: render }} />
       )}
 
+      {isNonProd() && (
+        <p className="mode">Entorno {ENV}: esta ronda no cuenta para la clase real.</p>
+      )}
       {isMock('demere') && (
         <p className="mode">Modo local: sin conexión con la API de la clase, el marcador solo cuenta lo lanzado en esta pantalla.</p>
       )}

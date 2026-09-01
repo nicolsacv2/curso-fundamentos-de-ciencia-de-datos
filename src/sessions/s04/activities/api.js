@@ -6,6 +6,12 @@
 
      VITE_DEMERE_API=https://…  VITE_TRIANGLE_API=https://…  pnpm build
 
+   One build per environment, each with its own backend baked in — otherwise a change to
+   this file could never be tried in dev without also shipping it to the real class. The
+   three builds share a domain and differ by path (`/`, `/dev/`, `/qa/`), which is what
+   `base: './'` in vite.config.js is for. VITE_ENV names the environment so the activity
+   can say so on screen.
+
    Same standard as the Plates (Commons → bucket): a projected class must survive the
    external service falling over. With no base URL, or the moment any request fails, the
    client degrades to a local mock with the same interface — dice from Math.random,
@@ -19,6 +25,11 @@ const BASES = {
   demere: import.meta.env.VITE_DEMERE_API || null,
   triangle: import.meta.env.VITE_TRIANGLE_API || null
 };
+
+/* Which environment this bundle was built for. Baked in, not read from the URL: the
+   build already knows, and a notice that depended on the link would go quiet the moment
+   a student navigated away from it. */
+export const ENV = import.meta.env.VITE_ENV || 'prod';
 
 /* Whether the last answer for an activity came from the mock. The components read it to
    show the notice; it flips once and stays: retrying the network on every throw would
@@ -34,6 +45,11 @@ export function joinCode() {
   if (typeof location === 'undefined') return null; /* prerender, tests, tooling */
   return new URLSearchParams(location.search).get('s') || null;
 }
+
+/* True when the class is being driven by a non-production backend. The activities show
+   it, because «esto no cuenta» is the single most useful thing to know at a glance when
+   a rehearsal and the real class look identical on screen. */
+export const isNonProd = () => ENV !== 'prod';
 
 /* One player per activity, remembered across reloads. In a classroom people refresh,
    lose the tab, or come back on another device; the server recovers the same player from
