@@ -772,10 +772,24 @@ function renderTriangle(t) {
 
   /* The bets: where each player says the center is. Crosses, so they never get
      confused with the construction's points. */
-  (t.centers || []).forEach(cn => {
+  /* A bet carrying a `color` is drawn for projection: its own muted tone, and the name
+     in a <title> so hovering reveals who placed it. Thirty names printed beside thirty
+     crosses would bury the very cloud they are meant to describe — and the point of the
+     cloud is its shape, not its labels. Without a colour it falls back to the
+     cyan-plus-label of the offline mock, where there is only ever one person.
+     Mirrors verquo-render's triangle.py; the two must draw the same picture. */
+  (t.centers || []).forEach((cn, i) => {
     const [x, y] = P(cn.x, cn.y);
-    b += `<path d="M${x - 6},${y - 6} L${x + 6},${y + 6} M${x - 6},${y + 6} L${x + 6},${y - 6}" stroke="${C.ask}" stroke-width="2" fill="none"/>`;
-    if (cn.player_name) b += `<text x="${x + 10}" y="${y + 4}" data-ax="${x}" data-ay="${y}" data-ox="10" data-oy="4" fill="${C.ink3}" font-family="${MONO}" font-size="10">${cn.player_name}</text>`;
+    const cross = `<path d="M${x - 6},${y - 6} L${x + 6},${y + 6} M${x - 6},${y + 6} L${x + 6},${y - 6}" stroke="${cn.color || C.ask}" stroke-width="2" fill="none"/>`;
+    if (cn.color) {
+      /* A generous transparent disc, so the hover target is the cross and not its
+         two-pixel strokes. */
+      b += `<g data-bet="${i}"><title>${cn.player_name || ''}</title>${cross}`
+        + `<circle cx="${x}" cy="${y}" r="14" fill="transparent"/></g>`;
+    } else {
+      b += cross;
+      if (cn.player_name) b += `<text x="${x + 10}" y="${y + 4}" data-ax="${x}" data-ay="${y}" data-ox="10" data-oy="4" fill="${C.ink3}" font-family="${MONO}" font-size="10">${cn.player_name}</text>`;
+    }
   });
 
   b += txt(30, H - 14, `LADO ${t.side1} · ÁNGULO ${t.angle}° · LADO ${t.side2}`, { fs: 10.5, fill: C.ink3, ls: 1.6 });
