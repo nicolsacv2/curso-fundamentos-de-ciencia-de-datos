@@ -18,7 +18,8 @@ import { useEffect, useRef, useState } from 'react';
 import {
   registerPlayer, createTriangle, addPoint, midpoint, addSegment,
   deletePoint, deleteSegment, chooseCenter, undoLast, subscribeTriangle,
-  startPlayingTriangle, subscribeSession, subscribeCanvas, finishActivity, isMock, isNonProd, ENV
+  startPlayingTriangle, subscribeSession, subscribeCanvas, finishActivity,
+  adoptTriangle, showCenters, isMock, isNonProd, ENV
 } from './api.js';
 
 /* |cos| of the angle between stroke and base ≤ cos(75°) ⇒ within 15° of perpendicular. */
@@ -86,13 +87,16 @@ export default function TriangleActivity() {
   });
 
   const create = () => run(async () => {
-    const { triangle, points: ps, render: r } = await createTriangle(
+    const { triangle } = await createTriangle(
       Number(form.l1), Number(form.ang), Number(form.l2), player.id
     );
-    setTri(triangle);
-    setPoints(ps);
+    /* Adopted locally like anyone else's, so the admin's own screen is drawn by the
+       same code that draws the students'. */
+    const started = adoptTriangle(triangle);
+    setTri(started.triangle);
+    setPoints(started.points);
     setSegments([]);
-    setRender(r);
+    setRender(started.render);
   });
 
   /* ── Coordinates ── */
@@ -164,13 +168,13 @@ export default function TriangleActivity() {
     }
   }), []);
 
-  /* The canvas the class is on. Polled by id once we know it, and by «whatever is
-     current» before that — which is how a student who did not build the triangle sees
-     it at all, and how the admin, who never builds one, sees anything. */
+  /* Only two things cross the wire here: the triangle comes down, the centre goes up.
+     The poll brings the class's triangle — adopted once, into a canvas that is this
+     student's alone — and the crosses the server has decided they may see. Everything
+     they build on it stays on this machine and is never sent. */
   useEffect(() => {
     if (!player) return undefined;
     const handle = (data, reset) => {
-      if (data.triangle && (!tri || tri.id !== data.triangle.id)) setTri(data.triangle);
       if (reset) {
         setPlayer(null);
         setName('');
@@ -187,19 +191,28 @@ export default function TriangleActivity() {
         setError(data.session ? '' : 'La actividad terminó.');
         return;
       }
-      if (data.points) setPoints(data.points);
-      if (data.segments) setSegments(data.segments);
-      if (data.render) setRender(data.render);
+      /* A triangle we have not started on yet: begin a private canvas from it. */
+      if (data.triangle && (!tri || tri.id !== data.triangle.id)) {
+        const started = adoptTriangle(data.triangle);
+        setTri(started.triangle);
+        setPoints(started.points);
+        setSegments([]);
+        setSent(false);
+        setRender(started.render);
+        return;
+      }
+      /* The room's crosses, once we are allowed them. They go onto the local canvas so
+         the drawing keeps this student's own construction underneath. */
+      if (data.centers && data.centers.length) {
+        const withBets = showCenters(data.centers);
+        if (withBets) setRender(withBets.render);
+      }
     };
     const opts = { player: () => (player ? player.id : null) };
     return tri
       ? subscribeTriangle(tri.id, handle, opts)
       : subscribeCanvas(handle, opts);
-  }, [tri, player, playing]);
-
-  const finish = () => run(async () => {
-    await finishActivity('triangle', player.id);
-  });
+  }, [tri, player]);
 
   const begin = () => run(async () => {
     await startPlayingTriangle(player.id);

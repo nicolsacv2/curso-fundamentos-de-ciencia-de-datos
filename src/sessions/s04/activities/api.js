@@ -218,6 +218,50 @@ const mock = {
 const id = () => mock.nextId++;
 const d6 = () => 1 + Math.floor(Math.random() * 6);
 
+/* ═══════════════════ The private canvas ═══════════════════
+   Only two things cross the wire in this activity: the TRIANGLE comes down from the
+   server, and the CENTRE goes up when the student presses Enviar. Everything in
+   between — points, midpoints, strokes, undo, the three-stroke cap and its cascades —
+   happens here, on this student's own machine.
+
+   That is not an optimisation. Thirty people sharing one canvas meant thirty
+   constructions on top of each other and everyone seeing everyone else's answer take
+   shape; a private canvas is what makes «where do YOU think the centre is» a question
+   each person actually answers. */
+const local = fn => Promise.resolve(fn());
+
+/* Take the class's triangle and start a private canvas on it. The three vertices are
+   born as points, exactly as the mock's own createTriangle does. */
+export function adoptTriangle(triangle) {
+  const [a, b, c] = triangle.vertices;
+  const t = {
+    id: triangle.id,
+    side1: triangle.side1,
+    angle: triangle.angle,
+    side2: triangle.side2,
+    vertices: triangle.vertices,
+    points: [
+      { id: id(), label: 'A', x: a[0], y: a[1], kind: 'vertex' },
+      { id: id(), label: 'B', x: b[0], y: b[1], kind: 'vertex' },
+      { id: id(), label: 'C', x: c[0], y: c[1], kind: 'vertex' }
+    ],
+    segments: [],
+    centers: [],
+    history: []
+  };
+  mock.triangle = t;
+  return { triangle: t, points: t.points, segments: [], render: renderTriangle(t) };
+}
+
+/* The class's crosses, once the server has revealed them. They live on the local canvas
+   so the local drawing can show them beside the student's own construction. */
+export function showCenters(centers) {
+  const t = mock.triangle;
+  if (!t) return null;
+  t.centers = centers || [];
+  return { centers: t.centers, render: renderTriangle(t) };
+}
+
 /* ═══════════════════ Players ═══════════════════ */
 export function registerPlayer(name, activity = 'demere') {
   const code = joinCode();
@@ -339,11 +383,7 @@ function record(t, gesture, type, entId) {
 }
 
 export function addPoint(triId, x, y, label, playerId, gesture) {
-  return call('triangle', `/v1/triangles/${triId}/points`, {
-    method: 'POST',
-    body: { x, y, label, player_id: playerId, gesture },
-    playerId
-  }, () => {
+  return local(() => {
     const t = mock.triangle;
     const point = { id: id(), label: label || `P${t.points.filter(p => p.kind !== 'vertex').length + 1}`, x, y, kind: 'point' };
     t.points.push(point);
@@ -355,7 +395,7 @@ export function addPoint(triId, x, y, label, playerId, gesture) {
 /* Undo: pops the last gesture and removes everything it created. Vertices are not
    gestures, so the triangle itself is never undone. */
 export function undoLast(triId) {
-  return call('triangle', `/v1/triangles/${triId}/undo`, { method: 'POST' }, () => {
+  return local(() => {
     const t = mock.triangle;
     const last = t.history.pop();
     if (last) {
@@ -373,13 +413,7 @@ export function undoLast(triId) {
    `parent` (the segment's endpoints): it is what lets the frontend test, later, if a
    stroke leaving this midpoint is perpendicular to the segment it bisects. */
 export function midpoint(triId, p, q, playerId, gesture) {
-  /* POST, not the older GET: a request with a side effect is a trap in front of any
-     cache or proxy. The server keeps the GET as an alias, but this is the real one. */
-  return call('triangle', `/v1/triangles/${triId}/midpoints`, {
-    method: 'POST',
-    body: { x1: p.x, y1: p.y, x2: q.x, y2: q.y, player_id: playerId, gesture },
-    playerId
-  }, () => {
+  return local(() => {
     const t = mock.triangle;
     /* Compact labels only when the parents have single-letter names — a midpoint of
        midpoints would otherwise be called M(M(AB)M(BC)). */
@@ -405,11 +439,7 @@ export function midpoint(triId, p, q, playerId, gesture) {
    convention `from` is the end that touches the base segment — the midpoint, or the
    foot of the perpendicular — which is where the render puts the signal. */
 export function addSegment(triId, p, q, { ortho = false, bisector = false, gesture } = {}, playerId) {
-  return call('triangle', `/v1/triangles/${triId}/segments`, {
-    method: 'POST',
-    body: { from: [p.x, p.y], to: [q.x, q.y], ortho, bisector, player_id: playerId, gesture },
-    playerId
-  }, () => {
+  return local(() => {
     const t = mock.triangle;
     const segment = { id: id(), from: [p.x, p.y], to: [q.x, q.y], ortho, bisector };
     t.segments.push(segment);
@@ -447,7 +477,7 @@ function removeSegmentsCascade(t, doomed) {
 }
 
 export function deletePoint(triId, pointId) {
-  return call('triangle', `/v1/triangles/${triId}/points/${pointId}`, { method: 'DELETE' }, () => {
+  return local(() => {
     const t = mock.triangle;
     const p = t.points.find(x => String(x.id) === String(pointId));
     if (!p) return { points: t.points, segments: t.segments, centers: t.centers, render: renderTriangle(t) };
@@ -461,16 +491,26 @@ export function deletePoint(triId, pointId) {
 }
 
 export function deleteSegment(triId, segId) {
-  return call('triangle', `/v1/triangles/${triId}/segments/${segId}`, { method: 'DELETE' }, () => {
+  return local(() => {
     const t = mock.triangle;
     removeSegmentsCascade(t, t.segments.filter(s => String(s.id) === String(segId)));
     return { points: t.points, segments: t.segments, centers: t.centers, render: renderTriangle(t) };
   });
 }
 
-/* Each player's answer to «¿cuál es el centro?» — one bet per player (upsert): the
-   shared canvas shows everyone's crosses, ready to compare against the real three. */
-export function chooseCenter(triId, x, y, playerId, gesture) {
+/* Each player's answer to «¿cuál es el centro?» — one bet per player (upsert).
+   THE one thing this activity sends up: the coordinates of a centre, and nothing else.
+   Sending it is also what earns the student the rest of the room's crosses.
+
+   The drawing that comes back is the LOCAL one: the server has never seen this
+   student's construction, so its own picture would be the bare triangle. Here the
+   crosses land on top of the work that led to them. */
+export async function chooseCenter(triId, x, y, playerId, gesture) {
+  const answer = await sendCenter(triId, x, y, playerId, gesture);
+  return showCenters(answer.centers) || answer;
+}
+
+function sendCenter(triId, x, y, playerId, gesture) {
   return call('triangle', `/v1/triangles/${triId}/center`, {
     method: 'POST',
     body: { x, y, player_id: playerId, gesture },
