@@ -160,6 +160,14 @@ export function startPlayingTriangle(playerId) {
   }, () => ({ session: { playing: true } }));
 }
 
+/* The admin ends the class from the room. Every other screen finds out on its next
+   poll — the class comes back null — and resets itself. */
+export function finishActivity(activity, playerId) {
+  return call(activity, '/v1/sessions/finish', {
+    method: 'POST', body: { player_id: playerId }, playerId
+  }, () => ({ session: null }));
+}
+
 /* The class itself, independent of any canvas. The triangle needs this: its own poll
    only exists once a triangle does, so without it a waiting screen would never learn
    that the activity had been started. */

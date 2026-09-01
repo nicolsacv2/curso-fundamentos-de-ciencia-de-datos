@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   registerPlayer, createTriangle, addPoint, midpoint, addSegment,
   deletePoint, deleteSegment, chooseCenter, undoLast, subscribeTriangle,
-  startPlayingTriangle, subscribeSession, subscribeCanvas, isMock, isNonProd, ENV
+  startPlayingTriangle, subscribeSession, subscribeCanvas, finishActivity, isMock, isNonProd, ENV
 } from './api.js';
 
 /* |cos| of the angle between stroke and base ≤ cos(75°) ⇒ within 15° of perpendicular. */
@@ -196,6 +196,10 @@ export default function TriangleActivity() {
       ? subscribeTriangle(tri.id, handle, opts)
       : subscribeCanvas(handle, opts);
   }, [tri, player, playing]);
+
+  const finish = () => run(async () => {
+    await finishActivity('triangle', player.id);
+  });
 
   const begin = () => run(async () => {
     await startPlayingTriangle(player.id);
@@ -883,6 +887,15 @@ export default function TriangleActivity() {
           ) : (
             <p className="hint">Esperando que inicie la actividad…</p>
           )}
+        </div>
+      )}
+
+      {player && player.is_admin && playing && (
+        <div className="controls">
+          <span className="hint">Diriges esta clase.</span>
+          <button type="button" className="ghost" disabled={busy} onClick={finish}>
+            Finalizar actividad
+          </button>
         </div>
       )}
 

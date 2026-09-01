@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   registerPlayer, chooseGame, throwRound, getGamesSummary,
-  subscribeSummary, startPlaying, isMock, isNonProd, ENV
+  subscribeSummary, startPlaying, finishActivity, isMock, isNonProd, ENV
 } from './api.js';
 
 const GAMES = [
@@ -74,6 +74,10 @@ export default function DiceActivity() {
     setPlayer(p);
   });
 
+  const finish = () => run(async () => {
+    await finishActivity('demere', player.id);
+  });
+
   const begin = () => run(async () => {
     await startPlaying(player.id);
     setPlaying(true);
@@ -127,6 +131,15 @@ export default function DiceActivity() {
           ) : (
             <p className="hint">Esperando que inicie la actividad…</p>
           )}
+        </div>
+      )}
+
+      {player && player.is_admin && playing && (
+        <div className="controls">
+          <span className="hint">Diriges esta clase.</span>
+          <button type="button" className="ghost" disabled={busy} onClick={finish}>
+            Finalizar actividad
+          </button>
         </div>
       )}
 
