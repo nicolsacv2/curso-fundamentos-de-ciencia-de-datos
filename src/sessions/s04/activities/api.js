@@ -51,35 +51,6 @@ export function joinCode() {
    a rehearsal and the real class look identical on screen. */
 export const isNonProd = () => ENV !== 'prod';
 
-/* One player per activity, remembered across reloads. In a classroom people refresh,
-   lose the tab, or come back on another device; the server recovers the same player from
-   the name, and this saves them retyping it. */
-const stored = key => {
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null; /* private windows and blocked site data */
-  }
-};
-const store = (key, value) => {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    /* nothing to do: the name is one keystroke away */
-  }
-};
-
-export const savedPlayer = activity => {
-  const raw = stored(`verquo:${activity}:player`);
-  try {
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-};
-const savePlayer = (activity, player) =>
-  store(`verquo:${activity}:player`, JSON.stringify(player));
-
 async function real(activity, path, { method = 'GET', body, playerId } = {}) {
   const headers = {};
   if (body) headers['Content-Type'] = 'application/json';
@@ -123,19 +94,37 @@ async function call(activity, path, opts, mockFn) {
    only ever appear on the screen that drew it — and the shared marcador, the whole point
    of both activities, would not exist. Unchanged state answers 304 and costs nothing.
 
+   The poll names the class as well as the version, and that is what makes the reset
+   work. A new class starts again at version 0, so a screen still holding version 12
+   would otherwise be told «nothing new» for ever and never see the class that is
+   actually running. When the name comes back different — a new class — or null — the
+   activity stopped — the screen throws away what it had and starts over.
+
    In mock mode there is nothing shared to poll, so subscribing is a no-op. */
-function poll(activity, url, onUpdate, interval) {
+function poll(activity, path, onEvent, interval) {
   if (degraded[activity]) return () => {};
   let version = -1;
+  let code = null;
+  let seen = false;
   let stopped = false;
+  let timer;
 
   const tick = async () => {
     if (stopped) return;
     try {
-      const data = await real(activity, url(version));
-      if (data && !stopped && data.version !== version) {
-        version = data.version;
-        onUpdate(data);
+      const q = [];
+      if (version >= 0) q.push(`since=${version}`);
+      if (code) q.push(`session=${encodeURIComponent(code)}`);
+      const url = q.length ? `${path}${path.includes('?') ? '&' : '?'}${q.join('&')}` : path;
+      const data = await real(activity, url);
+      if (data && !stopped) {
+        const next = data.session ? data.session.code : null;
+        /* Not on the first answer: arriving to a running class is not a reset. */
+        const reset = seen && next !== code;
+        version = typeof data.version === 'number' ? data.version : -1;
+        code = next;
+        seen = true;
+        onEvent(data, reset);
       }
     } catch (e) {
       if (!e.userFacing) degraded[activity] = true;
@@ -143,18 +132,18 @@ function poll(activity, url, onUpdate, interval) {
     if (!stopped) timer = setTimeout(tick, interval);
   };
 
-  let timer = setTimeout(tick, 0);
+  timer = setTimeout(tick, 0);
   return () => {
     stopped = true;
     clearTimeout(timer);
   };
 }
 
-export const subscribeSummary = (onUpdate, { interval = 2000 } = {}) =>
-  poll('demere', v => `/v1/games/summary${v >= 0 ? `?since=${v}` : ''}`, onUpdate, interval);
+export const subscribeSummary = (onEvent, { interval = 2000 } = {}) =>
+  poll('demere', '/v1/games/summary', onEvent, interval);
 
-export const subscribeTriangle = (triId, onUpdate, { interval = 2000 } = {}) =>
-  poll('triangle', v => `/v1/triangles/${triId}${v >= 0 ? `?since=${v}` : ''}`, onUpdate, interval);
+export const subscribeTriangle = (triId, onEvent, { interval = 2000 } = {}) =>
+  poll('triangle', `/v1/triangles/${triId}`, onEvent, interval);
 
 /* ═══════════════════ Mock state ═══════════════════
    In-memory and per-browser: enough to run the whole class offline, minus the shared
@@ -180,9 +169,6 @@ export function registerPlayer(name, activity = 'demere') {
       mock.players.push(p);
     }
     return { player: p };
-  }).then(res => {
-    savePlayer(activity, res.player);
-    return res;
   });
 }
 

@@ -3,8 +3,11 @@
    truth for the whole class — and every answer comes back with the SVG already drawn
    (sixes and double sixes in red). See docs/apis/. */
 
-import { useState } from 'react';
-import { registerPlayer, chooseGame, throwRound, getGamesSummary, isMock, isNonProd, ENV } from './api.js';
+import { useState, useEffect } from 'react';
+import {
+  registerPlayer, chooseGame, throwRound, getGamesSummary,
+  subscribeSummary, isMock, isNonProd, ENV
+} from './api.js';
 
 const GAMES = [
   {
@@ -25,6 +28,21 @@ export default function DiceActivity() {
   const [render, setRender] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+
+  /* The shared marcador. Every screen in the room polls, so a round thrown by anyone
+     shows up here within a couple of seconds — which is the whole reason the backend
+     exists. The same poll reports WHICH class is running: when the instructor stops the
+     activity or opens a new one, this screen throws away its player and its board and
+     goes back to the name, instead of carrying a stale player into a class it does not
+     belong to. */
+  useEffect(() => subscribeSummary((data, reset) => {
+    if (reset) {
+      setPlayer(null);
+      setName('');
+      setError(data.session ? '' : 'La actividad terminó.');
+    }
+    setRender(data.render);
+  }), []);
 
   const run = async fn => {
     setBusy(true);

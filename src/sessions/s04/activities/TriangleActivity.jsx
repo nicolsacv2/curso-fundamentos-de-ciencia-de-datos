@@ -17,7 +17,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   registerPlayer, createTriangle, addPoint, midpoint, addSegment,
-  deletePoint, deleteSegment, chooseCenter, undoLast, isMock, isNonProd, ENV
+  deletePoint, deleteSegment, chooseCenter, undoLast, subscribeTriangle,
+  isMock, isNonProd, ENV
 } from './api.js';
 
 /* |cos| of the angle between stroke and base ≤ cos(75°) ⇒ within 15° of perpendicular. */
@@ -140,6 +141,36 @@ export default function TriangleActivity() {
     const vy = -w.x * Math.sin(rot) + w.y * Math.cos(rot);
     return { x: ox + k * vx, y: oy - k * vy };
   };
+
+  /* The canvas is shared, so this screen has to see what other people draw — until now
+     a stroke only ever appeared on the screen that made it. The poll also reports which
+     class is running: when the instructor stops the activity or starts a new one, the
+     whole canvas is dropped and the student is sent back to the name, rather than left
+     drawing on a triangle that no longer exists. */
+  useEffect(() => {
+    if (!tri) return undefined;
+    return subscribeTriangle(tri.id, (data, reset) => {
+      if (reset) {
+        setPlayer(null);
+        setName('');
+        setTri(null);
+        setPoints([]);
+        setSegments([]);
+        setRender('');
+        setSel(null);
+        setPick(null);
+        setChoosing(false);
+        setSent(false);
+        setForm({ l1: '', ang: '', l2: '' });
+        setViewT({ s: 1, x: 0, y: 0 });
+        setError(data.session ? '' : 'La actividad terminó.');
+        return;
+      }
+      if (data.points) setPoints(data.points);
+      if (data.segments) setSegments(data.segments);
+      if (data.render) setRender(data.render);
+    });
+  }, [tri]);
 
   const apply = res => {
     if (res.points) setPoints(res.points);
