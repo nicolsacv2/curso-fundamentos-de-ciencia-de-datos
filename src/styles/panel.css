@@ -193,6 +193,128 @@ figcaption a:hover,figcaption a:focus-visible{
 .milestone .t{font-family:var(--display);font-size:21px;line-height:1.25;color:var(--ink)}
 .milestone .d{font-size:17px;color:var(--ink-2);line-height:1.5}
 
+/* ── Activity: the live widgets of session 4 ──────────────
+   Cyan family, like .task: an activity is what the group does. The result canvas is
+   an SVG that arrives from the Actividades API (or from the local mock) and gets the
+   same frame as a .diagram; the red inside it is, as everywhere, the datum revealed. */
+.activity{
+  border:1px solid var(--ask-dim);
+  background:var(--ground-2);
+  padding:22px 24px;max-width:1000px;
+  display:flex;flex-direction:column;gap:18px
+}
+.activity .controls{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0
+}
+.activity label{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);flex:0 0 auto
+}
+.activity input{
+  background:var(--ground);border:1px solid var(--line);color:var(--ink);
+  font-family:var(--body);font-size:16px;padding:10px 12px;min-height:44px;
+  flex:1 1 200px;min-width:0
+}
+.activity input.num{flex:0 1 90px}
+.activity input:focus-visible{outline:2px solid var(--ask);outline-offset:1px}
+.activity input::placeholder{color:var(--ink-3)}
+/* Primary action: same block as the rail's .back. */
+.activity button.act{
+  appearance:none;background:var(--ask);color:var(--ground);border:0;border-radius:2px;
+  padding:10px 18px;min-height:44px;cursor:pointer;
+  font-family:var(--mono);font-size:12.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;line-height:1;
+  transition:background .16s ease
+}
+.activity button.act:hover:not(:disabled){background:#7FDCE1}
+.activity button.act:disabled{opacity:.4;cursor:default}
+/* Secondary action: ghost, like the zoom bar's. */
+.activity button.ghost{
+  appearance:none;background:none;border:1px solid var(--line);color:var(--ink-2);
+  padding:10px 16px;min-height:44px;cursor:pointer;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase
+}
+.activity button.ghost:hover:not(:disabled),
+.activity button.ghost:focus-visible{color:var(--ask);border-color:var(--ask)}
+.activity button.ghost:disabled{opacity:.4;cursor:default}
+/* Game choice: two cards, same vocabulary as .card. */
+.activity .choice{display:flex;flex-direction:column;gap:14px}
+.activity .pickers{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:720px){.activity .pickers{grid-template-columns:1fr 1fr}}
+.activity .pick{
+  appearance:none;text-align:left;cursor:pointer;
+  background:var(--ground);border:1px solid var(--line);
+  padding:18px 20px;display:flex;flex-direction:column;gap:8px;
+  transition:border-color .16s ease
+}
+.activity .pick:hover,.activity .pick:focus-visible{border-color:var(--ask)}
+.activity .pick .k{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ask)
+}
+.activity .pick .d{font-size:16px;color:var(--ink-2);line-height:1.5;font-family:var(--body)}
+/* Point chips: pressed = selected. */
+.activity .chip{
+  appearance:none;background:var(--ground);border:1px solid var(--line);color:var(--ink-2);
+  font-family:var(--mono);font-size:12.5px;padding:9px 13px;min-height:40px;cursor:pointer
+}
+.activity .chip[aria-pressed="true"]{
+  border-color:var(--ask);color:var(--ask);background:rgba(91,200,206,.1)
+}
+.activity .hint{margin:0;font-size:17px;color:var(--ink-2);flex:1 1 100%}
+.activity .err{
+  margin:0;font-size:15px;color:var(--reveal);
+  border-left:3px solid var(--reveal);padding-left:12px
+}
+.activity .canvas{
+  background:var(--ground);border:1px solid var(--line-soft);padding:18px;
+  /* The lens: the drawing pans and zooms inside; nothing may spill out, and the
+     reset button anchors to the frame, not to the moving content. */
+  position:relative;overflow:hidden
+}
+/* The lens controls: the zoom slider and the reset-to-fit button, pinned to the
+   frame's top-right corner, always visible above the moving drawing. */
+.activity .canvas .lens{
+  position:absolute;top:8px;right:8px;z-index:5;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(19,29,43,.85);border:1px solid var(--line);padding:5px 8px
+}
+.activity .canvas .lens input[type="range"]{
+  width:110px;margin:0;accent-color:var(--ask);cursor:pointer;flex:1 1 auto;min-width:0
+}
+.activity .canvas .reset{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;cursor:pointer;flex:0 0 auto;
+  background:var(--ground-2);border:1px solid var(--line);color:var(--ink-3);
+  transition:color .15s,border-color .15s
+}
+.activity .canvas .reset:hover,.activity .canvas .reset:focus-visible{
+  color:var(--ask);border-color:var(--ask)
+}
+.activity .canvas .trash:hover:not(:disabled),
+.activity .canvas .trash:focus-visible:not(:disabled){
+  color:var(--reveal);border-color:var(--reveal)
+}
+.activity .canvas .trash:disabled{opacity:.35;cursor:default}
+.activity .canvas svg{display:block;width:100%;height:auto}
+/* The drawing is the interface: points and segments carry invisible hit targets.
+   pointer-events is explicit so a transparent paint still catches the tap.
+   touch-action:none lets a finger drag a stroke without scrolling the page, and
+   user-select:none keeps the drag from selecting the labels. */
+.activity .canvas{user-select:none;-webkit-user-select:none}
+.activity .canvas svg{touch-action:none}
+.activity .canvas svg [data-point-id]{cursor:grab;pointer-events:all}
+.activity .canvas svg [data-seg]{cursor:pointer;pointer-events:all}
+/* Center sent: the drawing is read-only, so no hover invites anything. */
+.activity .canvas.done svg [data-point-id],
+.activity .canvas.done svg [data-seg]{cursor:default}
+/* Choosing the center: the pointing hand everywhere — the whole plane is the target. */
+.activity .canvas.choosing svg [data-point-id],
+.activity .canvas.choosing svg [data-seg]{cursor:pointer}
+.activity .mode{
+  margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink-3)
+}
+
 /* ── Block loading state ────────────────────── */
 .loading{
   padding:80px 0;color:var(--ink-3);

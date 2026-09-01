@@ -99,6 +99,26 @@ Las tablas de la sesión 3 sí conservan su scroll: sus cabeceras y su columna d
 van pegadas porque cada actividad se responde con una coordenada, y una coordenada no
 sirve si perdiste de vista su letra. También pueden ampliarse.
 
+## Las actividades en vivo de la sesión 4
+
+La sesión 4 trae dos actividades que toda la clase juega a la vez — los dados de Méré y
+el triángulo — respaldadas por dos servicios externos que viven en su propio
+repositorio: una **API de Actividades** (estado en Supabase, activación por key del
+instructor) y una **API de Render** (estado → SVG). La arquitectura completa, los
+endpoints y los mockups están en [`docs/apis/`](docs/apis/README.md).
+
+El frontend solo conoce una variable:
+
+```sh
+VITE_ACTIVITIES_API=https://…  pnpm build   # ver .env.example
+```
+
+Sin la variable — o en el momento en que una petición falle — el cliente
+(`src/sessions/s04/activities/api.js`) degrada a un **mock local** con la misma
+interfaz: dados con `Math.random`, geometría calculada en el navegador y el mismo SVG.
+Es el estándar de las láminas (Commons → bucket) aplicado a las APIs: la clase
+proyectada nunca se cae, solo pierde el marcador compartido y lo dice en un aviso.
+
 ## Desarrollo
 
 Requiere Node 20+ y pnpm (vía corepack). Todo vive dentro del proyecto: no hace falta

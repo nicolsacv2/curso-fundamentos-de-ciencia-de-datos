@@ -97,6 +97,13 @@
   .milestone .d{font-size:16px}
 
   .foot{padding:22px 0 50px;font-size:11.5px}
+
+  .activity{padding:16px 14px;gap:14px}
+  .activity input{flex-basis:100%}
+  .activity input.num{flex:1 1 60px}
+  .activity button.act{flex:1 1 auto}
+  .activity .hint{font-size:15px}
+  .activity .canvas{padding:12px}
 }
 
 /* ══════════ Narrow phone ══════════ */
