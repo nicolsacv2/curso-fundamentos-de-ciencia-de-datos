@@ -47,9 +47,14 @@ export default function TriangleActivity() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [playing, setPlaying] = useState(false);
-  /* Whose cross the cursor is on. Shown as a caption rather than left to the browser's
-     own <title> tooltip, which takes about a second and is drawn by the operating
-     system — the wrong place and the wrong moment when a room is watching. */
+  /* Whose cross the cursor is on, and where that cross sits inside the frame. Shown
+     rather than left to the browser's own <title> tooltip, which takes about a second and
+     is drawn by the operating system — the wrong place and the wrong moment when a room
+     is watching.
+
+     `{ name, x, y, below }`, x/y in pixels relative to the frame. The position is read
+     off the live DOM on every move rather than derived from `viewT`, which is what makes
+     the label follow the cross through zoom and panning for free. */
   const [overBet, setOverBet] = useState(null);
   /* «Elegir el centro»: choosing arms the mode, pick holds the provisional bet, and
      sent closes the game — one center per player, and after Enviar the drawing turns
@@ -150,6 +155,39 @@ export default function TriangleActivity() {
     const vy = -w.x * Math.sin(rot) + w.y * Math.cos(rot);
     return { x: ox + k * vx, y: oy - k * vy };
   };
+
+  /* Where to hang the name of whoever marked the cross under the cursor.
+     `<g data-bet>` wraps the ✕ together with a transparent r=14 disc
+     (verquo_render/triangle.py), so the middle of its box IS the point the student
+     marked. Reading it off the live DOM means zoom and panning need no arithmetic here.
+
+     The frame is overflow:hidden, so a cross near an edge would have its label clipped.
+     Rather than measure the label — which would need a second pass and would jitter —
+     the anchor point moves: in the middle of the frame the label is centred over the
+     cross, and against an edge it is pinned by that same edge and grows inwards. Same
+     for the top edge, where it flips underneath. */
+  const TAG_HALF = 90;   /* half of the label's max-width, see .bet-tag in panel.css */
+  const TAG_ROOM = 28;   /* the height it needs above the cross before it has to flip */
+
+  const betUnder = e => {
+    const g = e.target.closest && e.target.closest('[data-bet]');
+    if (!g || !wrap.current) return null;
+    const r = g.getBoundingClientRect();
+    const f = wrap.current.getBoundingClientRect();
+    const x = r.left + r.width / 2 - f.left;
+    const below = r.top - f.top < TAG_ROOM;
+    return {
+      name: g.getAttribute('data-bet'),
+      x: Math.max(0, Math.min(f.width, x)),
+      y: (below ? r.bottom : r.top) - f.top,
+      below,
+      tx: x < TAG_HALF ? '0' : x > f.width - TAG_HALF ? '-100%' : '-50%'
+    };
+  };
+
+  const same = (a, b) =>
+    a === b || (a && b && a.name === b.name && a.tx === b.tx && a.below === b.below
+      && Math.abs(a.x - b.x) < 1 && Math.abs(a.y - b.y) < 1);
 
   /* The canvas is shared, so this screen has to see what other people draw — until now
      a stroke only ever appeared on the screen that made it. The poll also reports which
@@ -995,10 +1033,6 @@ export default function TriangleActivity() {
 
       {error && <p className="err" role="alert">{error}</p>}
 
-      {render && overBet && (
-        <p className="mode">Centro de <b>{overBet}</b></p>
-      )}
-
       {render && (
         <div
           className={`canvas${sent ? ' done' : ''}${choosing ? ' choosing' : ''}`}
@@ -1007,9 +1041,8 @@ export default function TriangleActivity() {
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onMouseMove={e => {
-            const g = e.target.closest && e.target.closest('[data-bet]');
-            const who = g && g.getAttribute('data-bet');
-            setOverBet(prev => (prev === (who || null) ? prev : who || null));
+            const next = betUnder(e);
+            setOverBet(prev => (same(prev, next) ? prev : next));
           }}
           onMouseLeave={() => setOverBet(null)}
           onPointerUp={onPointerUp}
@@ -1020,6 +1053,23 @@ export default function TriangleActivity() {
             style={{ transform: `translate(${viewT.x}px, ${viewT.y}px) scale(${viewT.s})`, transformOrigin: '0 0' }}
             dangerouslySetInnerHTML={{ __html: render }}
           />
+          {/* Absolute, and a sibling of the drawing rather than a child of it: inside,
+              the zoom would scale the text; outside the frame, it used to sit above it
+              in the flow, push the whole canvas down, take the cross out from under the
+              cursor and blink for ever. */}
+          {overBet && (
+            <span
+              className="bet-tag"
+              style={{
+                left: overBet.x,
+                top: overBet.y,
+                '--tx': overBet.tx,
+                '--ty': overBet.below ? '8px' : 'calc(-100% - 8px)'
+              }}
+            >
+              {overBet.name}
+            </span>
+          )}
           <div className="lens">
             <button
               type="button"

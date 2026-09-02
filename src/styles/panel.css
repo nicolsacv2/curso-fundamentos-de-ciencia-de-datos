@@ -311,6 +311,23 @@ figcaption a:hover,figcaption a:focus-visible{
 /* Choosing the center: the pointing hand everywhere — the whole plane is the target. */
 .activity .canvas.choosing svg [data-point-id],
 .activity .canvas.choosing svg [data-seg]{cursor:pointer}
+/* The name of whoever marked the cross under the cursor. Absolute, and inside the frame:
+   as a caption above it, it added its own height to the flow, pushed the drawing down,
+   took the cross out from under the cursor — which cleared it, which sprang the drawing
+   back up — and flickered without end.
+
+   --tx/--ty carry where it hangs off its anchor. The frame is overflow:hidden, so a cross
+   near an edge gets a label pinned by that edge (--tx 0 or -100%) instead of centred, and
+   one near the top gets it underneath; TriangleActivity picks. pointer-events:none is
+   load-bearing: a label that caught the mouse would steal the move events off the cross
+   and bring the flicker back through the other door. */
+.activity .canvas .bet-tag{
+  position:absolute;z-index:4;pointer-events:none;
+  transform:translate(var(--tx,-50%),var(--ty,calc(-100% - 8px)));
+  max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink);
+  background:rgba(19,29,43,.92);border:1px solid var(--line);padding:2px 6px
+}
 .activity .mode{
   margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink-3)
 }
