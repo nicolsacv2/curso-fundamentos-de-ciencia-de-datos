@@ -876,6 +876,12 @@ export default function TriangleActivity() {
   };
 
   const isAdmin = Boolean(player && player.is_admin);
+  /* No backend at all: there is no instructor to press Comenzar and no class to wait
+     for, so the activity simply runs. The whole point of the local fallback is that a
+     projected class survives the service falling over — a gate that keeps everyone on a
+     waiting screen for ever would defeat it. */
+  const offline = isMock('triangle');
+  const ready = playing || offline;
 
   return (
     <div className="activity">
@@ -896,18 +902,18 @@ export default function TriangleActivity() {
       {/* Registered, waiting for the person running the class to say go. */}
       {/* Before the go-ahead. The admin chooses the triangle FIRST — there is nothing
           to start until the room has something to work on — and only then can begin. */}
-      {player && player.is_admin && !playing && (
+      {player && isAdmin && !ready && (
         <p className="hint">{player.name}, tú diriges esta clase.{' '}
           {tri
             ? 'Cuando el salón esté listo, empieza.'
             : 'Elige el triángulo sobre el que va a trabajar la clase.'}</p>
       )}
 
-      {player && !player.is_admin && !playing && (
+      {player && !isAdmin && !ready && (
         <p className="hint">Esperando que inicie la actividad…</p>
       )}
 
-      {player && player.is_admin && !playing && tri && (
+      {player && isAdmin && !ready && tri && (
         <div className="controls">
           <button type="button" className="act" disabled={busy} onClick={begin}>
             Comenzar actividad
@@ -915,7 +921,7 @@ export default function TriangleActivity() {
         </div>
       )}
 
-      {player && player.is_admin && playing && (
+      {player && isAdmin && playing && (
         <div className="controls">
           <span className="hint">Diriges esta clase.</span>
           <button type="button" className="ghost" disabled={busy} onClick={finish}>
@@ -926,14 +932,14 @@ export default function TriangleActivity() {
 
       {/* The admin projects; they do not build. Their own answer on the shared canvas
           would anchor the room before anyone had committed to theirs. */}
-      {player && player.is_admin && playing && tri && (
+      {player && isAdmin && playing && tri && (
         <p className="hint">Estás proyectando. A medida que el salón envía su centro,
           aparece aquí una <b>✕</b> de su color; pasa el cursor por encima para ver de
           quién es. Nadie más ve estas cruces hasta que envía la suya.</p>
       )}
 
       {/* Students never see this form: one canvas per class is the premise. */}
-      {player && player.is_admin && !tri && (
+      {player && (isAdmin || offline) && !tri && (
         <form className="controls" onSubmit={e => { e.preventDefault(); create(); }}>
           <label>Lado, ángulo, lado</label>
           <input className="num" inputMode="decimal" value={form.l1} aria-label="primer lado"
@@ -948,7 +954,7 @@ export default function TriangleActivity() {
         </form>
       )}
 
-      {player && !player.is_admin && playing && !tri && (
+      {player && !isAdmin && !offline && playing && !tri && (
         <p className="hint">Esperando a que se construya el triángulo…</p>
       )}
 

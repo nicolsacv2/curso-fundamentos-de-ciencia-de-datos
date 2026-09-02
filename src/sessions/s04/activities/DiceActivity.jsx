@@ -97,6 +97,10 @@ export default function DiceActivity() {
     setRender(r);
   });
 
+  /* No backend: nobody is going to press Comenzar, so the activity just runs. The
+     local fallback exists so a projected class survives the service falling over. */
+  const ready = playing || isMock('demere');
+
   const chosen = GAMES.find(g => g.key === player?.chosen_game);
 
   return (
@@ -117,7 +121,7 @@ export default function DiceActivity() {
 
       {/* Registered, but the class has not been started yet. The admin gets the
           button; everyone else gets the wait. */}
-      {player && !playing && (
+      {player && !ready && (
         <div className="choice">
           {player.is_admin ? (
             <>
@@ -143,7 +147,7 @@ export default function DiceActivity() {
         </div>
       )}
 
-      {player && playing && !player.chosen_game && (
+      {player && ready && !player.chosen_game && (
         <div className="choice">
           <p className="hint">{player.name}, apuesta una moneda: ¿con cuál juego te la jugarías?</p>
           <div className="pickers">
@@ -157,7 +161,7 @@ export default function DiceActivity() {
         </div>
       )}
 
-      {playing && chosen && (
+      {ready && chosen && (
         <div className="controls">
           <p className="hint"><b>{player.name}</b> apuesta con el <b>{chosen.name.toLowerCase()}</b>. {chosen.rule}</p>
           <button type="button" className="act" disabled={busy} onClick={throwOnce}>
