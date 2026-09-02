@@ -39,7 +39,7 @@ cambio de pantalla. Los estilos reales están en `src/styles/panel.css` (bloque
 ```
 ┌─ .activity ────────────────────────────────────────────────────┐
 │  Lucía apuesta con el juego 1. Un dado, 4 tiros…               │
-│  [ LANZAR ]   [ marcador de la clase ]                         │
+│  [ LANZAR ]                                                    │
 │                                                                │
 │  ┌─ .canvas (SVG de la API de Render) ────────────────────────┐│
 │  │  LUCÍA · GANA CHEVALIER                                    ││

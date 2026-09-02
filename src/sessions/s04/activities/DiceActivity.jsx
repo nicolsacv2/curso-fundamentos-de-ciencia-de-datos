@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import {
-  registerPlayer, chooseGame, throwRound, getGamesSummary,
+  registerPlayer, chooseGame, throwRound,
   subscribeSummary, startPlaying, finishActivity, isMock, isNonProd, ENV
 } from './api.js';
 
@@ -41,6 +41,11 @@ export default function DiceActivity() {
      and must not restart the subscription every time it changes. */
   const lastRound = useRef(null);
 
+  /* Whether a request is out right now. A ref rather than `busy`, because `busy` only
+     disables the button on the NEXT render: two clicks inside one frame both get through
+     it. This one is set before the fetch even starts. */
+  const inFlight = useRef(false);
+
   useEffect(() => subscribeSummary((data, reset) => {
     if (reset) {
       lastRound.current = null;
@@ -53,6 +58,8 @@ export default function DiceActivity() {
   }, { round: () => lastRound.current }), []);
 
   const run = async fn => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true);
     setError('');
     try {
@@ -60,6 +67,7 @@ export default function DiceActivity() {
     } catch (e) {
       setError(e.message);
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   };
@@ -83,19 +91,26 @@ export default function DiceActivity() {
     setPlaying(true);
   });
 
-  const throwOnce = () => run(async () => {
-    const { render: r, round } = await throwRound(player.chosen_game, player.id);
-    /* Remembered so the poll keeps drawing it: otherwise the next tick, two seconds
-       from now, would replace these dice with a board that has no round on it. */
-    lastRound.current = round.id;
-    setRender(r);
-  });
+  /* A throw is the one thing here that is not idempotent: every POST appends a round to
+     the class's tally. The in-flight guard alone does not cover it, because a round trip
+     is 100-250 ms — shorter than a double click, so the second click would find the
+     button live again and buy the class a second round nobody asked for. Half a second
+     is the server's own per-player spacing (VERQUO_MIN_SPACING_SECONDS): a click dropped
+     inside that window loses nothing, since the server was going to hold it back exactly
+     that long anyway. */
+  const lastThrow = useRef(0);
 
-  const marcador = () => run(async () => {
-    lastRound.current = null;
-    const { render: r } = await getGamesSummary();
-    setRender(r);
-  });
+  const throwOnce = () => {
+    if (Date.now() - lastThrow.current < 500) return;
+    lastThrow.current = Date.now();
+    run(async () => {
+      const { render: r, round } = await throwRound(player.chosen_game, player.id);
+      /* Remembered so the poll keeps drawing it: otherwise the next tick, two seconds
+         from now, would replace these dice with a board that has no round on it. */
+      lastRound.current = round.id;
+      setRender(r);
+    });
+  };
 
   /* No backend: nobody is going to press Comenzar, so the activity just runs. The
      local fallback exists so a projected class survives the service falling over. */
@@ -166,9 +181,6 @@ export default function DiceActivity() {
           <p className="hint"><b>{player.name}</b> apuesta con el <b>{chosen.name.toLowerCase()}</b>. {chosen.rule}</p>
           <button type="button" className="act" disabled={busy} onClick={throwOnce}>
             {busy ? 'Lanzando…' : 'Lanzar'}
-          </button>
-          <button type="button" className="ghost" disabled={busy} onClick={marcador}>
-            Marcador de la clase
           </button>
         </div>
       )}

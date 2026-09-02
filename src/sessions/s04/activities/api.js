@@ -76,13 +76,29 @@ async function real(activity, path, { method = 'GET', body, playerId } = {}) {
   return res.json();
 }
 
-async function call(activity, path, opts, mockFn) {
+/* `replayable` is about what a lost ANSWER means. Almost everything here can be applied
+   twice without harm — registering a name, choosing a game, sending a centre are all
+   idempotent — so when the network dies mid-flight, running the mock is exactly right and
+   the class keeps going.
+
+   A throw is the exception: every POST appends a round. If the server inserted it and
+   only the answer got lost — a redeploy, a moment of bad wifi — rolling again locally
+   would count the same click twice, once in the shared marcador and once on this screen.
+   So that one call reports the doubt instead of inventing dice. One click is lost; the
+   next one already plays locally, with its notice, and the activity survives. */
+async function call(activity, path, opts, mockFn, { replayable = true } = {}) {
   if (!degraded[activity]) {
     try {
       return await real(activity, path, opts);
     } catch (e) {
       if (e.userFacing) throw e;
       degraded[activity] = true;
+      if (!replayable) {
+        throw Object.assign(
+          new Error('No pudimos confirmar el lanzamiento. Inténtalo otra vez.'),
+          { userFacing: true }
+        );
+      }
     }
   }
   return mockFn();
@@ -327,9 +343,13 @@ export function throwRound(game, playerId) {
     mock.rounds[game].push(round);
     const s = summary();
     return { round, summary: s, render: renderDice(game, round, s) };
-  });
+  }, { replayable: false });
 }
 
+/* The board on its own, with nobody's dice pinned to it. No screen asks for this any
+   more — the two-second poll already pushes the same drawing — but verquo's
+   `tools/dump_golden.mjs` renders the `dice-summary-*` references through it, and those
+   are what pin the Python port to this file byte for byte. */
 export function getGamesSummary() {
   return call('demere', '/v1/games/summary', {}, () => {
     const s = summary();
