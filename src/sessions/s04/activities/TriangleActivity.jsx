@@ -52,9 +52,9 @@ export default function TriangleActivity() {
      is drawn by the operating system — the wrong place and the wrong moment when a room
      is watching.
 
-     `{ name, x, y, below }`, x/y in pixels relative to the frame. The position is read
-     off the live DOM on every move rather than derived from `viewT`, which is what makes
-     the label follow the cross through zoom and panning for free. */
+     `{ name, x, y, tx, ty }`, x/y being the cursor in pixels relative to the frame and
+     tx/ty which corner of the label sits there. Taken from the pointer rather than
+     derived from `viewT`, so zoom and panning come for free. */
   const [overBet, setOverBet] = useState(null);
   /* «Elegir el centro»: choosing arms the mode, pick holds the provisional bet, and
      sent closes the game — one center per player, and after Enviar the drawing turns
@@ -156,38 +156,35 @@ export default function TriangleActivity() {
     return { x: ox + k * vx, y: oy - k * vy };
   };
 
-  /* Where to hang the name of whoever marked the cross under the cursor.
-     `<g data-bet>` wraps the ✕ together with a transparent r=14 disc
-     (verquo_render/triangle.py), so the middle of its box IS the point the student
-     marked. Reading it off the live DOM means zoom and panning need no arithmetic here.
+  /* The name rides the cursor while it is over someone's cross — an ordinary tooltip,
+     which is what the gesture already reads as. Coordinates come straight from the
+     pointer, so zoom and panning need no arithmetic here at all.
 
-     The frame is overflow:hidden, so a cross near an edge would have its label clipped.
-     Rather than measure the label — which would need a second pass and would jitter —
-     the anchor point moves: in the middle of the frame the label is centred over the
-     cross, and against an edge it is pinned by that same edge and grows inwards. Same
-     for the top edge, where it flips underneath. */
-  const TAG_HALF = 90;   /* half of the label's max-width, see .bet-tag in panel.css */
-  const TAG_ROOM = 28;   /* the height it needs above the cross before it has to flip */
+     The frame is overflow:hidden, so near an edge the label would be clipped. Rather
+     than measure it — a second pass, and it would jitter — it just changes which of its
+     corners sits at the cursor: to the left of the pointer when there is no room on the
+     right, and below it when there is none above. */
+  const TAG_MAX = 180;   /* .bet-tag max-width in panel.css */
+  const TAG_GAP = 14;    /* clear of the pointer, so it never sits under the arrow */
 
   const betUnder = e => {
     const g = e.target.closest && e.target.closest('[data-bet]');
     if (!g || !wrap.current) return null;
-    const r = g.getBoundingClientRect();
     const f = wrap.current.getBoundingClientRect();
-    const x = r.left + r.width / 2 - f.left;
-    const below = r.top - f.top < TAG_ROOM;
+    const x = e.clientX - f.left;
+    const y = e.clientY - f.top;
     return {
       name: g.getAttribute('data-bet'),
-      x: Math.max(0, Math.min(f.width, x)),
-      y: (below ? r.bottom : r.top) - f.top,
-      below,
-      tx: x < TAG_HALF ? '0' : x > f.width - TAG_HALF ? '-100%' : '-50%'
+      x,
+      y,
+      tx: x > f.width - TAG_MAX - TAG_GAP ? `calc(-100% - ${TAG_GAP}px)` : `${TAG_GAP}px`,
+      ty: y < 30 ? `${TAG_GAP}px` : `calc(-100% - ${TAG_GAP}px)`
     };
   };
 
   const same = (a, b) =>
-    a === b || (a && b && a.name === b.name && a.tx === b.tx && a.below === b.below
-      && Math.abs(a.x - b.x) < 1 && Math.abs(a.y - b.y) < 1);
+    a === b || (a && b && a.name === b.name && a.tx === b.tx && a.ty === b.ty
+      && Math.round(a.x) === Math.round(b.x) && Math.round(a.y) === Math.round(b.y));
 
   /* The canvas is shared, so this screen has to see what other people draw — until now
      a stroke only ever appeared on the screen that made it. The poll also reports which
@@ -1064,7 +1061,7 @@ export default function TriangleActivity() {
                 left: overBet.x,
                 top: overBet.y,
                 '--tx': overBet.tx,
-                '--ty': overBet.below ? '8px' : 'calc(-100% - 8px)'
+                '--ty': overBet.ty
               }}
             >
               {overBet.name}
