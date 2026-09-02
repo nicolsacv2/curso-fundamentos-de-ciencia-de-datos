@@ -601,6 +601,22 @@ export default function TriangleActivity() {
     });
   }, [render, viewT.s]);
 
+  /* The renderer ships every bet as `<g data-bet><title>name</title>…`, and a <title> is
+     precisely what a browser draws its own tooltip from. With .bet-tag on the cursor that
+     made two labels for one cross: ours at once, and the operating system's a second
+     later, in its own font, in its own place. The name moves to aria-label, which reads
+     the same to a screen reader and draws nothing.
+
+     Keyed on [render] alone: this is about the markup, not the zoom. */
+  useEffect(() => {
+    wrap.current?.querySelectorAll('[data-bet] > title').forEach(t => {
+      const g = t.parentNode;
+      g.setAttribute('role', 'img');
+      g.setAttribute('aria-label', t.textContent);
+      t.remove();
+    });
+  }, [render]);
+
   /* ── Pointer gestures ── */
   const onPointerDown = e => {
     /* The admin only watches. Refused server-side too — this just keeps the projected
