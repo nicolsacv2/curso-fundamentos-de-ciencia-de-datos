@@ -489,12 +489,24 @@ repite en cada línea.
 
 ## Fase 8 · El material ya publicado
 
-- [ ] **T30 · Quitar la caja de la sesión 2**
+- [x] **T30 · Quitar la caja de la sesión 2**
       RF-64, RF-65, RF-66
       Retirar «SESIÓN 5 · se grafica» de `s02/figures/block3.js`, conservar los otros
       tres destinos y dejar el comentario que explica la divergencia con el original.
       **Hecho cuando:** la figura muestra tres flechas; `check_content.py` reporta como
       faltantes solo las palabras de esa caja y ninguna otra.
+
+      **Resultado.** Quedan los tres destinos ciertos (3 se limpia, 4 se describe, 7 se
+      modela), centrados exactamente donde estaban los cuatro —centro vertical 183, el
+      mismo de antes—, y el `aria-label` ya no nombra la sesión 5. El comentario de RF-66
+      queda junto a la figura, diciendo que esta es la única divergencia esperada con el
+      original y que cualquier otra que el verificador reporte es una regresión real.
+
+      **La mitad del «hecho cuando» no se pudo comprobar.** `check_content.py` necesita el
+      curso original en `../fundamentos_ciencia_de_datos/sesiones` y ese directorio no
+      existe en esta máquina: el script muere con `FileNotFoundError` antes de comparar
+      nada. No es que pase o falle, es que no puede ejecutarse. Queda pendiente de correr
+      donde esté el original, y es lo primero que hay que mirar allí.
 
 - [ ] **T31 · Reescribir el cierre de la sesión 4**
       RF-67, RF-68

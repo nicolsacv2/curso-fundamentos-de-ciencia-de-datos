@@ -19,14 +19,23 @@ export function dataset() {
   b += txt(304,212,'de este curso',{fs:17,ff:SERIF,fill:C.ink});
   b += txt(304,236,'nuestros datos, no los de un ejemplo',{fs:11,fill:C.ink3});
 
+  /* The session 5 box used to be here, promising that the classroom table would be
+     graphed. It is not: session 5 works on 183 countries from Gapminder, and leaving the
+     arrow up would have this figure promising something no later panel delivers.
+
+     This is the one place where the ported text of session 2 no longer matches the
+     original course, so check_content.py will report these words as missing. That
+     difference is expected and it is the only one; anything else it reports is a real
+     regression. See specs/001-sesion-05-graficos-y-pca. */
   const D = [
     ['SESIÓN 3','se limpia'],
     ['SESIÓN 4','se describe'],
-    ['SESIÓN 5','se grafica'],
     ['SESIÓN 7','se modela']
   ];
   D.forEach(([s,q],i)=>{
-    const y = 44+i*74;
+    /* Three boxes centred where four used to sit, so the fan of arrows stays balanced
+       against the table it comes out of. */
+    const y = 81+i*74;
     b += box(700,y,260,56,C.ask);
     b += txt(722,y+24,s,{fs:11.5,fill:C.ask,ls:1.6});
     b += txt(722,y+44,q,{fs:15,ff:SERIF,fill:C.ink});
@@ -36,5 +45,5 @@ export function dataset() {
 
   b += txt(20,H-14,'ESTA TABLA ES EL HILO QUE COSE EL CURSO. SIN ELLA SON OCHO TEMAS SUELTOS.',
     {fs:11,fill:C.ask,ls:1.6});
-  return svg(W,H,'El formulario alimenta la tabla del salón, y de esa tabla salen flechas hacia las sesiones 3, 4, 5 y 7, donde se limpia, se describe, se grafica y se modela',b);
+  return svg(W,H,'El formulario alimenta la tabla del salón, y de esa tabla salen flechas hacia las sesiones 3, 4 y 7, donde se limpia, se describe y se modela',b);
 }
