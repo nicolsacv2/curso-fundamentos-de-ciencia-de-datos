@@ -242,16 +242,23 @@ export function dispersion() {
     b += pline([[L, y], [x, y]], C.reveal, { sw: 1, dash: '3 3', op: 0.8 });
     b += pline([[x, H - B], [x, y]], C.reveal, { sw: 1, dash: '3 3', op: 0.8 });
     b += dot(x, y, 6, C.reveal);
-    b += txt(x + 14, y - 8, 'Colombia', { fs: 13, ff: SERIF, fill: C.ink });
-    b += txt(x + 14, y + 10, `${co[col('pib')]} dólares · ${co[col('vida')]} años`,
+    /* Colombia sits in the crowded part of the cloud, so its label carries its own
+       ground. Without it the figures are read through six other countries. */
+    b += box(x + 14, y - 34, 214, 46, C.reveal, { fill: C.ground2, sw: 1, stroke: C.reveal });
+    b += txt(x + 28, y - 14, 'Colombia', { fs: 13, ff: SERIF, fill: C.ink });
+    b += txt(x + 28, y + 4, `${co[col('pib')]} dólares · ${co[col('vida')]} años`,
              { fs: 11, ff: MONO, fill: C.ink3 });
   }
 
   b += txt(W - RG, H - B + 40, 'PIB per cápita (dólares) →', { fs: 12, fill: C.ink3, ta: 'end' });
-  b += txt(L - 12, T - 18, '↑ Esperanza de vida (años)', { fs: 12, fill: C.ink3 });
+  /* Its own line, above the corner label: sharing one put "DISPERSIÓN" through the
+     middle of "Esperanza de vida". */
+  b += txt(L, T - 34, '↑ Esperanza de vida (años)', { fs: 12, fill: C.ink3 });
   b += txt(56, 40, 'DISPERSIÓN', { fs: 11.5, fill: C.ask, ls: 1.6 });
-  b += txt(L, T - 18, 'el mismo gráfico de la entrada, con otras dos variables',
-           { fs: 11.5, fill: C.ask });
+  /* Right-aligned at the far edge: sharing a line with the axis label put one string
+     on top of the other, and on a wall that reads as a rendering fault. */
+  b += txt(W - RG, T - 18, 'el mismo gráfico de la entrada, con otras dos variables',
+           { fs: 11.5, fill: C.ask, ta: 'end' });
 
   return svg(W, H, 'Diagrama de dispersión de los 183 países: PIB per cápita en el eje '
     + 'horizontal y esperanza de vida en el vertical, con Colombia señalada y sus dos '
