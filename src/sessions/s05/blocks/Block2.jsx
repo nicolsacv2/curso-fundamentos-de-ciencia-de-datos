@@ -89,6 +89,54 @@ export default function Block2({ id, tabId }) {
         </Prose>
       </Pair>
 
+      <h3>Dos análisis distintos, no uno con opciones</h3>
+      <Prose>
+        <p>Esa decisión tiene nombre propio. Hacer el análisis <b>sin</b> estandarizar es
+          trabajar sobre la <b>matriz de covarianzas</b>; hacerlo <b>estandarizando</b> es
+          trabajar sobre la <b>matriz de correlaciones</b>. Son dos análisis distintos que
+          dan resultados distintos, y elegir uno es parte del trabajo.</p>
+      </Prose>
+
+      <Pair>
+        <Prose>
+          <h4>Sobre la matriz de covarianzas</h4>
+          <List>
+            <li>Los datos se <b>centran</b> y nada más.</li>
+            <li>Pesa más la variable con <b>mayor varianza absoluta</b>, aunque esa varianza
+              sea grande solo por la unidad en que está medida.</li>
+            <li>La suma de los autovalores es la <b>varianza total</b> de los datos, en sus
+              unidades al cuadrado. Aquí daría 374 014 782 — un número que no significa
+              nada para nadie.</li>
+            <li>Conviene cuando todas las variables están en la <b>misma unidad</b> y sus
+              diferencias de escala son parte de lo que quieres estudiar: cuatro medidas de
+              longitud en centímetros, notas de cuatro exámenes sobre diez.</li>
+          </List>
+        </Prose>
+        <Prose>
+          <h4>Sobre la matriz de correlaciones</h4>
+          <List>
+            <li>Los datos se centran <b>y</b> se dividen por su desviación típica.</li>
+            <li>Todas las variables entran <b>pesando lo mismo</b>, y lo que decide es cómo
+              se mueven juntas, no cuánto miden.</li>
+            <li>La suma de los autovalores es siempre el <b>número de variables</b>: aquí,
+              exactamente 4. Por eso los porcentajes se leen igual en cualquier estudio.</li>
+            <li>Conviene cuando las unidades <b>no son comparables</b>, que es nuestro caso:
+              dólares, años e hijos por mujer.</li>
+          </List>
+        </Prose>
+      </Pair>
+
+      <Prose>
+        <p><b>La prueba está en cambiar una unidad.</b> Si el PIB se midiera en miles de
+          dólares en vez de en dólares —los mismos países, la misma riqueza, otra etiqueta—,
+          el análisis sobre covarianzas <b>cambia de arriba abajo</b>: la primera componente
+          pasa de ser PIB puro a estar mandada por la mortalidad infantil, y la varianza que
+          explica cae del 100 % al 83,4 %.</p>
+        <p>El análisis sobre correlaciones da <b>exactamente lo mismo</b>: 77,2 % y las
+          mismas cargas. Y eso es lo que se le pide a un método: que la respuesta dependa de
+          los datos, no de en qué unidad los escribió quien los recogió.</p>
+      </Prose>
+
       <Diagram fig={antesYDespues}>
         Los mismos {PAISES.length} países antes y después de proyectarse. Colombia está
         señalada en las dos mitades: es una sola nube, vista de dos maneras.

@@ -634,6 +634,49 @@ reales?»— que el material no respondía.
 
 ---
 
+## Fase 11 · Lo que la clase preguntó, segunda ronda
+
+Todo esto salió de dos preguntas hechas mirando la sesión funcionando, y ninguna tenía
+respuesta en el material.
+
+- [x] **T36 · Centrar, transponer, normalizar — en ese orden**
+      RF-88, RF-96 a RF-102
+      **Hecho.** El orden es la explicación: se centra mientras las variables aún son
+      columnas, porque la media que se resta es la de cada una; se transpone; y se
+      normaliza a longitud 1, que es lo que hace que el coseno **sea** la correlación y lo
+      que le da al círculo su radio.
+
+      Con eso se unen los dos caminos que el bloque usaba sin reconocerlo: girar la tabla
+      explica **por qué** el ángulo es una correlación, y las cargas son **cómo** se
+      calcula. La sombra de un vector unitario sobre el plano *es* su carga.
+
+      Y queda dicho de dónde sale el «aproxima»: no del paso 3, donde el coseno es exacto,
+      sino del 4, al aplastar cuatro dimensiones contra dos — el 7,9 % que las dos
+      primeras componentes no conservan. *(Aquí me equivoqué primero: escribí «183
+      dimensiones contra dos». Los vectores llevan 183 números, pero cuatro variables
+      ocupan cuatro dimensiones.)*
+
+- [x] **T37 · ¿Hace falta estandarizar? Y covarianzas contra correlaciones**
+      RF-103 a RF-115
+      **Hecho.** La construcción del plano pasa de cinco pasos a siete: la nube en sus
+      unidades, el punto medio, y estandarizar. El primer panel dibuja la nube sin
+      estandarizar y sale **una línea** — el PIB se lo come todo —, así que la respuesta la
+      da el dibujo antes que el texto.
+
+      **Centrar sí es necesario**, es parte de lo que el método es. **Estandarizar no**: es
+      elegir entre el PCA sobre covarianzas y el PCA sobre correlaciones. Aquí no hay
+      elección real, y está demostrado con los datos: sin estandarizar, la primera
+      componente explica el 100,0 % con peso 1,0000 en el PIB y 0,0003 · 0,0000 · 0,0009
+      en las otras tres.
+
+      La diferencia entre los dos análisis se explica con la prueba que la zanja: si el PIB
+      se midiera en **miles** de dólares, el de covarianzas cambia de arriba abajo (la
+      primera componente pasa a estar mandada por la mortalidad, y su varianza cae al
+      83,4 %) y el de correlaciones da exactamente lo mismo. Un método debe responder a los
+      datos, no a la unidad en que alguien los escribió.
+
+---
+
 ## Terminología, fijada después de implementar
 
 Los dos objetos del análisis tienen nombre propio y no son el mismo:

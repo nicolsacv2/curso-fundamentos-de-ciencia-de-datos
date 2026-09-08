@@ -144,6 +144,21 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-106**: EL SISTEMA enunciará que estandarizar es una decisión y no un requisito del
   método.
 - **RF-107**: EL SISTEMA mostrará qué primera componente resulta cuando no se estandariza.
+- **RF-108**: EL SISTEMA explicará que el análisis puede hacerse sobre la matriz de
+  covarianzas o sobre la de correlaciones.
+- **RF-109**: EL SISTEMA enunciará que el análisis sobre covarianzas parte de datos solo
+  centrados.
+- **RF-110**: EL SISTEMA enunciará que el análisis sobre correlaciones parte de datos
+  además divididos por su desviación típica.
+- **RF-111**: EL SISTEMA enunciará que en el análisis sobre covarianzas pesa más la
+  variable de mayor varianza absoluta.
+- **RF-112**: EL SISTEMA enunciará que el análisis sobre correlaciones no cambia si se
+  cambian las unidades de una variable.
+- **RF-113**: EL SISTEMA mostrará qué le ocurre al análisis sobre covarianzas cuando se
+  cambia la unidad de una variable.
+- **RF-114**: EL SISTEMA enunciará que la suma de los autovalores del análisis sobre
+  correlaciones es el número de variables.
+- **RF-115**: EL SISTEMA indicará en qué caso conviene cada uno de los dos análisis.
 
 ### Bloque 3 — círculo de correlaciones
 
