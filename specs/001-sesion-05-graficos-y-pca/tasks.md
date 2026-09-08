@@ -458,23 +458,32 @@ repite en cada línea.
 
 ## Fase 7 · Cierre · 166–180
 
-- [ ] **T27 · `figures/closing.js`: el 3D que sobra**
+- [x] **T27 · `figures/closing.js`: el 3D que sobra**
       RF-48
       El mismo dato en tres dimensiones y en dos.
       **Hecho cuando:** las dos versiones muestran el mismo dato y la de dos ejes se lee
       mejor.
 
-- [ ] **T28 · `figures/closing.js`: los otros tres gráficos basura**
+- [x] **T28 · `figures/closing.js`: los otros tres gráficos basura**
       RF-50, RF-51, RF-52
       Sin etiquetas en los ejes; sin ejes; sobrecargado hasta impedir la lectura.
       **Hecho cuando:** los tres existen y cada uno falla por un motivo distinto.
 
-- [ ] **T29 · `blocks/Closing.jsx`**
+- [x] **T29 · `blocks/Closing.jsx`**
       RF-49, RF-53, RF-54, RF-55
       Qué se pierde con la tercera dimensión; qué impide entender cada gráfico basura;
       ticket de salida; ninguna tarea para la sesión 6.
       **Hecho cuando:** cada uno de los cuatro gráficos basura lleva su frase de qué
       impide entender, y no hay ningún bloque de tarea en el panel.
+
+      **Resultado.** Los cuatro con su frase, un solo `<Task>` —el ticket— y ninguna tarea.
+      El cierre nombra el patrón que comparten: o le **quitan** al lector lo que necesita
+      (etiquetas, ejes, la base en cero) o le **añaden** lo que no pidió (una dimensión,
+      todos los nombres). Y ninguno se arregla con mejores datos.
+
+      El caso límite 9 queda resuelto en el propio texto: el 3D del bloque 2 se gira y por
+      eso enseña de dónde sale una proyección; el del cierre es una foto fija de algo que
+      cabía en dos ejes, y lo que cuesta son exactamente los cuatro números.
 
 ---
 
