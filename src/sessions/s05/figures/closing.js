@@ -75,3 +75,62 @@ export function tresDeMas() {
     + 'la tercera dimensión no lleva ninguna variable y solo consigue que el valor de '
     + 'cada barra ya no se pueda leer sobre el eje', b);
 }
+
+/* ── 2, 3 and 4. Three ways to make a good scatter useless ──
+   All three draw the same cloud the class read in block 1 — GDP against life expectancy
+   — so the three faults can be compared without the data changing underneath. */
+function nube(x0, y0, w, h, o) {
+  o = o || {};
+  const xs = PAISES.map(p => p[col('pib')]);
+  const ys = PAISES.map(p => p[col('vida')]);
+  const sx = scale([0, Math.max(...xs) * 1.02], [x0, x0 + w]);
+  const sy = scale([Math.min(...ys) - 3, Math.max(...ys) + 2], [y0 + h, y0]);
+  let b = '';
+  if (o.ejes) {
+    b += axes(x0, y0 + h, w, h);
+    [0, 50000, 100000].forEach(v => { b += pline([[sx(v), y0 + h], [sx(v), y0 + h + 5]], C.line, { sw: 1 }); });
+    [50, 65, 80].forEach(v => { b += pline([[x0 - 5, sy(v)], [x0, sy(v)]], C.line, { sw: 1 }); });
+  }
+  PAISES.forEach(p => {
+    b += dot(sx(p[col('pib')]), sy(p[col('vida')]), o.r || 3.2,
+             REGION_COLOR[p[col('region')]] || C.ink2, { op: o.op || 0.62 });
+  });
+  if (o.nombres) {
+    PAISES.forEach(p => {
+      b += txt(sx(p[col('pib')]) + 4, sy(p[col('vida')]) - 3, p[col('nombre')],
+               { fs: 5.5, fill: C.ink3, ff: MONO });
+    });
+  }
+  return b;
+}
+
+export function basura() {
+  const W = 980, H = 480, PW = 268, PH = 250, PY = 96;
+  let b = txt(56, 40, 'TRES MANERAS DE ARRUINAR EL MISMO GRÁFICO',
+              { fs: 11.5, fill: C.reveal, ls: 1.6 });
+  b += txt(56, 62, 'los tres dibujan los mismos 183 países del bloque 1',
+           { fs: 11.5, fill: C.ink3 });
+
+  /* no labels: the axes are there, but nothing says what they measure */
+  b += nube(70, PY, PW, PH, { ejes: true });
+  b += txt(70, PY + PH + 34, 'SIN ETIQUETAS', { fs: 11.5, fill: C.reveal, ls: 1.6 });
+  b += txt(70, PY + PH + 56, '¿qué mide cada eje?', { fs: 12.5, ff: SERIF, fill: C.ink2 });
+  b += txt(70, PY + PH + 76, '¿en qué unidades? ¿de qué año?', { fs: 11, fill: C.ink3 });
+
+  /* no axes at all */
+  b += nube(356, PY, PW, PH, {});
+  b += txt(356, PY + PH + 34, 'SIN EJES', { fs: 11.5, fill: C.reveal, ls: 1.6 });
+  b += txt(356, PY + PH + 56, 'una mancha bonita', { fs: 12.5, ff: SERIF, fill: C.ink2 });
+  b += txt(356, PY + PH + 76, 'sin dónde empieza ni cuánto vale nada', { fs: 11, fill: C.ink3 });
+
+  /* everything at once */
+  b += nube(642, PY, PW, PH, { ejes: true, nombres: true, r: 3.6, op: 0.8 });
+  b += txt(642, PY + PH + 34, 'SOBRECARGADO', { fs: 11.5, fill: C.reveal, ls: 1.6 });
+  b += txt(642, PY + PH + 56, `los ${PAISES.length} nombres a la vez`,
+           { fs: 12.5, ff: SERIF, fill: C.ink2 });
+  b += txt(642, PY + PH + 76, 'todo dicho, nada legible', { fs: 11, fill: C.ink3 });
+
+  return svg(W, H, 'Tres versiones del mismo diagrama de dispersión de 183 países: una sin '
+    + 'etiquetas en los ejes, otra sin ejes, y otra con los nombres de los 183 países '
+    + 'escritos encima. Los datos son correctos en las tres', b);
+}
