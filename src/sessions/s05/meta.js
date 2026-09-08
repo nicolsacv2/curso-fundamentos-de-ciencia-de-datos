@@ -14,7 +14,7 @@ export default {
     { id: 'entrada',  lab: 'Entrada',  rname: 'Tres fórmulas encadenadas', clock: '0–35' },
     { id: 'bloque-1', lab: 'Bloque 1', rname: 'Cinco gráficos',            clock: '35–75' },
     { id: 'bloque-2', lab: 'Bloque 2', rname: 'La sombra de la nube',      clock: '83–120' },
-    { id: 'bloque-3', lab: 'Bloque 3', rname: 'La tabla girada',           clock: '128–166' },
+    { id: 'bloque-3', lab: 'Bloque 3', rname: 'Mirar las variables',       clock: '128–166' },
     { id: 'cierre',   lab: 'Cierre',   rname: 'Gráficos que estorban',     clock: '166–180' }
   ]
 };

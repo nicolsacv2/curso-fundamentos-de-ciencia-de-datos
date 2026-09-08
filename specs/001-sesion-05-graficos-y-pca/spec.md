@@ -348,22 +348,13 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 11. **Números que no cuadran con el ejemplo.** Los porcentajes de varianza explicada de
    RF-26 tienen que salir del conjunto real; inventarlos rompería el principio de que los
    números en pantalla son comprobables.
-12. **La tabla girada muestra valores crudos, y el círculo no se construye con ellos.**
-   La figura de la transpuesta imprime los valores tal como vienen —Catar con 132900
-   dólares— y el texto pasaba de «la variable es un registro» a «un registro es un vector»
-   sin decir que antes hay que centrar y dividir por la desviación típica. Sin ese paso,
-   el vector de Catar lo decide el PIB y el ángulo no significa nada.
-
-   Lo destapó una pregunta sobre esa figura: «¿son las coordenadas de las componentes o
-   los valores reales?». Son los reales, y el material no explicaba el puente. Cubierto
-   ahora por RF-88 a RF-95, que exigen decir qué es centrar (restar la media), por qué se
-   divide (igualar escalas), qué pasa si no se hace (manda la variable más grande), qué
-   queda en el origen (la media de cada una) y qué matriz se acaba diagonalizando (la de
-   correlaciones).
-13. **La transpuesta no cabe en la pantalla.** Un conjunto célebre tiene decenas o
-   cientos de filas, así que su transpuesta tiene decenas o cientos de columnas y no se
-   proyecta entera. RF-36 exige mostrar ambas, de modo que hay que decidir qué recorte se
-   enseña sin que deje de leerse como la misma tabla girada.
+12. **El bloque 3 no dibuja la tabla, y es a propósito.** Hubo una figura con la tabla
+   junto a su transpuesta. Con valores crudos hacía creer que las flechas del círculo se
+   dibujan con esos números; con valores centrados seguía sobrando, porque lo que la
+   figura contaba —una columna pasa a ser una fila— ya lo dicen los pasos. Se retiró, y
+   el bloque arranca directamente en la construcción. Lo que sí quedó de aquella
+   pregunta son RF-88 a RF-102, que obligan a decir qué es centrar, por qué se divide y
+   qué se pierde al proyectar.
 
 ## Fuera de alcance
 

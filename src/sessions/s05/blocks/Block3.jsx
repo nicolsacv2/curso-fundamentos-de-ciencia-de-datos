@@ -27,42 +27,7 @@ export default function Block3({ id, tabId }) {
   return (
     <Panel id={id} tabId={tabId}>
       <p className="eyebrow">Bloque 3 · 128–166</p>
-      <h2>La tabla girada</h2>
-
-      <Pair>
-        <Prose>
-          <h4>Una variable pasa a ser un registro</h4>
-          <p>Al <b>transponer</b> la tabla, cada variable deja de ser una columna y se
-            convierte en una fila: en un registro más, con {PAISES.length} valores. Ya no
-            hay {PAISES.length} casos con 4 medidas, hay 4 casos con {PAISES.length}
-            {' '}medidas.</p>
-          <p>Y a un registro se le puede hacer lo mismo que a un país: colocarlo como un
-            {' '}<b>vector</b>. Cada variable es ahora una flecha.</p>
-        </Prose>
-        <Prose>
-          <h4>Dos vistas del mismo análisis</h4>
-          <p>El <b>plano factorial</b> del bloque anterior colocaba los <b>individuos</b>: un
-            punto por país. El <b>círculo de correlaciones</b> de este bloque coloca las
-            <b> variables</b>: una flecha por indicador.</p>
-          <p>No son dos análisis, son <b>las dos caras del mismo</b>. Salen de la misma
-            matriz y de los mismos autovectores; lo único que cambia es si miras la tabla o
-            la tabla girada.</p>
-        </Prose>
-      </Pair>
-
-      <h3>De la tabla girada al dibujo</h3>
-      <Prose>
-        <p>Los valores con los que se trabaja <b>ya vienen centrados</b>: cada número es la
-          distancia de ese país a la media de su variable. Con los valores tal como llegaron
-          —Catar con 132 900 dólares y 1.98 hijos por mujer— el vector de Catar lo decidiría
-          su PIB y nada más, porque 132 900 aplasta a 1.98, y el coseno del ángulo entre dos
-          flechas no significaría nada.</p>
-        <p>El camino completo son tres operaciones: <b>centrar</b>, <b>transponer</b> y
-          {' '}<b>normalizar</b>. La primera <b>ya está hecha</b> — es la del bloque
-          anterior, la que nos permitió encontrar las componentes —, así que lo único nuevo
-          de este bloque son las otras dos: girar la tabla para mirar variables en vez de
-          países, y ajustar la longitud de cada vector.</p>
-      </Prose>
+      <h2>Mirar las variables</h2>
 
       <Diagram fig={pasosCirculo}>
         Centrar, transponer, normalizar. El primero ya venía hecho; lo que se pierde está en
@@ -78,7 +43,7 @@ export default function Block3({ id, tabId }) {
             bloque anterior para encontrar las componentes, y se hace una sola vez: de esa
             misma preparación salen el plano de los países y el círculo de las variables.
             Lo que sí conviene mirar ahora es <i>qué significa</i>, y a eso vamos abajo.</li>
-          <li><b>02 · Transponer.</b> Se gira la tabla. Cada variable pasa a ser una fila:
+          <li><b>02 · Transponer.</b> Cada variable pasa a ser una fila:
             un <b>vector con {PAISES.length} números</b>, uno por país. Aquí empieza lo
             propio de este bloque — y fíjate en las <b>longitudes</b>: cada vector es tan
             largo como su escala lo hizo. El del PIB mide unas <b>14 000 veces</b> el de
@@ -95,7 +60,7 @@ export default function Block3({ id, tabId }) {
             {' '}{PAISES.length} números cada uno, ocupan entre todos un espacio de
             {' '}<b>cuatro</b> dimensiones — hay cuatro variables y nada más. La hoja tiene
             dos, así que se proyectan sobre el plano de las dos primeras componentes. <b>La sombra de un vector es su carga</b> — y aquí se juntan los
-            dos caminos de este bloque: girar la tabla explica <i>por qué</i> el ángulo es
+            dos caminos de este bloque: transponer explica <i>por qué</i> el ángulo es
             una correlación; las cargas son <i>cómo</i> se calcula. Es el mismo dibujo.</li>
           <li><b>05 · El círculo.</b> Su radio es 1 porque los vectores medían 1. Lo que le
             falte a una flecha para tocar el borde es lo que esa variable dejó fuera del
@@ -114,6 +79,14 @@ export default function Block3({ id, tabId }) {
       </Prose>
 
       <h3>El círculo de correlaciones</h3>
+      <Prose>
+        <p>El <b>plano factorial</b> del bloque anterior colocaba los <b>individuos</b>: un
+          punto por país. Este círculo coloca las <b>variables</b>: una flecha por indicador.
+          No son dos análisis, son <b>las dos caras del mismo</b> — salen de la misma matriz
+          y de los mismos autovectores; lo único que cambia es a cuál de los dos lados de la
+          tabla estás mirando.</p>
+      </Prose>
+
       <Diagram fig={circuloCorrelaciones}>
         Las cuatro variables en el plano de las dos primeras componentes, que juntas
         conservan el {dos} % de la información de las cuatro.
@@ -158,8 +131,8 @@ export default function Block3({ id, tabId }) {
         </Prose>
       </Pair>
 
-      <Idea>La tabla girada convierte cada variable en un vector, y el <b>coseno</b> del
-        ángulo entre dos vectores es su correlación.{' '}
+      <Idea>Transponer convierte cada variable en un vector, y el <b>coseno</b> del ángulo
+        entre dos vectores es su correlación.{' '}
         <span className="who">El mismo número de la entrada, ahora dibujado.</span></Idea>
     </Panel>
   );
