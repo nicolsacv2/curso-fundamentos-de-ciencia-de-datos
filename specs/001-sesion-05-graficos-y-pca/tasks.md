@@ -260,13 +260,21 @@ repite en cada línea.
       en que cambien los datos, y entonces sería una cifra proyectada que ya no pertenece
       a los puntos que tiene debajo. Comprobado que coincide con `CORR[vida][fertilidad]`.
 
-- [ ] **T15 · `blocks/Intro.jsx`**
+- [x] **T15 · `blocks/Intro.jsx`**
       RF-4, RF-10, RF-11, RF-12, RF-13, RF-14, RF-16, RF-58, RF-60, RF-61, RF-63
       Gancho, los cuatro indicadores con qué mide cada uno, la cadena varianza →
       covarianza → correlación, sin unidades y acotada, el nombre «diagrama de
       dispersión» sin construirlo, el año y el crédito de la fuente.
       **Hecho cuando:** los once requisitos se localizan uno a uno en la pantalla del
       bloque, lista en mano.
+
+      **Resultado.** Los once localizados uno a uno. En pantalla: 4 tarjetas de indicador
+      con qué mide cada uno, 2 figuras, el año 2015, los 183 países y la licencia
+      CC BY 4.0; sin scroll horizontal.
+
+      La desviación típica de la esperanza de vida se interpola desde `ESTAD`, así que el
+      número que ilustra «la desviación típica es la raíz de la varianza» es el de los
+      datos reales y no un ejemplo inventado.
 
 ---
 
