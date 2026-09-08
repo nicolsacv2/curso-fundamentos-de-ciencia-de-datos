@@ -122,3 +122,19 @@ export function varianzaExplicada() {
     `la ${i + 1} conserva el ${v} por ciento`).join(', ')}; entre las dos primeras, `
     + `el ${dos.toFixed(1)} por ciento`, b);
 }
+
+/* ── Who sits at each end of a component ───────────────────
+   Read from the data, not written down: the countries at the extremes are the argument
+   for a component's name, so they have to move if the data does. */
+export function extremos(j, cuantos) {
+  const [e] = [PCA3.vectores[j]];
+  const puntuados = PAISES.map(p => ({
+    nombre: p[col('nombre')],
+    score: PCA3.vars.reduce((s, k, i) => s + z(p[col(k)], ESTAD[k]) * e[i], 0),
+  })).sort((a, b) => a.score - b.score);
+  const n = cuantos || 3;
+  return {
+    bajos: puntuados.slice(0, n).map(p => p.nombre),
+    altos: puntuados.slice(-n).reverse().map(p => p.nombre),
+  };
+}

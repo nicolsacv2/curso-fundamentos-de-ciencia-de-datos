@@ -1,11 +1,14 @@
 import { Panel, Diagram, Pair, Prose, List, Idea, Task, Cards, Card }
   from '../../../components/content/index.jsx';
-import { antesYDespues, varianzaExplicada } from '../figures/block2.js';
+import { antesYDespues, varianzaExplicada, extremos } from '../figures/block2.js';
+import { COMPONENTES } from '../figures/cloud3d.js';
 import Cloud3D from '../views/Cloud3D.jsx';
 import { PCA3, PAISES, VARS, ANIO, FUENTE } from '../data/paises.js';
 
 export default function Block2({ id, tabId }) {
   const dos = (PCA3.porcentajes[0] + PCA3.porcentajes[1]).toFixed(1);
+  const nombre = k => VARS.find(v => v[0] === k)[1].toLowerCase();
+  const carga = (i, j) => PCA3.cargas[i][j].toFixed(2).replace('-', '−');
 
   return (
     <Panel id={id} tabId={tabId}>
@@ -54,6 +57,39 @@ export default function Block2({ id, tabId }) {
             cálculo.</p>
         </Prose>
       </Pair>
+
+      <h3>Ponerles nombre</h3>
+      <Prose>
+        <p>Una componente llega sin nombre: el cálculo produce direcciones, no significados.
+          Bautizarla es cosa nuestra, y se hace mirando dos cosas — <b>qué variables pesan
+          en ella</b> y <b>quién queda en cada extremo</b>. Lo que sigue es una lectura, no
+          un resultado, y por eso se puede discutir.</p>
+      </Prose>
+
+      <Cards>
+        {COMPONENTES.map((c, j) => {
+          const ext = extremos(j);
+          return (
+            <Card key={c.eje} k={`${c.eje} · ${PCA3.porcentajes[j]} %`} t={c.nombre}>
+              {PCA3.vars.map(v => `${nombre(v)} ${carga(PCA3.vars.indexOf(v), j)}`).join(' · ')}
+              {' — de '}{ext.bajos.slice(0, 2).join(' y ')}{' en un extremo a '}
+              {ext.altos.slice(0, 2).join(' y ')}{' en el otro.'}
+            </Card>
+          );
+        })}
+      </Cards>
+
+      <Prose>
+        <p>«{COMPONENTES[0].nombre}» se sostiene solo: {COMPONENTES[0].glosa}, y va de
+          {' '}{extremos(0).bajos[0]} a {extremos(0).altos[0]}. La segunda es más incómoda de
+          nombrar — {COMPONENTES[1].glosa} — y por eso separa a {extremos(1).altos.slice(0, 2).join(' y ')},
+          ricos y con natalidad alta, de {extremos(1).bajos.slice(0, 2).join(' y ')}, de renta
+          media y natalidad muy baja.</p>
+        <p><b>Cuidado con el nombre.</b> En cuanto una componente se llama «nivel de vida»,
+          es facilísimo empezar a tratarla como si fuera una variable que alguien midió. No
+          lo es: es una mezcla que inventamos nosotros para poder dibujar, y el nombre es la
+          parte que no salió de ningún cálculo.</p>
+      </Prose>
 
       <h3>Cuánto conserva cada componente</h3>
       <Diagram fig={varianzaExplicada}>

@@ -27,6 +27,20 @@ const COLS = Object.fromEntries(CAMPOS.map((c, i) => [c, i]));
 const KEYS = PCA3.vars;
 const LABEL = Object.fromEntries(VARS.map(([k, name]) => [k, name]));
 
+/* What the two components get called.
+
+   These names are read off the loadings and nothing else: the first rises with GDP and
+   life expectancy and falls with children per woman; the second is almost pure GDP with
+   life expectancy sitting at zero. They are interpretations, not results — the algebra
+   produces directions, not meanings — and the block says so out loud, because a named
+   component is very easy to start treating as a measured variable. */
+export const COMPONENTES = [
+  { eje: 'CP 1', nombre: 'nivel de vida',
+    glosa: 'sube con el PIB y la esperanza de vida, baja con los hijos por mujer' },
+  { eje: 'CP 2', nombre: 'riqueza con familias grandes',
+    glosa: 'casi solo PIB, con la esperanza de vida en cero' },
+];
+
 /* Region tints. They are a help, never the message: every figure has to survive a
    projector that flattens two of these into the same colour. */
 const REGION = {
@@ -100,6 +114,29 @@ function axes3d(cam, mid, span, named) {
   return s;
 }
 
+
+/* Every label of the scene goes through here.
+
+   They are drawn last and pushed apart when they collide, because their positions come
+   from a rotation the reader controls: any fixed offset is right at one angle and wrong
+   at the next. Each one carries its own ground — underneath there are 183 dots. */
+function drawLabels(labels) {
+  const placed = [];
+  let s = '';
+  labels.slice().sort((a, b) => a.y - b.y).forEach(lab => {
+    let y = lab.y;
+    placed.forEach(o => {
+      if (Math.abs(y - o.y) < 21 && Math.abs(lab.x - o.x) < (lab.w + o.w) / 2) y = o.y + 21;
+    });
+    placed.push({ ...lab, y });
+    s += `<rect x="${(lab.x - lab.w / 2).toFixed(1)}" y="${(y - 10).toFixed(1)}"
+      width="${lab.w.toFixed(1)}" height="19" rx="3" fill="${C.ground2}" opacity=".88"
+      ${lab.borde ? `stroke="${lab.color}" stroke-width=".8"` : ''}/>`;
+    s += txt(lab.x, y + 4, lab.t, { fs: lab.fs || 11, fill: lab.color, ta: 'middle' });
+  });
+  return s;
+}
+
 export default function cloud3d(o) {
   o = o || {};
   const cam = camera(o.yaw ?? INITIAL.yaw, o.pitch ?? INITIAL.pitch);
@@ -114,12 +151,26 @@ export default function cloud3d(o) {
   const far = Math.min(...drawn.map(d => d.depth));
 
   let b = arrow('ar-s5-cloud', C.ink3) + arrow('ar-s5-vec', C.reveal);
+  const labels = [];
   b += `<rect x="0" y="0" width="${W}" height="${H}" fill="${C.ground2}" opacity=".35"/>`;
   b += axes3d(cam, mid, span, !o.vectors);
 
   if (o.plane) {
     const corners = planeCorners(raw, mid).map(c => project(cam, c)).map(p => [p.x, p.y]);
     b += poly(corners, C.ask, { op: 0.12, stroke: C.ask, sw: 1.2 });
+
+    /* The two axes of the plane, named. Without this the plane is a pane of glass; with
+       it, it is a pair of directions the class can argue about. */
+    const [e1, e2] = PCA3.vectores;
+    const centre = project(cam, KEYS.map((_, i) => -mid[i]));
+    [[e1, COMPONENTES[0], 2.6], [e2, COMPONENTES[1], 1.9]].forEach(([e, comp, len]) => {
+      const tip = project(cam, e.map((v, i) => v * len - mid[i]));
+      b += pline([[centre.x, centre.y], [tip.x, tip.y]], C.ask, { sw: 1.4, op: 0.9 });
+      const out = project(cam, e.map((v, i) => v * (len + 0.5) - mid[i]));
+      const rotulo = `${comp.eje} · ${comp.nombre}`;
+      labels.push({ x: out.x, y: out.y, t: rotulo, color: C.ask, borde: true,
+                    w: rotulo.length * 6.2 + 14 });
+    });
   }
 
   if (o.projections) {
@@ -164,13 +215,13 @@ export default function cloud3d(o) {
       /* The label goes past the arrowhead, not on it: at the tip it fell inside the
          cloud and had 183 dots reading through it. */
       const out = project(cam, dir.map((v, j) => v * 1.34 - mid[j]));
-      const w = LABEL[k].length * 6.6 + 14;
-      b += `<rect x="${(out.x - w / 2).toFixed(1)}" y="${(out.y - 9).toFixed(1)}"
-        width="${w.toFixed(1)}" height="18" rx="3" fill="${C.ground2}" opacity=".82"/>`;
-      b += txt(out.x, out.y + 4, LABEL[k], { fs: 11.5, fill: C.reveal, ta: 'middle' });
+      labels.push({ x: out.x, y: out.y, t: LABEL[k], color: C.reveal, fs: 11.5,
+                    w: LABEL[k].length * 6.6 + 14 });
     });
     b += '</g>';
   }
+
+  b += drawLabels(labels);
 
   b += txt(28, 34, `${PAISES.length} países · ${ANIO}`, { fs: 12, fill: C.ink3, ls: 1.4 });
   b += txt(28, 56, 'Arrastra para girarla', { fs: 13, ff: SERIF, fill: C.ink2 });

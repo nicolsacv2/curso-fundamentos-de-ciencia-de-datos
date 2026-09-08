@@ -125,6 +125,17 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-34**: EL SISTEMA enunciará en el bloque 2 la maldición de la dimensionalidad.
 - **RF-35**: EL SISTEMA presentará en el bloque 2 el análisis de componentes principales
   como una respuesta a la maldición de la dimensionalidad.
+- **RF-80**: EL SISTEMA propondrá un nombre para cada una de las dos primeras componentes
+  del plano factorial.
+- **RF-81**: EL SISTEMA justificará cada uno de esos nombres con las cargas de su
+  componente.
+- **RF-82**: EL SISTEMA mostrará qué países quedan en cada extremo de cada una de esas dos
+  componentes.
+- **RF-83**: EL SISTEMA advertirá que el nombre de una componente es una interpretación y
+  no un resultado del cálculo.
+- **RF-84**: EL SISTEMA mostrará en el bloque 2 la construcción del plano factorial como
+  una secuencia de pasos dibujados.
+- **RF-85**: EL SISTEMA describirá con texto cada uno de los pasos de esa construcción.
 
 ### Bloque 3 — círculo de correlaciones
 
@@ -154,6 +165,11 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
   representada queda esa variable en el plano dibujado.
 - **RF-47**: EL SISTEMA remitirá a la fórmula de correlación de la entrada al enunciar su
   equivalencia con el ángulo.
+- **RF-86**: EL SISTEMA mostrará en el bloque 3 la construcción del círculo de
+  correlaciones como una secuencia de pasos dibujados.
+- **RF-87**: EL SISTEMA describirá con texto cada uno de los pasos de esa construcción.
+- **RF-88**: EL SISTEMA incluirá en esa construcción el paso de estandarizar cada fila de
+  la tabla girada.
 
 ### Cierre — gráficos basura
 
@@ -277,7 +293,12 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 11. **Números que no cuadran con el ejemplo.** Los porcentajes de varianza explicada de
    RF-26 tienen que salir del conjunto real; inventarlos rompería el principio de que los
    números en pantalla son comprobables.
-12. **La transpuesta no cabe en la pantalla.** Un conjunto célebre tiene decenas o
+12. **La tabla girada muestra valores crudos, y el círculo no se construye con ellos.**
+   La figura de la transpuesta imprime los valores tal como vienen —Catar con 132900
+   dólares— y el texto pasa de «la variable es un registro» a «un registro es un vector»
+   sin decir que antes hay que centrar y dividir por la desviación típica. Sin ese paso,
+   el vector de Catar lo decide el PIB y el ángulo no significa nada. RF-88 lo cubre.
+13. **La transpuesta no cabe en la pantalla.** Un conjunto célebre tiene decenas o
    cientos de filas, así que su transpuesta tiene decenas o cientos de columnas y no se
    proyecta entera. RF-36 exige mostrar ambas, de modo que hay que decidir qué recorte se
    enseña sin que deje de leerse como la misma tabla girada.

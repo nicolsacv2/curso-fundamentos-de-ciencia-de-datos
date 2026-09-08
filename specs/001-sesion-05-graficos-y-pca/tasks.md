@@ -574,6 +574,50 @@ repite en cada línea.
 
 ---
 
+## Fase 10 · Lo que la clase preguntó
+
+Dos tareas añadidas después de ver la sesión funcionando. La segunda nace de una pregunta
+sobre la figura de la tabla girada —«¿son las coordenadas de las componentes o los valores
+reales?»— que el material no respondía.
+
+- [x] **T34 · Bautizar las dos componentes en el bloque 2**
+      RF-80, RF-81, RF-82, RF-83
+      Un nombre para cada una de las dos primeras componentes del plano factorial, con las
+      cargas que lo justifican y los países de cada extremo. Y la advertencia de que el
+      nombre es interpretación, no resultado.
+      **Hecho cuando:** los dos nombres aparecen en el plano factorial de la figura 3D y
+      en el texto, cada uno con sus cargas y sus países extremos leídos del archivo
+      generado; y la advertencia está a la vista, no en letra pequeña.
+
+      **Resultado.** Los dos ejes del plano van rotulados dentro de la escena: **CP 1 ·
+      nivel de vida** (PIB +0,80, vida +0,93, hijos −0,87; de Malí y Níger a Catar y
+      Singapur) y **CP 2 · riqueza con familias grandes** (casi solo PIB, con la esperanza
+      de vida en cero; separa Catar y Kuwait de Moldavia y Bosnia). Los extremos se
+      calculan de `PAISES`, no se escriben.
+
+      La advertencia tiene su propio párrafo: en cuanto una componente se llama «nivel de
+      vida» es facilísimo tratarla como una variable que alguien midió, y el nombre es
+      justo la parte que no salió de ningún cálculo.
+
+      **Y obligó a un arreglo de fondo.** Al añadir dos rótulos más, quedaron encima de los
+      de los vectores: cuatro etiquetas disputándose el centro de la nube. Ahora todos los
+      rótulos de la escena se colocan por un mismo sitio, que los separa. Verificado en
+      **714 combinaciones de ángulo**: ni un solapamiento. Importa porque el ángulo lo
+      elige quien mira, así que un ajuste fijo estaría bien en una posición y mal en la
+      siguiente.
+
+- [ ] **T35 · El paso a paso de las dos construcciones**
+      RF-84, RF-85, RF-86, RF-87, RF-88
+      Una figura de pasos numerados en cada bloque, cada paso dibujado y descrito: en el
+      bloque 2, cómo se llega al plano factorial; en el bloque 3, cómo se llega al círculo
+      de correlaciones. El del bloque 3 tiene que incluir el paso de estandarizar, que es
+      el que hoy falta.
+      **Hecho cuando:** cada figura tiene sus pasos numerados y dibujados, cada paso tiene
+      su descripción en el texto del bloque, y la construcción del círculo pasa
+      explícitamente por centrar y dividir por la desviación típica.
+
+---
+
 ## Terminología, fijada después de implementar
 
 Los dos objetos del análisis tienen nombre propio y no son el mismo:
