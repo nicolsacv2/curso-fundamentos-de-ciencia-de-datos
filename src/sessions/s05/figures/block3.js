@@ -89,12 +89,12 @@ export function transpuesta() {
     + `fila. Se muestran 6 de los ${PAISES.length} países`, b);
 }
 
-/* ── The circle of variables ───────────────────────────────
+/* ── The factorial plane ───────────────────────────────────
    Each variable as an arrow in the plane of the first two components. Starting from the
    correlation matrix, a loading *is* the correlation between that variable and that
    component, so every arrow fits inside a circle of radius one — and how close it gets
    to the edge is how well the plane represents it (RF-46). */
-export function circulo() {
+export function planoFactorial() {
   const W = 980, H = 520, CXP = 400, CY = 262, R = 190;
   const L = PCA4.cargas;
 
@@ -118,7 +118,7 @@ export function circulo() {
 
      Two of these variables sit three degrees from each other, so their labels landed on
      top of one another: two names and two numbers in the same twelve pixels. Nudging
-     them apart in y keeps each one beside its own arrow and readable, which a circle
+     them apart in y keeps each one beside its own arrow and readable, which a plane
      whose whole subject is the angle between arrows rather needs. */
   const placed = [];
   KEYS.map((k, i) => {
@@ -159,7 +159,7 @@ export function circulo() {
     + `${Math.max(...L.map(l => Math.hypot(l[0], l[1]))).toFixed(2)}: el plano las `
     + 'representa bien a las cuatro.', { fs: 12, fill: C.ink3, ta: 'middle' });
 
-  return svg(W, H, 'Círculo de variables: las cuatro variables como flechas en el plano '
+  return svg(W, H, 'Plano factorial: las cuatro variables como flechas en el plano '
     + 'de las dos primeras componentes. ' + KEYS.map((k, i) =>
       `${LABEL[k]} con longitud ${Math.hypot(L[i][0], L[i][1]).toFixed(2)}`).join(', '), b);
 }
@@ -183,7 +183,7 @@ function miniCircle(cx, cy, r, arrows, tag, caption, ilustrativo) {
       stroke="${ilustrativo ? C.ink3 : C.ask}" stroke-width="2" fill="none"
       marker-end="url(#ar-s5-ang)"/>`;
   });
-  /* Same pushing apart as the big circle needs, and for the same reason: the pair this
+  /* Same pushing apart as the plane needs, and for the same reason: the pair this
      figure exists to show sits three degrees apart, so their names land on each other. */
   const placed = [];
   arrows.map(([ang, name]) => ({
@@ -240,7 +240,7 @@ export function tresAngulos() {
   b += txt(490, 60, 'El coseno del ángulo entre dos flechas aproxima su correlación',
            { fs: 14, ff: SERIF, fill: C.ink, ta: 'middle' });
 
-  return svg(W, H, 'Tres casos del ángulo entre dos flechas del círculo: hijos por mujer y '
+  return svg(W, H, 'Tres casos del ángulo entre dos flechas del plano factorial: hijos por mujer y '
     + `mortalidad infantil a ${juntas.grados.toFixed(0)} grados con correlación `
     + `${rReal('fertilidad', 'mortalidad').toFixed(2)}; un caso ilustrativo de dos variables `
     + 'perpendiculares con correlación cero; y esperanza de vida contra mortalidad infantil '

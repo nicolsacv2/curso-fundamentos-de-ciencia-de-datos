@@ -8,7 +8,7 @@
 export default {
   n: 5,
   title: 'Ver lo que no cabe en la hoja',
-  goal: 'Elegir el gráfico que corresponde a cada dato y a cada pregunta, y leer un plano y un círculo de componentes para ver a la vez más variables de las que caben en dos ejes.',
+  goal: 'Elegir el gráfico que corresponde a cada dato y a cada pregunta, y leer un plano factorial para ver a la vez más variables de las que caben en dos ejes.',
   hook: 'Cuatro variables no caben en un papel de dos dimensiones; vamos a dibujarlas todas y a perder menos de lo que crees.',
   blocks: [
     { id: 'entrada',  lab: 'Entrada',  rname: 'Tres fórmulas encadenadas', clock: '0–35' },

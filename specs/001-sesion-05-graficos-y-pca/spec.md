@@ -7,7 +7,7 @@ con una caja de resúmenes numéricos —centro, dispersión, asociación— y c
 cada uno. La sesión 5 los vuelve dibujo: qué gráfico le corresponde a cada tipo de dato,
 cómo se lee, y qué pasa cuando las variables son tantas que ningún plano las muestra a
 la vez. Ahí entra el análisis de componentes principales, primero como nube que se mira
-desde su mejor ángulo y después como círculo de variables, donde el ángulo entre dos
+desde su mejor ángulo y después como plano factorial, donde el ángulo entre dos
 flechas es la correlación que la entrada acaba de definir con fórmula. La sesión cierra
 con el reverso: gráficos que estorban en vez de mostrar.
 
@@ -39,7 +39,7 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
   elegir el que deforma lo que quiero mostrar.
 - **H3**: Como estudiante quiero entender qué hace PCA con una nube de puntos para leer
   un plano de componentes sin creer que es un mapa geográfico.
-- **H4**: Como estudiante quiero leer un círculo de variables para deducir qué variables
+- **H4**: Como estudiante quiero leer un plano factorial para deducir qué variables
   van juntas sin calcular ninguna correlación.
 - **H5**: Como estudiante quiero reconocer un gráfico basura para no producirlo yo.
 - **H6**: Como profesor quiero que la sesión 5 se recorra igual que las cuatro
@@ -58,7 +58,7 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-4**: EL SISTEMA abrirá la sesión 5 con el gancho «Cuatro variables no caben en un
   papel de dos dimensiones; vamos a dibujarlas todas y a perder menos de lo que crees».
 - **RF-5**: EL SISTEMA mostrará como objetivo de la sesión 5 «elegir el gráfico que
-  corresponde a cada dato y a cada pregunta, y leer un plano y un círculo de componentes
+  corresponde a cada dato y a cada pregunta, y leer un plano factorial
   para ver a la vez más variables de las que caben en dos ejes».
 - **RF-6**: EL SISTEMA anunciará junto a cada bloque su franja de minutos: 0–35 la
   entrada, 35–75 el bloque 1, 83–120 el bloque 2, 128–166 el bloque 3 y 166–180 el
@@ -125,7 +125,7 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-35**: EL SISTEMA presentará en el bloque 2 el análisis de componentes principales
   como una respuesta a la maldición de la dimensionalidad.
 
-### Bloque 3 — círculo de variables
+### Bloque 3 — plano factorial
 
 - **RF-36**: EL SISTEMA mostrará en el bloque 3 la tabla del ejemplo junto a su
   transpuesta.
@@ -134,12 +134,12 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-38**: EL SISTEMA explicará que cada variable, convertida en registro, se representa
   como un vector.
 - **RF-39**: EL SISTEMA enunciará que el ángulo entre dos de esos vectores es el que el
-  círculo dibuja.
-- **RF-40**: EL SISTEMA enunciará que el plano de los individuos y el círculo de las
+  plano factorial dibuja.
+- **RF-40**: EL SISTEMA enunciará que el plano de los individuos y el plano factorial de las
   variables son dos vistas del mismo análisis.
-- **RF-41**: EL SISTEMA explicará el círculo de variables como la representación de cada
+- **RF-41**: EL SISTEMA explicará el plano factorial como la representación de cada
   variable original mediante una flecha en el plano de los dos primeros componentes.
-- **RF-42**: EL SISTEMA enunciará que el coseno del ángulo entre dos flechas del círculo
+- **RF-42**: EL SISTEMA enunciará que el coseno del ángulo entre dos flechas del plano factorial
   aproxima la correlación entre esas dos variables.
 - **RF-43**: EL SISTEMA mostrará dibujado el caso de dos flechas con ángulo próximo a 0°
   y su correlación próxima a +1.
@@ -249,9 +249,9 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
    cierre conserva cuatro gráficos basura, la explicación de qué impide entender cada uno
    y el ticket de salida, todo en catorce minutos.
 4. **El signo de los componentes es arbitrario.** Dos programas pueden dibujar el mismo
-   PCA en espejo. Si el círculo se compara con una imagen de otra fuente, la orientación
+   PCA en espejo. Si el plano factorial se compara con una imagen de otra fuente, la orientación
    puede no coincidir sin que ninguno de los dos esté mal.
-5. **Flechas cortas en el círculo.** Una variable mal representada en el plano dibuja una
+5. **Flechas cortas en el plano factorial.** Una variable mal representada dibuja una
    flecha corta, cuyo ángulo ya no aproxima bien la correlación. Es exactamente el caso
    en que la regla de RF-42 falla, y el bloque 3 la enseña como regla.
 6. **Correlación cero con relación perfecta.** La sesión 4 ya mostró la parábola con

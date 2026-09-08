@@ -1,6 +1,6 @@
 import { Panel, Diagram, Pair, Prose, List, Idea, Task }
   from '../../../components/content/index.jsx';
-import { transpuesta, circulo, tresAngulos } from '../figures/block3.js';
+import { transpuesta, planoFactorial, tresAngulos } from '../figures/block3.js';
 import { PAISES, PCA4, VARS, CORR, ANIO, FUENTE } from '../data/paises.js';
 
 export default function Block3({ id, tabId }) {
@@ -44,26 +44,27 @@ export default function Block3({ id, tabId }) {
         <Prose>
           <h4>Dos vistas del mismo análisis</h4>
           <p>El plano del bloque anterior colocaba los <b>individuos</b>: un punto por país.
-            El círculo de este bloque coloca las <b>variables</b>: una flecha por indicador.</p>
+            El <b>plano factorial</b> de este bloque coloca las <b>variables</b>: una flecha
+            por indicador.</p>
           <p>No son dos análisis, son <b>las dos caras del mismo</b>. Salen de la misma
             matriz y de los mismos autovectores; lo único que cambia es si miras la tabla o
             la tabla girada.</p>
         </Prose>
       </Pair>
 
-      <h3>El círculo de variables</h3>
-      <Diagram fig={circulo}>
+      <h3>El plano factorial</h3>
+      <Diagram fig={planoFactorial}>
         Las cuatro variables en el plano de las dos primeras componentes, que juntas
         conservan el {dos} % de la información de las cuatro.
       </Diagram>
 
       <h3>El ángulo es la correlación</h3>
       <Prose>
-        <p>Aquí está el cierre del círculo, y no es una metáfora. Recuerda la fórmula de la
+        <p>Aquí está el cierre del recorrido, y no es una metáfora. Recuerda la fórmula de la
           entrada: <b>r = cov(x, y) / (s<sub>x</sub> · s<sub>y</sub>)</b>. Esa división por
           las desviaciones típicas es, geométricamente, dividir cada vector por su longitud.
           Y el producto de dos vectores unitarios <b>es el coseno del ángulo que forman</b>.</p>
-        <p>Por eso el círculo se lee sin calcular nada: dos flechas juntas son dos variables
+        <p>Por eso el plano factorial se lee sin calcular nada: dos flechas juntas son dos variables
           que suben juntas; dos flechas opuestas, una que sube cuando la otra baja; y dos
           flechas en ángulo recto, dos variables que no se dicen nada.</p>
       </Prose>
@@ -77,7 +78,7 @@ export default function Block3({ id, tabId }) {
         <Prose>
           <h4>Por qué «aproxima» y no «es»</h4>
           <p>El coseno del ángulo <b>aproxima</b> la correlación, y la palabra hay que
-            tomársela en serio: el círculo solo tiene dos dimensiones, y las variables viven
+            tomársela en serio: el plano factorial solo tiene dos dimensiones, y las variables viven
             en cuatro.</p>
           <p>En estos datos, esperanza de vida y fertilidad forman un ángulo cuyo coseno es
             {' '}{cosVidaFert.toFixed(2)}, mientras que su correlación real es
@@ -92,7 +93,7 @@ export default function Block3({ id, tabId }) {
           <p>Aquí las cuatro miden entre {Math.min(...cargas.map(l => Math.hypot(l[0], l[1]))).toFixed(2)}
             {' '}y {Math.max(...cargas.map(l => Math.hypot(l[0], l[1]))).toFixed(2)}, así que
             el plano las sostiene bien. <b>Con flechas cortas, la regla del ángulo deja de
-            valer</b> — y ese es el momento de desconfiar del círculo, no de creerlo más.</p>
+            valer</b> — y ese es el momento de desconfiar del plano, no de creerlo más.</p>
         </Prose>
       </Pair>
 

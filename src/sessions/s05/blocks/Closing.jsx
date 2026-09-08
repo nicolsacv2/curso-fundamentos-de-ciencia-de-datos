@@ -79,7 +79,7 @@ export default function Closing({ id, tabId }) {
               2 500 se ve la cola, con 20 000 desaparece.»</li>
             <li>«Los hijos por mujer, con cajas por región — y la decisión es qué cuento
               como atípico, porque eso mueve los bigotes.»</li>
-            <li>«Las cuatro a la vez, con el círculo — y la decisión es quedarme con dos
+            <li>«Las cuatro a la vez, con el plano factorial — y la decisión es quedarme con dos
               componentes y perder el {(100 - dos).toFixed(1)} % restante.»</li>
           </List>
         </Prose>
