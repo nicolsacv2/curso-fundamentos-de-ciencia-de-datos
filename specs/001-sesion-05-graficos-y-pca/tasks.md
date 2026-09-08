@@ -76,11 +76,37 @@ repite en cada línea.
       Verificado dentro del script, no a ojo: Av = λv para cada autovector (error
       < 1e-9), autovalores ordenados y traza igual al número de variables.
 
-- [ ] **T4 · `scripts/check_pca.py`**
+- [x] **T4 · `scripts/check_pca.py`**
       RF-26, RF-56, RF-57, RF-59
       Recalcula desde el CSV y compara contra `paises.js`; tolerancia 0,01.
       **Hecho cuando:** sale con código 0 sobre los datos generados, y con código 1 si se
       edita a mano un autovalor de `paises.js`. Las dos ejecuciones, comprobadas.
+
+      **Resultado.** Sale 0 con el archivo intacto y 1 con las siete ediciones probadas:
+      autovalor, porcentaje, correlación, vector, media, desviación y el PIB de un país.
+
+      Comprueba dos cosas por caminos distintos: recalcula desde los CSV y compara valor
+      a valor, y verifica los números publicados en sus propios términos (Av = λv,
+      vectores ortonormales, cargas = v·√λ). La primera mitad no detectaría un error en
+      el álgebra, porque lo repetiría; la segunda sí.
+
+      **Tres cosas que aparecieron al construirlo**, ninguna evidente antes:
+
+      1. La tolerancia de 0,01 que pedía esta tarea dejaba pasar la edición más pequeña
+         posible en un porcentaje (77,23 → 77,24 son exactamente 0,01). Están separadas:
+         exacta contra el recálculo —ambos lados redondean igual, así que cualquier
+         diferencia es una edición—, y holgada solo donde se comparan valores guardados
+         con distinta precisión.
+      2. **El orden de las filas mueve el cuarto decimal** de los autovectores: la coma
+         flotante no es asociativa y Jacobi suma en el orden en que llegan los países.
+         El extractor ordena alfabéticamente y el verificador tiene que hacer lo mismo.
+      3. **El PCA se calcula sobre los valores redondeados que el archivo publica**, no
+         sobre los del CSV. Así, quien recalcule desde `paises.js` obtiene exactamente
+         los porcentajes proyectados; si saliera de números que el archivo no muestra,
+         la tabla no se podría auditar contra sus propias componentes.
+
+      Y un cuarto, del propio verificador: su mensaje decía «valores, ESTAD y CORR
+      idénticos» cuando `CORR` no se comparaba. Editarla pasaba desapercibida. Corregido.
 
 ---
 
@@ -244,8 +270,9 @@ repite en cada línea.
       reales: fertilidad–mortalidad 3,4° (r = +0,85) sirve para RF-43, y vida–mortalidad
       166,6° (r = −0,87) sirve para RF-45, pero el par más cercano a 90° es PIB–vida a
       43,7°. Los cuatro indicadores miden desarrollo, así que ninguno es independiente de
-      otro. RF-44 tendrá que dibujarse como caso ilustrativo, no salido del conjunto —
-      decisión pendiente de acordar.
+      otro. RF-44 se dibuja como **caso ilustrativo** (acordado): un esquema de dos flechas a
+      90°, separado del círculo real y rotulado como tal, para que nadie lo lea como si
+      saliera de estos países. El círculo de T24 sigue mostrando lo que hay.
       **Hecho cuando:** las tres parejas están dibujadas con su ángulo y su correlación
       rotulada: cerca de +1, de 0 y de −1.
 
