@@ -508,13 +508,19 @@ repite en cada línea.
       nada. No es que pase o falle, es que no puede ejecutarse. Queda pendiente de correr
       donde esté el original, y es lo primero que hay que mirar allí.
 
-- [ ] **T31 · Reescribir el cierre de la sesión 4**
+- [x] **T31 · Reescribir el cierre de la sesión 4**
       RF-67, RF-68
       Que no prometa graficar los números de esa sesión, y que anuncie lo que la 5 sí
       trata.
       **Hecho cuando:** la frase final de «Lo que queda» no promete la tabla del salón, y
       `check_content.py` no añade ninguna diferencia nueva (la sesión 4 no está en el
       original, así que no debería moverse).
+
+      **Resultado.** Ya no dice «la sesión que viene los volvemos dibujo». Dice que se
+      cambia de material y por qué —para aprender a elegir un gráfico hacen falta más de
+      veintitrés filas—, y anuncia lo que la 5 sí hace. La deuda de Simpson con la
+      sesión 6 se queda donde estaba. La sesión 4 no la compara `check_content.py`, que en
+      esta máquina tampoco puede ejecutarse (ver T30).
 
 ---
 

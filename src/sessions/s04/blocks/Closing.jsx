@@ -51,8 +51,11 @@ export default function Closing({ id, tabId }) {
           paradoja de Simpson espera a la sesión 6, y todos los números de hoy — el {MINUTOS.media},
           el {MINUTOS.mediana}, el {MINUTOS.desviacion} — siguen dependiendo de lo que votamos al
           limpiar la tabla.</p>
-        <p>La sesión que viene los volvemos <b>dibujo</b>: qué gráfico le corresponde a cada
-          resumen, y cómo detectar un gráfico que miente aunque sus números sean ciertos.</p>
+        <p>La sesión que viene cambiamos de material: dejamos esta tabla y nos vamos a 183
+          países, porque para aprender a <b>elegir un gráfico</b> hacen falta más de veintitrés
+          filas. Veremos qué gráfico admite cada tipo de dato, cómo mirar cuatro variables a la
+          vez cuando la hoja solo tiene dos ejes, y cómo un gráfico puede estorbar aunque todos
+          sus números sean ciertos.</p>
       </Prose>
 
       <Idea>Todo resumen es una decisión sobre qué esconder.{' '}
