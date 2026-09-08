@@ -57,12 +57,24 @@ repite en cada línea.
       diciendo cuántos son en cada ejecución. Sin resolver: si alguna figura acaba
       rotulando países, hay que revisar esa lista antes.
 
-- [ ] **T3 · Jacobi y los dos PCA en el mismo script**
+- [x] **T3 · Jacobi y los dos PCA en el mismo script**
       RF-26, RF-59
       Estandarizar, matriz de covarianza, diagonalización por Jacobi. `PCA3` con los tres
       indicadores de la nube; `PCA4` con los cuatro, más las cargas de cada variable.
       **Hecho cuando:** `paises.js` exporta `PCA3` y `PCA4`, y en cada uno los
       porcentajes de varianza suman 100 ± 0,01.
+
+      **Resultado.** Los dos suman 100,0000. `PCA3` (PIB, vida, fertilidad):
+      75,7 % · 17,6 % · 6,7 %. `PCA4`: 77,2 % · 14,9 % · 5,3 % · 2,6 %. Se exportan
+      además `ESTAD` (media, desviación, mínimo y máximo por indicador, para que las
+      figuras estandaricen sin llevar una segunda copia de la tabla) y `CORR`.
+
+      La nube lleva PIB, vida y fertilidad; la que queda fuera es mortalidad infantil,
+      que es casi el espejo de la esperanza de vida (r = −0,87) y es la que el bloque 3
+      recupera al transponer.
+
+      Verificado dentro del script, no a ojo: Av = λv para cada autovector (error
+      < 1e-9), autovalores ordenados y traza igual al número de variables.
 
 - [ ] **T4 · `scripts/check_pca.py`**
       RF-26, RF-56, RF-57, RF-59
@@ -216,12 +228,24 @@ repite en cada línea.
 
 - [ ] **T24 · `figures/block3.js`: el círculo de variables**
       RF-41, RF-46
+
+      **Aviso de T3.** Las cuatro flechas son largas (0,94 a 0,99), así que el plano
+      representa bien las cuatro variables. Pero el coseno exagera: en vida–fertilidad
+      da −0,96 cuando la correlación real es −0,77 (Δ 0,19). RF-42 dice «aproxima», y
+      esa palabra hay que sostenerla en pantalla.
       Las cuatro cargas de `PCA4`, con el círculo unidad.
       **Hecho cuando:** las cuatro flechas salen de las cargas del archivo generado, y la
       diferencia de longitud entre ellas es visible.
 
 - [ ] **T25 · `figures/block3.js`: los tres ángulos**
       RF-43, RF-44, RF-45
+
+      **Aviso de T3: el ángulo recto no existe en estos datos.** Medidos sobre las cargas
+      reales: fertilidad–mortalidad 3,4° (r = +0,85) sirve para RF-43, y vida–mortalidad
+      166,6° (r = −0,87) sirve para RF-45, pero el par más cercano a 90° es PIB–vida a
+      43,7°. Los cuatro indicadores miden desarrollo, así que ninguno es independiente de
+      otro. RF-44 tendrá que dibujarse como caso ilustrativo, no salido del conjunto —
+      decisión pendiente de acordar.
       **Hecho cuando:** las tres parejas están dibujadas con su ángulo y su correlación
       rotulada: cerca de +1, de 0 y de −1.
 

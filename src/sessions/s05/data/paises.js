@@ -219,3 +219,62 @@ export const PAISES = [
   ["zmb", "Zambia", "africa", 4034, 59.0, 5.59, 67.8],
   ["zwe", "Zimbabue", "africa", 1801, 60.0, 3.35, 79.6],
 ];
+
+/* Per indicator: mean, standard deviation (n−1), minimum and maximum.
+   The figures standardize with these instead of shipping a second copy
+   of the table, and the entry block quotes them beside the formulas. */
+export const ESTAD = {
+  pib: { media: 17260.17, desv: 19339.43, min: 599, max: 132900 },
+  vida: { media: 71.7, desv: 7.7, min: 48.5, max: 83.5 },
+  fertilidad: { media: 2.81, desv: 1.36, min: 1.3, max: 7.51 },
+  mortalidad: { media: 32.64, desv: 33.29, min: 1.9, max: 156.9 },
+};
+
+/* Correlation matrix, in the order of VARS. The entry reads one cell of it
+   off a scatter plot; the circle of variables is this matrix, drawn. */
+export const CORR = [
+  [1.0, 0.6411, -0.4874, -0.5207],
+  [0.6411, 1.0, -0.7694, -0.8668],
+  [-0.4874, -0.7694, 1.0, 0.8449],
+  [-0.5207, -0.8668, 0.8449, 1.0],
+];
+
+/* The three indicators the cloud is drawn with.
+   vectores[j] is the j-th component in the space of vars; cargas[i] is
+   variable i seen from every component — its arrow in the circle. */
+export const PCA3 = {
+  vars: ["pib", "vida", "fertilidad"],
+  valores: [2.2721, 0.5272, 0.2006],
+  porcentajes: [75.74, 17.57, 6.69],
+  vectores: [
+    [0.5329, 0.6181, -0.578],
+    [0.804, -0.1569, 0.5735],
+    [-0.2638, 0.7703, 0.5806],
+  ],
+  cargas: [
+    [0.8033, 0.5838, -0.1181],
+    [0.9316, -0.114, 0.345],
+    [-0.8712, 0.4164, 0.2601],
+  ],
+};
+
+/* All four: the circle of variables in block 3.
+   vectores[j] is the j-th component in the space of vars; cargas[i] is
+   variable i seen from every component — its arrow in the circle. */
+export const PCA4 = {
+  vars: ["pib", "vida", "fertilidad", "mortalidad"],
+  valores: [3.0894, 0.595, 0.2105, 0.1051],
+  porcentajes: [77.23, 14.88, 5.26, 2.63],
+  vectores: [
+    [0.4153, 0.5352, -0.5088, -0.5313],
+    [0.8756, -0.0202, 0.3708, 0.309],
+    [-0.2089, 0.6159, 0.7224, -0.2348],
+    [-0.1313, 0.5778, -0.2858, 0.7531],
+  ],
+  cargas: [
+    [0.73, 0.6754, -0.0959, -0.0426],
+    [0.9407, -0.0156, 0.2826, 0.1873],
+    [-0.8943, 0.2861, 0.3314, -0.0927],
+    [-0.9338, 0.2383, -0.1077, 0.2441],
+  ],
+};

@@ -122,6 +122,116 @@ ES = {
 ROUNDING = {'pib': 0, 'vida': 1, 'fertilidad': 2, 'mortalidad': 1}
 
 
+# The three indicators the 3D cloud is drawn with (RF-59). Child mortality is
+# the one left out, for two reasons: it is nearly the mirror of life expectancy,
+# so a fourth axis would repeat what the second already says; and it is the
+# variable block 3 brings back, when four no longer fit in three axes and the
+# table has to be transposed. What the cloud cannot show is the point.
+CLOUD = ('pib', 'vida', 'fertilidad')
+
+
+def moments(values):
+    """Mean and sample standard deviation (n−1), as session 4 computes them."""
+    n = len(values)
+    mean = sum(values) / n
+    var = sum((v - mean) ** 2 for v in values) / (n - 1)
+    return mean, var ** 0.5
+
+
+def standardize(columns):
+    """Each column to z scores.
+
+    PCA on standardized data is PCA on the correlation matrix, and that is what
+    the circle of variables needs: in raw units GDP runs in the thousands and
+    fertility between one and seven, so the first component would be "GDP" and
+    nothing else -- an artefact of the units, not a finding about the world.
+    """
+    out = []
+    for col in columns:
+        mean, sd = moments(col)
+        out.append([(v - mean) / sd for v in col])
+    return out
+
+
+def correlation(z):
+    """Correlation matrix of already standardized columns."""
+    n = len(z[0])
+    return [[sum(a * b for a, b in zip(zi, zj)) / (n - 1) for zj in z] for zi in z]
+
+
+def jacobi(matrix):
+    """Eigenvalues and eigenvectors of a symmetric matrix, by Jacobi rotations.
+
+    Forty lines instead of NumPy. Principle 1 allows four dependencies and this
+    matrix is 4×4: rotating away the largest off-diagonal entry until none is
+    left is enough, and it keeps the script readable by whoever teaches this.
+
+    Returns (eigenvalues, eigenvectors) sorted from largest to smallest, each
+    eigenvector as a list.
+    """
+    n = len(matrix)
+    a = [row[:] for row in matrix]
+    v = [[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
+
+    for _ in range(100):
+        size, p, q = max((abs(a[i][j]), i, j)
+                         for i in range(n) for j in range(i + 1, n))
+        if size < 1e-14:
+            break
+        theta = (a[q][q] - a[p][p]) / (2 * a[p][q])
+        t = (1 if theta >= 0 else -1) / (abs(theta) + (theta * theta + 1) ** 0.5)
+        c = 1 / (t * t + 1) ** 0.5
+        s = t * c
+        for k in range(n):                       # columns: A J
+            akp, akq = a[k][p], a[k][q]
+            a[k][p], a[k][q] = c * akp - s * akq, s * akp + c * akq
+        for k in range(n):                       # rows: Jᵀ (A J)
+            apk, aqk = a[p][k], a[q][k]
+            a[p][k], a[q][k] = c * apk - s * aqk, s * apk + c * aqk
+        for k in range(n):                       # accumulate V J
+            vkp, vkq = v[k][p], v[k][q]
+            v[k][p], v[k][q] = c * vkp - s * vkq, s * vkp + c * vkq
+
+    values = [a[i][i] for i in range(n)]
+    vectors = [[v[i][j] for i in range(n)] for j in range(n)]
+    order = sorted(range(n), key=lambda j: -values[j])
+    return [values[j] for j in order], [vectors[j] for j in order]
+
+
+def pca(rows, keys, field):
+    """The whole analysis for a set of indicators, ready to be drawn.
+
+    `cargas` are the loadings: eigenvector times the square root of its
+    eigenvalue. Starting from the correlation matrix they *are* the correlation
+    between a variable and a component, which is why the circle has radius one
+    and why the cosine of the angle between two arrows reads as a correlation
+    (RF-42). The length of an arrow in the first two components is how well the
+    plane represents that variable (RF-46).
+    """
+    z = standardize([[row[field[k]] for row in rows] for k in keys])
+    values, vectors = jacobi(correlation(z))
+
+    # The sign of a component is arbitrary: the same data drawn by two programs
+    # can come out mirrored (edge case 4). Fixing the largest loading positive
+    # makes this repository's figures reproducible, not the mathematics less so.
+    for i, vec in enumerate(vectors):
+        biggest = max(range(len(vec)), key=lambda k: abs(vec[k]))
+        if vec[biggest] < 0:
+            vectors[i] = [-x for x in vec]
+
+    total = sum(values)
+    loadings = [[vectors[j][i] * values[j] ** 0.5 for j in range(len(values))]
+                for i in range(len(keys))]
+    return {
+        'vars': list(keys),
+        'valores': [round(v, 4) for v in values],
+        'porcentajes': [round(100 * v / total, 2) for v in values],
+        'vectores': [[round(x, 4) for x in vec] for vec in vectors],
+        'cargas': [[round(x, 4) for x in row] for row in loadings],
+        '_raw': (values, vectors, correlation(z)),
+    }
+
+
 def read_countries(path):
     """{geo code: (English name, region key)} for sovereign countries only."""
     out = {}
@@ -187,6 +297,31 @@ def main():
     assert 'Colombia' in names, 'falta Colombia'
     assert len(set(names)) == len(names), 'hay un nombre repetido'
 
+    field = {k: 3 + i for i, (k, _, _, _, _) in enumerate(INDICATORS)}
+    keys = [k for k, _, _, _, _ in INDICATORS]
+    pca3 = pca(rows, CLOUD, field)
+    pca4 = pca(rows, keys, field)
+    stats = {}
+    for k in keys:
+        col = [row[field[k]] for row in rows]
+        mean, sd = moments(col)
+        stats[k] = (round(mean, 2), round(sd, 2), min(col), max(col))
+    corr = pca4['_raw'][2]
+
+    # The numbers above are the ones the wall will show, so they get checked
+    # here rather than believed. Av = λv is the definition of an eigenvector:
+    # if Jacobi drifted, this is where it stops.
+    for analysis in (pca3, pca4):
+        values, vectors, matrix = analysis.pop('_raw')
+        n = len(values)
+        for lam, vec in zip(values, vectors):
+            for i in range(n):
+                av = sum(matrix[i][k] * vec[k] for k in range(n))
+                assert abs(av - lam * vec[i]) < 1e-9, 'Av ≠ λv'
+        assert values == sorted(values, reverse=True), 'autovalores sin ordenar'
+        assert abs(sum(values) - n) < 1e-9, 'la traza debería ser el nº de variables'
+        assert abs(sum(analysis['porcentajes']) - 100) < 0.01, analysis['porcentajes']
+
     j = lambda o: json.dumps(o, ensure_ascii=False)
     out = [
         '/* Generated by scripts/extract_gapminder.py — do not edit by hand.',
@@ -225,7 +360,47 @@ def main():
     ]
     for row in rows:
         out.append('  [' + ', '.join(j(v) for v in row) + '],')
+    out += [
+        '];',
+        '',
+        '/* Per indicator: mean, standard deviation (n−1), minimum and maximum.',
+        '   The figures standardize with these instead of shipping a second copy',
+        '   of the table, and the entry block quotes them beside the formulas. */',
+        'export const ESTAD = {',
+    ]
+    for k in keys:
+        mean, sd, lo, hi = stats[k]
+        out.append(f'  {k}: {{ media: {mean}, desv: {sd}, min: {lo}, max: {hi} }},')
+    out += [
+        '};',
+        '',
+        '/* Correlation matrix, in the order of VARS. The entry reads one cell of it',
+        '   off a scatter plot; the circle of variables is this matrix, drawn. */',
+        'export const CORR = [',
+    ]
+    for row in corr:
+        out.append('  [' + ', '.join(str(round(x, 4)) for x in row) + '],')
     out += ['];', '']
+
+    for name, analysis, note in (
+        ('PCA3', pca3, 'The three indicators the cloud is drawn with.'),
+        ('PCA4', pca4, 'All four: the circle of variables in block 3.')):
+        out += [
+            f'/* {note}',
+            '   vectores[j] is the j-th component in the space of vars; cargas[i] is',
+            '   variable i seen from every component — its arrow in the circle. */',
+            f'export const {name} = {{',
+            '  vars: ' + j(analysis['vars']) + ',',
+            '  valores: ' + j(analysis['valores']) + ',',
+            '  porcentajes: ' + j(analysis['porcentajes']) + ',',
+            '  vectores: [',
+        ]
+        for vec in analysis['vectores']:
+            out.append('    ' + j(vec) + ',')
+        out += ['  ],', '  cargas: [']
+        for row in analysis['cargas']:
+            out.append('    ' + j(row) + ',')
+        out += ['  ],', '};', '']
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, 'w', encoding='utf-8') as fh:
@@ -237,6 +412,9 @@ def main():
     print(f'  {len(same_in_both)} se escriben igual en los dos idiomas '
           f'y se proyectan tal cual')
     print('   ', ', '.join(sorted(same_in_both)[:10]) + ' …')
+    for name, analysis in (('PCA3', pca3), ('PCA4', pca4)):
+        pct = ' · '.join(f'{x:.1f}%' for x in analysis['porcentajes'])
+        print(f'  {name} ({len(analysis["vars"])} vars) varianza explicada: {pct}')
 
 
 if __name__ == '__main__':
