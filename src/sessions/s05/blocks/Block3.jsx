@@ -126,7 +126,7 @@ export default function Block3({ id, tabId }) {
         conservan el {dos} % de la información de las cuatro.
       </Diagram>
 
-      <h3>El ángulo es la correlación</h3>
+      <h3>El coseno del ángulo es la correlación</h3>
       <Prose>
         <p>Mira otra vez la fórmula de la entrada: <b>r = cov(x, y) / (s<sub>x</sub> ·
           s<sub>y</sub>)</b>. Esa división por las desviaciones típicas es, palabra por
@@ -165,8 +165,8 @@ export default function Block3({ id, tabId }) {
         </Prose>
       </Pair>
 
-      <Idea>La tabla girada convierte cada variable en un vector, y el ángulo entre dos
-        vectores es su correlación.{' '}
+      <Idea>La tabla girada convierte cada variable en un vector, y el <b>coseno</b> del
+        ángulo entre dos vectores es su correlación.{' '}
         <span className="who">El mismo número de la entrada, ahora dibujado.</span></Idea>
     </Panel>
   );

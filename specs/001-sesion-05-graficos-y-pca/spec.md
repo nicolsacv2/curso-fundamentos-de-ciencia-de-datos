@@ -7,8 +7,8 @@ con una caja de resúmenes numéricos —centro, dispersión, asociación— y c
 cada uno. La sesión 5 los vuelve dibujo: qué gráfico le corresponde a cada tipo de dato,
 cómo se lee, y qué pasa cuando las variables son tantas que ningún plano las muestra a
 la vez. Ahí entra el análisis de componentes principales, primero como nube que se mira
-desde su mejor ángulo y después como círculo de correlaciones, donde el ángulo entre dos
-flechas es la correlación que la entrada acaba de definir con fórmula. La sesión cierra
+desde su mejor ángulo y después como círculo de correlaciones, donde el coseno del ángulo
+entre dos flechas es la correlación que la entrada acaba de definir con fórmula. La sesión cierra
 con el reverso: gráficos que estorban en vez de mostrar.
 
 Dos decisiones tomadas en la entrevista, ambas deliberadas:
