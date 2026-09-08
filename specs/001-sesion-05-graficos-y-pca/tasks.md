@@ -12,7 +12,7 @@ repite en cada línea.
 
 ## Fase 0 · Los datos, antes que nada
 
-- [ ] **T1 · Conseguir el CSV y fijar el año**
+- [x] **T1 · Conseguir el CSV y fijar el año**
       RF-56, RF-57
       Descargar de Gapminder las cuatro series —PIB per cápita, esperanza de vida,
       fertilidad, mortalidad infantil— y dejarlas junto al repositorio, como el `.xlsx`
@@ -20,7 +20,22 @@ repite en cada línea.
       **Hecho cuando:** el año elegido tiene las cuatro series para más de 150 países, y
       ese número queda anotado para T2.
 
-- [ ] **T2 · `scripts/extract_gapminder.py`: leer, filtrar y emitir**
+      **Resultado.** Los cinco CSV están en `../gapminder-data/`, con `PROCEDENCIA.txt`
+      al lado (URLs, fecha y licencia CC BY 4.0). Salen del repositorio
+      `open-numbers/ddf--gapminder--gapminder_world`, que es el que conserva los cuatro
+      indicadores clásicos; `systema_globalis` y `fasttrack` no los tienen completos.
+      Las cuatro series van de 1800 a 2015.
+
+      **Año elegido: 2015**, con **183 países** que tienen los cuatro a la vez. La
+      cobertura es plana desde 2005 —183 todos los años—, así que quedarse con el último
+      no cuesta ni un país. Antes de 2005 hay 187, pero los cuatro de diferencia son
+      Aruba, Hong Kong, Macao y Puerto Rico, que no son estados soberanos.
+
+      Aviso para T2: el orden de las columnas **no** es el mismo en los cuatro CSV —en
+      `child_mortality` el valor va primero—, así que el parser lee la cabecera, nunca
+      posiciones.
+
+- [x] **T2 · `scripts/extract_gapminder.py`: leer, filtrar y emitir**
       RF-56, RF-57, RF-58, RF-61, RF-63
       Stdlib pura, docstring con qué hace y cómo se invoca. Descarta los países a los
       que les falte cualquiera de las cuatro series. Emite `ANIO`, `VARS` (clave, nombre
@@ -28,6 +43,19 @@ repite en cada línea.
       **Hecho cuando:** `python3 scripts/extract_gapminder.py` escribe
       `src/sessions/s05/data/paises.js` con la cabecera «do not edit by hand» e imprime
       cuántos países entraron y cuántos se descartaron.
+
+      **Resultado.** 183 países × 4 indicadores, año 2015; 92 descartados por faltarles
+      alguno de los cuatro. `paises.js` son 12 KB y exporta `ANIO`, `FUENTE`, `VARS`,
+      `REGIONES`, `CAMPOS` y `PAISES`.
+
+      Comprobado contra los CSV: Colombia sale `[12760, 75.8, 2.23, 15.9]`, y el cuarto
+      valor viene del archivo cuyas columnas van en otro orden (`15.9,col,2015`) — leer
+      por cabecera era la precaución correcta.
+
+      Los nombres de país se proyectan en español (principio 6): el script traduce los
+      118 que difieren y deja tal cual los 68 que se escriben igual en los dos idiomas,
+      diciendo cuántos son en cada ejecución. Sin resolver: si alguna figura acaba
+      rotulando países, hay que revisar esa lista antes.
 
 - [ ] **T3 · Jacobi y los dos PCA en el mismo script**
       RF-26, RF-59
