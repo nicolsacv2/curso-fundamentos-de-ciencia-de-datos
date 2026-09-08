@@ -122,13 +122,17 @@ repite en cada línea.
       porque son rótulo interno del rail: «Tres fórmulas encadenadas», «Cinco gráficos»,
       «La sombra de la nube», «La tabla girada», «Gráficos que estorban».
 
-- [ ] **T6 · Los cinco bloques en blanco y el registry**
+- [x] **T6 · Los cinco bloques en blanco y el registry**
       RF-1, RF-2
       Cinco `.jsx` con solo `<Panel>`, el `eyebrow` y el `h2`; `meta05` en `METAS` y los
       cinco `import()` en `BLOCKS[5]`.
       **Hecho cuando:** el índice muestra la sesión 5 con su título, su objetivo y cinco
       chips; se recorren las cinco pestañas sin error de consola, y `pnpm build` emite
       cinco chunks nuevos.
+
+      **Resultado.** 25 chunks en total (5 sesiones × 5 bloques); los cinco nuevos pesan
+      0,28 kB. `syllabus.js` no se toca: `Cover.jsx` prefiere `meta.js` cuando existe, y
+      su entrada 5 queda muerta como las de las sesiones 1 a 4.
 
 ---
 
