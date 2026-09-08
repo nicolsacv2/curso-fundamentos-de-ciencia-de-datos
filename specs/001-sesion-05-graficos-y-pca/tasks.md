@@ -280,17 +280,31 @@ repite en cada línea.
 
 ## Fase 4 · Bloque 1 · 35–75
 
-- [ ] **T16 · `figures/block1.js`: barras y circular**
+- [x] **T16 · `figures/block1.js`: barras y circular**
       RF-21
       **Hecho cuando:** ambas figuras usan datos de `paises.js`, sin números escritos a
       mano.
 
-- [ ] **T17 · `figures/block1.js`: caja e histograma con dos anchos**
+      **Resultado.** Barras: esperanza de vida media por región (África 63,5 · Asia 72,7 ·
+      América 74,6 · Europa 78,2), contrastadas contra un cálculo independiente. Circular:
+      reparto de los 183 países, suma 100,0 %. Las cuatro cifras del circular van al lado
+      en cifras, que es la lección: cuatro ángulos no se ordenan a ojo, cuatro longitudes
+      sí.
+
+- [x] **T17 · `figures/block1.js`: caja e histograma con dos anchos**
       RF-20, RF-21
       El mismo PIB per cápita con dos anchos de intervalo, lado a lado: la elección se ve
       como decisión (caso límite 8).
       **Hecho cuando:** los dos histogramas tienen los mismos datos y distinta forma, y
       la caja rotula mediana, cuartiles y bigotes.
+
+      **Resultado.** Cajas de fertilidad por región con medianas 4,55 · 2,40 · 2,15 · 1,55,
+      verificadas aparte; atípicos en rojo y la anatomía rotulada una vez sobre la última
+      caja. Cuantil interpolado, el mismo que usó la sesión 4: cambiar de método aquí
+      movería una mediana que la clase ya escribió.
+
+      Histograma: el mismo PIB con intervalos de 2 500 (54 barras) y de 20 000 (7). El
+      pie lo dice sin rodeos: el ancho no viene con los datos, lo eliges tú.
 
 - [ ] **T18 · `figures/block1.js`: la dispersión del bloque**
       RF-21
