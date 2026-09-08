@@ -88,3 +88,58 @@ export function transpuesta() {
     + 'números girados, de modo que cada variable, que era una columna, pasa a ser una '
     + `fila. Se muestran 6 de los ${PAISES.length} países`, b);
 }
+
+/* ── The circle of variables ───────────────────────────────
+   Each variable as an arrow in the plane of the first two components. Starting from the
+   correlation matrix, a loading *is* the correlation between that variable and that
+   component, so every arrow fits inside a circle of radius one — and how close it gets
+   to the edge is how well the plane represents it (RF-46). */
+export function circulo() {
+  const W = 980, H = 520, CXP = 400, CY = 262, R = 190;
+  const L = PCA4.cargas;
+
+  let b = arrow('ar-s5-load', C.ask);
+  b += `<circle cx="${CXP}" cy="${CY}" r="${R}" fill="none" stroke="${C.line}"
+    stroke-width="1.2"/>`;
+  b += `<circle cx="${CXP}" cy="${CY}" r="${R / 2}" fill="none" stroke="${C.lineSoft}"
+    stroke-width="1" stroke-dasharray="3 4"/>`;
+  b += pline([[CXP - R - 18, CY], [CXP + R + 18, CY]], C.lineSoft, { sw: 1 });
+  b += pline([[CXP, CY - R - 18], [CXP, CY + R + 18]], C.lineSoft, { sw: 1 });
+  b += txt(CXP + R + 24, CY + 4, 'CP 1', { fs: 11, fill: C.ink3 });
+  b += txt(CXP, CY - R - 26, 'CP 2', { fs: 11, fill: C.ink3, ta: 'middle' });
+
+  KEYS.forEach((k, i) => {
+    const x = CXP + L[i][0] * R, y = CY - L[i][1] * R;
+    const largo = Math.hypot(L[i][0], L[i][1]);
+    b += `<path d="M${CXP},${CY} L${x.toFixed(1)},${y.toFixed(1)}" stroke="${C.ask}"
+      stroke-width="2" fill="none" marker-end="url(#ar-s5-load)"/>`;
+    const away = 1 + 26 / (largo * R);
+    const tx = CXP + L[i][0] * R * away, ty = CY - L[i][1] * R * away;
+    b += txt(tx, ty + 4, LABEL[k], { fs: 12.5, ff: SERIF, fill: C.ink,
+             ta: tx < CXP ? 'end' : 'start' });
+    b += txt(tx, ty + 20, `${largo.toFixed(2)}`, { fs: 10.5, ff: MONO, fill: C.ink3,
+             ta: tx < CXP ? 'end' : 'start' });
+  });
+
+  /* The reading rules, on the right, where they do not fight the drawing. */
+  const rx = 700;
+  b += txt(rx, 96, 'CÓMO SE LEE', { fs: 11.5, fill: C.ask, ls: 1.6 });
+  [['Ángulo pequeño', 'las dos variables suben juntas'],
+   ['Ángulo recto', 'no se dicen nada'],
+   ['Ángulo llano', 'una sube cuando la otra baja'],
+   ['Flecha larga', 'el plano la representa bien'],
+   ['Flecha corta', 'esa variable vive fuera del plano']].forEach(([t, d], i) => {
+    const y = 138 + i * 58;
+    b += txt(rx, y, t, { fs: 13, ff: SERIF, fill: C.ink });
+    b += txt(rx, y + 18, d, { fs: 11, fill: C.ink3 });
+  });
+
+  b += txt(CXP, CY + R + 60, `El radio es 1. Las cuatro flechas miden entre `
+    + `${Math.min(...L.map(l => Math.hypot(l[0], l[1]))).toFixed(2)} y `
+    + `${Math.max(...L.map(l => Math.hypot(l[0], l[1]))).toFixed(2)}: el plano las `
+    + 'representa bien a las cuatro.', { fs: 12, fill: C.ink3, ta: 'middle' });
+
+  return svg(W, H, 'Círculo de variables: las cuatro variables como flechas en el plano '
+    + 'de las dos primeras componentes. ' + KEYS.map((k, i) =>
+      `${LABEL[k]} con longitud ${Math.hypot(L[i][0], L[i][1]).toFixed(2)}`).join(', '), b);
+}
