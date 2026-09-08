@@ -334,14 +334,23 @@ repite en cada línea.
 
 ## Fase 5 · Bloque 2 · 83–120
 
-- [ ] **T20 · `figures/block2.js`: la misma nube, antes y después**
+- [x] **T20 · `figures/block2.js`: la misma nube, antes y después**
       RF-25
       **Hecho cuando:** las dos mitades son reconociblemente la misma nube.
 
-- [ ] **T21 · `figures/block2.js`: la varianza explicada**
+      **Resultado.** 184 puntos a cada lado —los 183 países más Colombia destacada—, los
+      mismos colores de región y Colombia rotulada en las dos mitades. Eso último no es
+      adorno: «la misma nube» es una afirmación que la figura tiene que sostener, o se
+      lee como dos dibujos sin relación con una flecha en medio.
+
+- [x] **T21 · `figures/block2.js`: la varianza explicada**
       RF-26
       **Hecho cuando:** los porcentajes dibujados son los de `PCA3` en `paises.js`, no
       valores escritos a mano.
+
+      **Resultado.** 75,74 · 17,57 · 6,69 leídos de `PCA3`, con el acumulado bajo cada
+      barra (75,7 → 93,3 → 100,0). El titular dice lo único que importa después de
+      proyectar: las dos primeras conservan el 93,3 % y la tercera es lo que se pierde.
 
 - [ ] **T22 · `blocks/Block2.jsx`**
       RF-23, RF-24, RF-27, RF-28, RF-34, RF-35, RF-60
