@@ -43,10 +43,10 @@ export function transpuesta() {
 
   /* left: countries down, indicators across */
   const lx = 70, ly = 116;
-  b += txt(lx, ly - 44, 'LA TABLA', { fs: 11.5, fill: C.ink3, ls: 1.6 });
-  b += txt(lx, ly - 24, `${PAISES.length} países × ${KEYS.length} indicadores`,
+  b += txt(lx, ly - 58, 'LA TABLA', { fs: 11.5, fill: C.ink3, ls: 1.6 });
+  b += txt(lx, ly - 38, `${PAISES.length} países × ${KEYS.length} indicadores`,
            { fs: 12, fill: C.ink2 });
-  b += txt(lx, ly - 6, 'valores centrados', { fs: 10, fill: C.ink3 });
+  b += txt(lx, ly - 20, 'valores centrados', { fs: 10, fill: C.ink3 });
   KEYS.forEach((k, j) => {
     b += txt(lx + 96 + j * cw + cw / 2, ly, SHORT[k],
              { fs: 11, fill: k === HL ? C.ask : C.ink3, ta: 'middle' });
@@ -67,15 +67,15 @@ export function transpuesta() {
 
   /* right: indicators down, countries across — the same numbers, turned */
   const rx = 540, ry = 116;
-  b += txt(rx, ry - 44, 'LA TABLA GIRADA', { fs: 11.5, fill: C.ask, ls: 1.6 });
-  b += txt(rx, ry - 24, `${KEYS.length} indicadores × ${PAISES.length} países`,
+  b += txt(rx, ry - 58, 'LA TABLA GIRADA', { fs: 11.5, fill: C.ask, ls: 1.6 });
+  b += txt(rx, ry - 38, `${KEYS.length} indicadores × ${PAISES.length} países`,
            { fs: 12, fill: C.ink2 });
-  b += txt(rx, ry - 6, 'los mismos, centrados', { fs: 10, fill: C.ink3 });
+  b += txt(rx, ry - 20, 'los mismos, centrados', { fs: 10, fill: C.ink3 });
   rows.forEach((p, j) => {
-    b += txt(rx + 92 + j * 52 + 26, ry + 12, p[col('codigo')].toUpperCase(),
+    b += txt(rx + 92 + j * 52 + 26, ry, p[col('codigo')].toUpperCase(),
              { fs: 10.5, ff: MONO, fill: C.ink3, ta: 'middle' });
   });
-  b += txt(rx + 92 + 6 * 52 + 10, ry + 12, '⋯', { fs: 14, fill: C.ink3 });
+  b += txt(rx + 92 + 6 * 52 + 10, ry, '⋯', { fs: 14, fill: C.ink3 });
   KEYS.forEach((k, i) => {
     const y = ry + 22 + i * rh;
     if (k === HL) b += `<rect x="${rx}" y="${y - 15}" width="${92 + 6 * 52}" height="${rh - 4}"
