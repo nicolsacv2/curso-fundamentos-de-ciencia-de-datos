@@ -138,18 +138,27 @@ repite en cada línea.
 
 ## Fase 2 · La nube rotable (la pieza de riesgo)
 
-- [ ] **T7 · `s05/figures/shared.js`**
+- [x] **T7 · `s05/figures/shared.js`**
       RF-22
       Helpers locales de la sesión —caja, ejes, punto, trazo— y `camera({yaw, pitch})`,
       que devuelve `[x,y,z] → [px,py]`: dos rotaciones y proyección ortográfica.
       **Hecho cuando:** `grep -rl "from 'react'" src/sessions/s05/figures` sale vacío.
 
-- [ ] **T8 · `s05/figures/cloud3d.js`: la nube quieta**
+- [x] **T8 · `s05/figures/cloud3d.js`: la nube quieta**
       RF-22, RF-59, RF-77, RF-79
       Los tres indicadores estandarizados, un punto por país, ordenados por profundidad,
       con ejes rotulados. Ángulo inicial elegido para que se vea el volumen.
       **Hecho cuando:** la figura se ve en el bloque 1 sin interacción alguna, y los tres
       ejes llevan el nombre del indicador que representan.
+
+      **Resultado.** 183 puntos, tres ejes rotulados, color por región y opacidad por
+      profundidad. La escena es **isométrica**: los mismos píxeles por desviación típica
+      en los tres ejes, porque el bloque 2 dibujará dentro el plano de las componentes y
+      estirar un eje lo dejaría de ser. La caja sale alargada —el PIB llega a +6
+      desviaciones y la esperanza de vida no pasa de +1,6—, y ese sesgo es el dato.
+
+      Probados **1953 ángulos** (yaw × pitch, paso 0,1): la nube nunca se sale del
+      lienzo, con 28,5 px del margen más estrecho.
 
 - [ ] **T9 · `s05/views/Cloud3D.jsx` y la regla `.rotor`**
       RF-22, RF-74, RF-76, RF-78
