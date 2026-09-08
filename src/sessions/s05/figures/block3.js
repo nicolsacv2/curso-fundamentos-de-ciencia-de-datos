@@ -9,6 +9,13 @@ const LABEL = Object.fromEntries(VARS.map(([k, name]) => [k, name]));
    of the figure is the shape of the table, not the wording of its headers. */
 const SHORT = { pib: 'PIB', vida: 'vida', fertilidad: 'hijos', mortalidad: 'mortal.' };
 
+/* A value with its variable's mean taken out, printed the way each scale deserves:
+   GDP has no decimals to spare, fertility has nothing but decimals. */
+const centrado = (p, k) => {
+  const c = p[col(k)] - ESTAD[k].media;
+  return (Math.abs(c) >= 1000 ? Math.round(c) : c.toFixed(1)).toString().replace('-', '−');
+};
+
 /* Six countries, spread across the range rather than the first six alphabetically: a
    sample that is all of Africa teaches the wrong thing about the table. */
 function sample() {
@@ -21,7 +28,11 @@ function sample() {
    Both are cut: 183 rows do not fit on a wall and neither do 183 columns. What has to
    survive the cut is that it is the same table — same six countries, same four
    indicators, same numbers — so one variable is tinted in both, and the eye can follow
-   a column becoming a row. */
+   a column becoming a row.
+
+   The values are the centred ones, not the raw figures. With the raw ones the figure
+   invited exactly the wrong question — whether the arrows of the circle are drawn from
+   those numbers — and by this point in the block the centring has already happened. */
 export function transpuesta() {
   const W = 980, H = 470;
   const rows = sample();
@@ -35,6 +46,7 @@ export function transpuesta() {
   b += txt(lx, ly - 44, 'LA TABLA', { fs: 11.5, fill: C.ink3, ls: 1.6 });
   b += txt(lx, ly - 24, `${PAISES.length} países × ${KEYS.length} indicadores`,
            { fs: 12, fill: C.ink2 });
+  b += txt(lx, ly - 6, 'valores centrados', { fs: 10, fill: C.ink3 });
   KEYS.forEach((k, j) => {
     b += txt(lx + 96 + j * cw + cw / 2, ly, SHORT[k],
              { fs: 11, fill: k === HL ? C.ask : C.ink3, ta: 'middle' });
@@ -46,7 +58,7 @@ export function transpuesta() {
       const x = lx + 96 + j * cw;
       if (k === HL) b += `<rect x="${x}" y="${y - 15}" width="${cw}" height="${rh - 4}"
         fill="${C.ask}" opacity=".12"/>`;
-      b += txt(x + cw / 2, y, String(p[col(k)]), { fs: 11, ff: MONO, fill: C.ink, ta: 'middle' });
+      b += txt(x + cw / 2, y, centrado(p, k), { fs: 10, ff: MONO, fill: C.ink, ta: 'middle' });
     });
   });
   b += txt(lx, ly + 22 + 6 * rh, '⋮', { fs: 14, fill: C.ink3 });
@@ -58,19 +70,20 @@ export function transpuesta() {
   b += txt(rx, ry - 44, 'LA TABLA GIRADA', { fs: 11.5, fill: C.ask, ls: 1.6 });
   b += txt(rx, ry - 24, `${KEYS.length} indicadores × ${PAISES.length} países`,
            { fs: 12, fill: C.ink2 });
+  b += txt(rx, ry - 6, 'los mismos, centrados', { fs: 10, fill: C.ink3 });
   rows.forEach((p, j) => {
-    b += txt(rx + 92 + j * 52 + 26, ry, p[col('codigo')].toUpperCase(),
+    b += txt(rx + 92 + j * 52 + 26, ry + 12, p[col('codigo')].toUpperCase(),
              { fs: 10.5, ff: MONO, fill: C.ink3, ta: 'middle' });
   });
-  b += txt(rx + 92 + 6 * 52 + 10, ry, '⋯', { fs: 14, fill: C.ink3 });
+  b += txt(rx + 92 + 6 * 52 + 10, ry + 12, '⋯', { fs: 14, fill: C.ink3 });
   KEYS.forEach((k, i) => {
     const y = ry + 22 + i * rh;
     if (k === HL) b += `<rect x="${rx}" y="${y - 15}" width="${92 + 6 * 52}" height="${rh - 4}"
       fill="${C.ask}" opacity=".12"/>`;
     b += txt(rx, y, SHORT[k], { fs: 11.5, ff: MONO, fill: k === HL ? C.ask : C.ink3 });
     rows.forEach((p, j) => {
-      b += txt(rx + 92 + j * 52 + 26, y, String(p[col(k)]),
-               { fs: 10.5, ff: MONO, fill: C.ink, ta: 'middle' });
+      b += txt(rx + 92 + j * 52 + 26, y, centrado(p, k),
+               { fs: 9.5, ff: MONO, fill: C.ink, ta: 'middle' });
     });
   });
 
@@ -79,14 +92,14 @@ export function transpuesta() {
     stroke-width="1.4" marker-end="url(#ar-s5-turn)"/>`;
   b += txt(466, 286, 'transponer', { fs: 12, fill: C.ask, ta: 'middle' });
 
-  b += box(70, 392, 840, 52, C.ask, { fill: C.ground2, sw: 1.2, stroke: C.ask });
-  b += txt(92, 424, `Los mismos números. Lo que era una columna —${LABEL[HL].toLowerCase()}— `
-    + 'es ahora una fila: la variable pasó a ser un registro.',
-    { fs: 13.5, ff: SERIF, fill: C.ink });
+  b += box(70, 386, 840, 62, C.ask, { fill: C.ground2, sw: 1.2, stroke: C.ask });
+  b += txt(92, 412, 'Los mismos números, ya centrados.', { fs: 13.5, ff: SERIF, fill: C.ink });
+  b += txt(92, 434, `Lo que era una columna —${LABEL[HL].toLowerCase()}— es ahora una fila: `
+    + 'la variable pasó a ser un registro.', { fs: 13.5, ff: SERIF, fill: C.ink });
 
-  return svg(W, H, 'La tabla de países e indicadores junto a su transpuesta: los mismos '
-    + 'números girados, de modo que cada variable, que era una columna, pasa a ser una '
-    + `fila. Se muestran 6 de los ${PAISES.length} países`, b);
+  return svg(W, H, 'La tabla de países e indicadores junto a su transpuesta, con los '
+    + 'valores ya centrados: los mismos números girados, de modo que cada variable, que era '
+    + `una columna, pasa a ser una fila. Se muestran 6 de los ${PAISES.length} países`, b);
 }
 
 /* ── The correlation circle ────────────────────────────────

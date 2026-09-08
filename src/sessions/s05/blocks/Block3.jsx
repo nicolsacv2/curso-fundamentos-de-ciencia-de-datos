@@ -57,10 +57,11 @@ export default function Block3({ id, tabId }) {
 
       <h3>De la tabla girada al dibujo</h3>
       <Prose>
-        <p>Cuidado aquí, porque hay un paso que es fácil saltarse. La tabla de arriba
-          muestra los <b>valores reales</b>: Catar con 132 900 dólares y 1.98 hijos por
-          mujer. Con esos números tal cual, el vector de Catar lo decide su PIB y nada más
-          — 132 900 aplasta a 1.98 —, y el ángulo entre dos flechas no significaría nada.</p>
+        <p>La tabla de arriba <b>ya viene centrada</b>: cada número es la distancia de ese
+          país a la media de su variable, y por eso hay negativos. Con los valores tal como
+          llegaron —Catar con 132 900 dólares y 1.98 hijos por mujer— el vector de Catar lo
+          decidiría su PIB y nada más, porque 132 900 aplasta a 1.98, y el coseno del ángulo
+          entre dos flechas no significaría nada.</p>
         <p>El camino completo son tres operaciones: <b>centrar</b>, <b>transponer</b> y
           {' '}<b>normalizar</b>. La primera <b>ya está hecha</b> — es la del bloque
           anterior, la que nos permitió encontrar las componentes —, así que lo único nuevo
