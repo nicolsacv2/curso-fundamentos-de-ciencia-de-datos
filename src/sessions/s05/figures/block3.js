@@ -249,14 +249,16 @@ export function tresAngulos() {
 }
 
 /* ── How the correlation circle is built, in five drawings ──
-   Transpose, centre, normalise — and the order is the explanation.
+   Centre, transpose, normalise.
 
-   Turning the table first means everything after it happens to the object being drawn:
-   each variable is now a vector with one component per country, and it gets its mean
-   taken out and its length set to one. (Centring a column before turning the table is
-   the same arithmetic; doing it after keeps one object in view instead of two.)
-   Normalising to length 1 is what makes the cosine between two of those vectors exactly
-   their correlation, and what gives the circle its radius.
+   Centring comes first because it already happened: block 2 centred the table to find
+   its components, the computation standardises once, and both views come out of that
+   single preparation. Presenting it here as a fresh step would have the class centring
+   twice. What this block adds is the last two: turning the table to look at variables
+   instead of countries, and setting each vector's length to one.
+
+   Panel 2 keeps the centred values in their own units on purpose — GDP in the thousands
+   next to fertility in decimals — because that disparity is what panel 3 resolves.
 
    The last two panels are where the two explanations of this block meet: the shadow of
    one of those unit vectors on the plane of the first two components IS its loading. One
@@ -277,40 +279,42 @@ export function pasosCirculo() {
 
   let b = arrow('ar-s5-load', C.ask);
 
-  /* 1. turn it: each variable becomes a row, values still as they came */
-  const p1 = panel(0, 'Transponer: cada variable pasa a ser una fila');
+  /* 1. centring, which block 2 already did to find its components */
+  const p1 = panel(0, 'Centrar: cada variable, alrededor de su media');
   b += p1.b;
+  const zero1 = PY + 74;
+  b += pline([[p1.x0, zero1], [p1.x0 + PW - 26, zero1]], C.lineSoft, { sw: 1 });
+  b += txt(p1.x0 + PW - 22, zero1 + 4, '0', { fs: 9, fill: C.ink3 });
   KEYS.forEach((k, i) => {
-    const y = PY + 30 + i * 22;
-    const hl = i === 0;
-    if (hl) b += `<rect x="${p1.x0 - 4}" y="${y - 14}" width="${PW - 10}" height="20"
-      fill="${C.ask}" opacity=".12"/>`;
-    b += txt(p1.x0, y, SHORT[k], { fs: 9.5, ff: MONO, fill: hl ? C.ask : C.ink3 });
+    const x = p1.x0 + 18 + i * 34;
     rows.forEach((p, j) => {
-      b += txt(p1.x0 + 58 + j * 26, y, String(p[col(k)]).slice(0, 5),
-               { fs: 8, ff: MONO, fill: C.ink, ta: 'middle' });
-    });
-    b += txt(p1.x0 + 58 + 4 * 26, y, '⋯', { fs: 9, fill: C.ink3, ta: 'middle' });
-  });
-  b += txt(p1.x0, PY + 134, 'una fila = un vector', { fs: 9, fill: C.ask });
-  b += txt(p1.x0, PY + 146, `con un eje por país (${PAISES.length})`, { fs: 9, fill: C.ink3 });
-
-  /* 2. take each row's own mean out of it */
-  const p2 = panel(1, 'Centrar: a cada fila se le resta su media');
-  b += p2.b;
-  const zero2 = PY + 74;
-  b += pline([[p2.x0, zero2], [p2.x0 + PW - 26, zero2]], C.lineSoft, { sw: 1 });
-  b += txt(p2.x0 + PW - 22, zero2 + 4, '0', { fs: 9, fill: C.ink3 });
-  KEYS.forEach((k, i) => {
-    const x = p2.x0 + 18 + i * 34;
-    rows.forEach((p, j) => {
-      b += dot(x + j * 6, zero2 - z(p[col(k)], ESTAD[k]) * 15, 2.4,
+      b += dot(x + j * 6, zero1 - z(p[col(k)], ESTAD[k]) * 15, 2.4,
                i === 0 ? C.ask : C.ink3, { op: 0.85 });
     });
     b += txt(x + 9, PY + 106, SHORT[k].slice(0, 5), { fs: 8.5, ff: MONO, fill: C.ink3, ta: 'middle' });
   });
-  b += txt(p2.x0, PY + 134, 'cada fila alrededor', { fs: 9, fill: C.ink3 });
-  b += txt(p2.x0, PY + 146, 'de su propia media', { fs: 9, fill: C.ink3 });
+  b += txt(p1.x0, PY + 134, 'ya hecho en el bloque 2,', { fs: 9, fill: C.ask });
+  b += txt(p1.x0, PY + 146, 'para hallar las componentes', { fs: 9, fill: C.ink3 });
+
+  /* 2. now turn it: each variable becomes a row of centred values */
+  const p2 = panel(1, 'Transponer: cada variable pasa a ser una fila');
+  b += p2.b;
+  KEYS.forEach((k, i) => {
+    const y = PY + 30 + i * 22;
+    const hl = i === 0;
+    if (hl) b += `<rect x="${p2.x0 - 4}" y="${y - 14}" width="${PW - 10}" height="20"
+      fill="${C.ask}" opacity=".12"/>`;
+    b += txt(p2.x0, y, SHORT[k], { fs: 9.5, ff: MONO, fill: hl ? C.ask : C.ink3 });
+    rows.forEach((p, j) => {
+      const c = p[col(k)] - ESTAD[k].media;
+      b += txt(p2.x0 + 58 + j * 26, y,
+               (Math.abs(c) >= 1000 ? Math.round(c) : c.toFixed(1)).toString().replace('-', '−'),
+               { fs: 7.5, ff: MONO, fill: C.ink, ta: 'middle' });
+    });
+    b += txt(p2.x0 + 58 + 4 * 26, y, '⋯', { fs: 9, fill: C.ink3, ta: 'middle' });
+  });
+  b += txt(p2.x0, PY + 134, 'una fila = un vector', { fs: 9, fill: C.ask });
+  b += txt(p2.x0, PY + 146, `con un eje por país (${PAISES.length})`, { fs: 9, fill: C.ink3 });
 
   /* 3. unit length, and the cosine that follows */
   const p3 = panel(2, 'Normalizar: cada vector a longitud 1');
@@ -364,12 +368,13 @@ export function pasosCirculo() {
 
   b += txt(34, 46, 'CÓMO SE CONSTRUYE EL CÍRCULO DE CORRELACIONES',
            { fs: 11.5, fill: C.ask, ls: 1.6 });
-  b += txt(34, H - 18, 'Transponer · centrar · normalizar. Y lo que se pierde está en el paso 4, '
+  b += txt(34, H - 18, 'Centrar · transponer · normalizar. Y lo que se pierde está en el paso 4, '
     + 'no en el 3.', { fs: 11.5, fill: C.ink3 });
 
-  return svg(W, H, 'La construcción del círculo de correlaciones en cinco pasos: transponer '
-    + 'la tabla, con lo que cada variable pasa a ser una fila, un vector con un número por '
-    + 'país; centrar esa fila restándole su propia media; normalizar cada '
+  return svg(W, H, 'La construcción del círculo de correlaciones en cinco pasos: centrar '
+    + 'cada variable alrededor de su media, que es lo que ya se hizo en el bloque 2; '
+    + 'transponer la tabla, con lo que cada variable pasa a ser una fila, un vector con un '
+    + 'número por país; normalizar cada '
     + 'vector a longitud uno, con lo que el coseno del ángulo entre dos es exactamente su '
     + 'correlación; proyectar ese vector sobre el plano de las dos primeras componentes, y '
     + 'esa sombra es su carga; y las cuatro sombras dentro del círculo de radio uno', b);

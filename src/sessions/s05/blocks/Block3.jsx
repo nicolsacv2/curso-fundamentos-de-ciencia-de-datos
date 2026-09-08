@@ -68,27 +68,30 @@ export default function Block3({ id, tabId }) {
           muestra los <b>valores reales</b>: Catar con 132 900 dólares y 1.98 hijos por
           mujer. Con esos números tal cual, el vector de Catar lo decide su PIB y nada más
           — 132 900 aplasta a 1.98 —, y el ángulo entre dos flechas no significaría nada.</p>
-        <p>El camino completo son tres operaciones: <b>transponer</b>, <b>centrar</b> y
-          {' '}<b>normalizar</b>. Se gira la tabla primero para que todo lo demás le ocurra
-          {' '}<b>al objeto que vamos a dibujar</b>: una vez cada variable es un vector, se
-          le quita su media y se le ajusta la longitud. Centrar la columna antes de girar
-          es la misma cuenta, pero obliga a seguir dos objetos a la vez.</p>
+        <p>El camino completo son tres operaciones: <b>centrar</b>, <b>transponer</b> y
+          {' '}<b>normalizar</b>. La primera <b>ya está hecha</b> — es la del bloque
+          anterior, la que nos permitió encontrar las componentes —, así que lo único nuevo
+          de este bloque son las otras dos: girar la tabla para mirar variables en vez de
+          países, y ajustar la longitud de cada vector.</p>
       </Prose>
 
       <Diagram fig={pasosCirculo}>
-        Transponer, centrar, normalizar. Y lo que se pierde está en el paso 4, no en el 3.
+        Centrar, transponer, normalizar. El primero ya venía hecho; lo que se pierde está en
+        el paso 4, no en el 3.
       </Diagram>
 
       <Prose>
         <h4>Los cinco pasos, uno a uno</h4>
         <List>
-          <li><b>01 · Transponer.</b> Se gira la tabla. Cada variable pasa a ser una fila:
-            un <b>vector con {PAISES.length} números</b>, uno por país. Es la tabla girada
-            del principio, todavía con sus valores tal cual.</li>
-          <li><b>02 · Centrar.</b> A cada fila se le resta <b>su propia media</b> — la media
-            de esa variable en los {PAISES.length} países. El PIB de Catar deja de ser
-            {' '}{miles(catar[col('pib')])} dólares y pasa a ser «tanto por encima del PIB
-            medio». Ahora cada vector sale del centro de su variable, no del cero.</li>
+          <li><b>01 · Centrar.</b> A cada variable se le resta <b>su propia media</b>: el
+            PIB de Catar deja de ser {miles(catar[col('pib')])} dólares y pasa a ser «tanto
+            por encima del PIB medio». <b>Esto no es nuevo</b> — es lo que hicimos en el
+            bloque anterior para encontrar las componentes, y se hace una sola vez: de esa
+            misma preparación salen el plano de los países y el círculo de las variables.
+            Lo que sí conviene mirar ahora es <i>qué significa</i>, y a eso vamos abajo.</li>
+          <li><b>02 · Transponer.</b> Se gira la tabla. Cada variable pasa a ser una fila:
+            un <b>vector con {PAISES.length} números</b>, uno por país. Aquí empieza lo
+            propio de este bloque.</li>
           <li><b>03 · Normalizar.</b> Cada uno de esos vectores se lleva a <b>longitud
             1</b> — dividirlo por su desviación típica es hacer justo eso, salvo un factor
             que no cambia ningún ángulo. Y aquí está lo importante: el coseno del ángulo
