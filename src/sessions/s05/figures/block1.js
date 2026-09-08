@@ -119,22 +119,22 @@ function fiveNumbers(values) {
 }
 
 export function caja() {
-  const W = 980, H = 430, L = 196, B = 74, T = 46;
+  const W = 980, H = 430, L = 196, B = 74, T = 46, RIGHT = 300;
   const groups = REGIONES.map(([id, nombre]) => ({
     id, nombre,
     ...fiveNumbers(PAISES.filter(p => p[col('region')] === id).map(p => p[col('fertilidad')])),
   }));
   const sy = scale([0, 8], [H - B, T]);
-  const wide = (W - L - 60) / groups.length;
+  const wide = (W - L - RIGHT) / groups.length;
 
-  let b = axes(L, H - B, W - L - 40, H - B - T);
+  let b = axes(L, H - B, W - L - RIGHT + 20, H - B - T);
   [0, 2, 4, 6, 8].forEach(v => {
-    b += pline([[L - 5, sy(v)], [W - 40, sy(v)]], C.lineSoft, { sw: 1 });
+    b += pline([[L - 5, sy(v)], [W - RIGHT + 20, sy(v)]], C.lineSoft, { sw: 1 });
     b += txt(L - 12, sy(v) + 4, String(v), { fs: 11, fill: C.ink3, ta: 'end' });
   });
 
   groups.forEach((g, i) => {
-    const cx = L + 30 + i * wide + (wide - 58) / 2, half = 34;
+    const cx = L + 20 + i * wide + (wide - 58) / 2, half = 26;
     b += pline([[cx, sy(g.hi)], [cx, sy(g.q3)]], C.ink3, { sw: 1.2 });
     b += pline([[cx, sy(g.q1)], [cx, sy(g.lo)]], C.ink3, { sw: 1.2 });
     b += pline([[cx - 16, sy(g.hi)], [cx + 16, sy(g.hi)]], C.ink3, { sw: 1.2 });
@@ -147,14 +147,26 @@ export function caja() {
     b += txt(cx + half + 10, sy(g.med) + 4, g.med.toFixed(2), { fs: 11.5, ff: MONO, fill: C.ink });
   });
 
-  /* The anatomy, named once, on the last box. A box plot is five numbers and nobody
-     remembers which is which the first time. */
-  const last = groups[groups.length - 1];
-  const cx = L + 30 + (groups.length - 1) * wide + (wide - 58) / 2;
-  [[last.hi, 'máximo sin atípicos'], [last.q3, 'cuartil 3'], [last.med, 'mediana'],
-   [last.q1, 'cuartil 1'], [last.lo, 'mínimo']].forEach(([v, name]) => {
-    b += txt(cx + 90, sy(v) + 4, name, { fs: 11, fill: C.ink3 });
-    b += pline([[cx + 40, sy(v)], [cx + 84, sy(v)]], C.lineSoft, { sw: 1, dash: '2 3' });
+  /* The anatomy as a reference box of its own, at its own scale.
+
+     It used to be drawn onto the last real box, and Europe turned out to be the one
+     group whose five numbers sit within a single child of each other: the labels piled
+     up on one line and ran off the canvas. A legend that only works when the data is
+     spread out is not a legend. */
+  const rx = W - RIGHT + 96, top = T + 24;
+  const marks = [[top, 'máximo sin atípicos'], [top + 56, 'cuartil 3'],
+                 [top + 106, 'mediana'], [top + 156, 'cuartil 1'], [top + 212, 'mínimo']];
+  b += txt(rx - 46, T - 6, 'CÓMO SE LEE', { fs: 11, fill: C.ink3, ls: 1.6 });
+  b += pline([[rx, marks[0][0]], [rx, marks[1][0]]], C.ink3, { sw: 1.2 });
+  b += pline([[rx, marks[3][0]], [rx, marks[4][0]]], C.ink3, { sw: 1.2 });
+  b += pline([[rx - 14, marks[0][0]], [rx + 14, marks[0][0]]], C.ink3, { sw: 1.2 });
+  b += pline([[rx - 14, marks[4][0]], [rx + 14, marks[4][0]]], C.ink3, { sw: 1.2 });
+  b += bar(rx - 30, marks[1][0], 60, marks[3][0] - marks[1][0], C.ink2,
+           { op: 0.2, stroke: C.ink3 });
+  b += pline([[rx - 30, marks[2][0]], [rx + 30, marks[2][0]]], C.ink, { sw: 2.4 });
+  marks.forEach(([y, name]) => {
+    b += pline([[rx + 34, y], [rx + 52, y]], C.lineSoft, { sw: 1, dash: '2 3' });
+    b += txt(rx + 60, y + 4, name, { fs: 11, fill: C.ink3 });
   });
 
   b += txt(L - 12, T - 16, '↑ Hijos por mujer', { fs: 12, fill: C.ink3 });

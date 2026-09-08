@@ -306,6 +306,12 @@ repite en cada línea.
       Histograma: el mismo PIB con intervalos de 2 500 (54 barras) y de 20 000 (7). El
       pie lo dice sin rodeos: el ancho no viene con los datos, lo eliges tú.
 
+      **Corregido después, con la sesión en pantalla:** la anatomía se anotaba sobre la
+      última caja real, y Europa resultó ser justo el grupo cuyos cinco números caben en
+      un hijo de diferencia — los cinco rótulos se apilaron en una línea y se salían del
+      lienzo. Ahora es una **caja de referencia aparte, a su propia escala**. Una leyenda
+      que solo funciona cuando los datos están repartidos no es una leyenda.
+
 - [x] **T18 · `figures/block1.js`: la dispersión del bloque**
       RF-21
       **Hecho cuando:** la figura existe y retoma explícitamente la de la entrada.
