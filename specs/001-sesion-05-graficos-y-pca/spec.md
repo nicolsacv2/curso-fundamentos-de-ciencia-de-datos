@@ -191,7 +191,7 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-86**: EL SISTEMA mostrará en el bloque 3 la construcción del círculo de
   correlaciones como una secuencia de pasos dibujados.
 - **RF-87**: EL SISTEMA describirá con texto cada uno de los pasos de esa construcción.
-- **RF-88**: EL SISTEMA presentará esa construcción en el orden centrar, transponer y
+- **RF-88**: EL SISTEMA presentará esa construcción en el orden transponer, centrar y
   normalizar.
 - **RF-89**: EL SISTEMA explicará que centrar una variable consiste en restarle su propia
   media.
@@ -207,10 +207,10 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
   ENTONCES EL SISTEMA advertirá que la de mayor escala decidiría por sí sola el resultado.
 - **RF-95**: EL SISTEMA enunciará que las cargas son correlaciones y que por eso ninguna
   flecha sale del círculo de radio 1.
-- **RF-96**: EL SISTEMA explicará que se centra antes de transponer porque la media que se
-  resta es la de cada variable.
-- **RF-97**: EL SISTEMA explicará que, tras transponer, cada variable es un vector con un
-  componente por país.
+- **RF-96**: EL SISTEMA explicará que, una vez transpuesta la tabla, centrar es restarle a
+  cada fila su propia media.
+- **RF-97**: EL SISTEMA explicará que, al transponer, cada variable pasa a ser un vector
+  con un componente por país.
 - **RF-98**: EL SISTEMA explicará que normalizar es llevar cada uno de esos vectores a
   longitud 1.
 - **RF-99**: EL SISTEMA enunciará que el coseno del ángulo entre dos de esos vectores
