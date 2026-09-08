@@ -306,9 +306,14 @@ repite en cada línea.
       Histograma: el mismo PIB con intervalos de 2 500 (54 barras) y de 20 000 (7). El
       pie lo dice sin rodeos: el ancho no viene con los datos, lo eliges tú.
 
-- [ ] **T18 · `figures/block1.js`: la dispersión del bloque**
+- [x] **T18 · `figures/block1.js`: la dispersión del bloque**
       RF-21
       **Hecho cuando:** la figura existe y retoma explícitamente la de la entrada.
+
+      **Resultado.** PIB per cápita contra esperanza de vida, rotulada «el mismo gráfico
+      de la entrada, con otras dos variables». Colombia va señalada con sus dos guías
+      hasta los ejes y sus cifras leídas del archivo (12760 dólares · 75.8 años): así la
+      construcción se ve entera, de la fila de la tabla al punto.
 
 - [ ] **T19 · `blocks/Block1.jsx`**
       RF-17, RF-18, RF-19, RF-20, RF-21, RF-22, RF-60

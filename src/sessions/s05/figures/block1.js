@@ -207,3 +207,53 @@ export function histograma() {
   return svg(W, H, 'Dos histogramas del mismo PIB per cápita, uno con intervalos de 2 500 '
     + 'dólares y otro de 20 000: la misma variable cambia de forma según el ancho elegido', b);
 }
+
+/* ── Scatter: two variables at once ────────────────────── */
+/* The entry already showed one of these and only named it. Here it is built: this is
+   the same chart with two different variables, and one country is followed from its row
+   in the table to its dot, because that is the whole construction. Colombia, because
+   that is where this class is. */
+export function dispersion() {
+  const W = 980, H = 470, L = 110, RG = 46, T = 52, B = 70;
+  const xs = PAISES.map(p => p[col('pib')]);
+  const ys = PAISES.map(p => p[col('vida')]);
+  const sx = scale([0, Math.max(...xs) * 1.02], [L, W - RG]);
+  const sy = scale([Math.min(...ys) - 3, Math.max(...ys) + 2], [H - B, T]);
+
+  let b = axes(L, H - B, W - RG - L, H - B - T);
+  [0, 25000, 50000, 75000, 100000, 125000].forEach(v => {
+    b += pline([[sx(v), H - B], [sx(v), H - B + 5]], C.line, { sw: 1 });
+    b += txt(sx(v), H - B + 20, v === 0 ? '0' : `${v / 1000} mil`,
+             { fs: 10.5, fill: C.ink3, ta: 'middle' });
+  });
+  [50, 60, 70, 80].forEach(v => {
+    b += pline([[L - 5, sy(v)], [L, sy(v)]], C.line, { sw: 1 });
+    b += txt(L - 12, sy(v) + 4, String(v), { fs: 11, fill: C.ink3, ta: 'end' });
+  });
+
+  PAISES.forEach(p => {
+    b += dot(sx(p[col('pib')]), sy(p[col('vida')]), 4,
+             REGION_COLOR[p[col('region')]] || C.ink2, { op: 0.6 });
+  });
+
+  const co = PAISES.find(p => p[col('nombre')] === 'Colombia');
+  if (co) {
+    const x = sx(co[col('pib')]), y = sy(co[col('vida')]);
+    b += pline([[L, y], [x, y]], C.reveal, { sw: 1, dash: '3 3', op: 0.8 });
+    b += pline([[x, H - B], [x, y]], C.reveal, { sw: 1, dash: '3 3', op: 0.8 });
+    b += dot(x, y, 6, C.reveal);
+    b += txt(x + 14, y - 8, 'Colombia', { fs: 13, ff: SERIF, fill: C.ink });
+    b += txt(x + 14, y + 10, `${co[col('pib')]} dólares · ${co[col('vida')]} años`,
+             { fs: 11, ff: MONO, fill: C.ink3 });
+  }
+
+  b += txt(W - RG, H - B + 40, 'PIB per cápita (dólares) →', { fs: 12, fill: C.ink3, ta: 'end' });
+  b += txt(L - 12, T - 18, '↑ Esperanza de vida (años)', { fs: 12, fill: C.ink3 });
+  b += txt(56, 40, 'DISPERSIÓN', { fs: 11.5, fill: C.ask, ls: 1.6 });
+  b += txt(L, T - 18, 'el mismo gráfico de la entrada, con otras dos variables',
+           { fs: 11.5, fill: C.ask });
+
+  return svg(W, H, 'Diagrama de dispersión de los 183 países: PIB per cápita en el eje '
+    + 'horizontal y esperanza de vida en el vertical, con Colombia señalada y sus dos '
+    + 'valores leídos sobre los ejes', b);
+}
