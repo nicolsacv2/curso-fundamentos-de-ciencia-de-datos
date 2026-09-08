@@ -195,11 +195,20 @@ repite en cada línea.
       Se dibuja la sombra de los 183 países pero solo una línea de caída de cada ocho:
       183 líneas convierten el plano en una estera gris y tapan lo que explican.
 
-- [ ] **T11 · Los vectores de variables y sus proyecciones**
+- [x] **T11 · Los vectores de variables y sus proyecciones**
       RF-31, RF-32
       Un vector por indicador desde el centro de la nube, y su sombra sobre el plano.
       **Hecho cuando:** los tres vectores salen del mismo origen y cada uno tiene su
       proyección dibujada sobre el plano.
+
+      **Resultado.** Tres flechas y tres sombras, las seis desde el mismo origen —el
+      centro de la nube—, cada una rotulada con su indicador. Comprobado además que en
+      el ángulo de canto las sombras de los vectores caen en la **misma recta** que las
+      de los países (0,061 px): se proyectan sobre el mismo plano, no sobre uno paralelo.
+
+      Las flechas van a longitud fija: lo que se lee aquí es hacia dónde apunta cada
+      variable y cuánto de ella sobrevive en el plano —la longitud de la sombra, no la
+      de la flecha—, que es justo lo que el círculo del bloque 3 formaliza.
 
 - [ ] **T12 · Solidaridad al rotar, y la figura en pantalla pequeña**
       RF-33, RF-69, RF-70, RF-71, RF-72

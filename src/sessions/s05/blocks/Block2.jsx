@@ -8,9 +8,10 @@ export default function Block2({ id, tabId }) {
       <p className="eyebrow">Bloque 2 · 83–120</p>
       <h2>La sombra de la nube</h2>
 
-      <Cloud3D plane projections>
+      <Cloud3D plane projections vectors>
         La misma nube del bloque 1, con el plano de las dos primeras componentes dentro y
-        la sombra de cada país sobre él. Gírala hasta ver el plano de canto: las sombras
+        la sombra de cada país sobre él, y una flecha por indicador con su propia sombra. Gírala
+        hasta ver el plano de canto: todas las sombras
         caen en una línea. {PCA3.porcentajes[0]} % y {PCA3.porcentajes[1]} % de la varianza.
         {' '}Datos de {FUENTE.nombre} ({ANIO}), {FUENTE.licencia}.
       </Cloud3D>

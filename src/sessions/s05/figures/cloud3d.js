@@ -113,7 +113,7 @@ export default function cloud3d(o) {
   const near = Math.max(...drawn.map(d => d.depth));
   const far = Math.min(...drawn.map(d => d.depth));
 
-  let b = arrow('ar-s5-cloud', C.ink3);
+  let b = arrow('ar-s5-cloud', C.ink3) + arrow('ar-s5-vec', C.reveal);
   b += `<rect x="0" y="0" width="${W}" height="${H}" fill="${C.ground2}" opacity=".35"/>`;
   b += axes3d(cam, mid, span);
 
@@ -143,6 +143,28 @@ export default function cloud3d(o) {
     const t = (d.depth - far) / (near - far || 1);
     b += dot(d.x, d.y, 3 + t * 1.6, REGION[d.region] || C.ink2, { op: 0.35 + t * 0.5 });
   });
+
+  if (o.vectors) {
+    /* One arrow per original variable: the direction that variable grows in, from the
+       centre of the cloud. Drawn at a fixed length because what matters here is where
+       each one points and how much of it survives on the plane — the length of the
+       shadow, not of the arrow. */
+    const origin = project(cam, KEYS.map((_, i) => -mid[i]));
+    b += '<g class="vec">';
+    KEYS.forEach((k, i) => {
+      const dir = KEYS.map((_, j) => (j === i ? 2.1 : 0));
+      const tip = project(cam, dir.map((v, j) => v - mid[j]));
+      const shadow = project(cam, onPlane(dir, mid));
+      b += pline([[origin.x, origin.y], [shadow.x, shadow.y]], C.reveal,
+                 { sw: 1.1, op: 0.45, dash: '3 3' });
+      b += dot(shadow.x, shadow.y, 2.6, C.reveal, { op: 0.6 });
+      b += `<path d="M${origin.x.toFixed(1)},${origin.y.toFixed(1)}
+        L${tip.x.toFixed(1)},${tip.y.toFixed(1)}" stroke="${C.reveal}" stroke-width="1.8"
+        fill="none" marker-end="url(#ar-s5-vec)"/>`;
+      b += txt(tip.x, tip.y - 8, LABEL[k], { fs: 11, fill: C.reveal, ta: 'middle' });
+    });
+    b += '</g>';
+  }
 
   b += txt(28, 34, `${PAISES.length} países · ${ANIO}`, { fs: 12, fill: C.ink3, ls: 1.4 });
   b += txt(28, 56, 'Arrastra para girarla', { fs: 13, ff: SERIF, fill: C.ink2 });
