@@ -210,11 +210,24 @@ repite en cada línea.
       variable y cuánto de ella sobrevive en el plano —la longitud de la sombra, no la
       de la flecha—, que es justo lo que el círculo del bloque 3 formaliza.
 
-- [ ] **T12 · Solidaridad al rotar, y la figura en pantalla pequeña**
+- [x] **T12 · Solidaridad al rotar, y la figura en pantalla pequeña**
       RF-33, RF-69, RF-70, RF-71, RF-72
       **Hecho cuando:** al girar, plano, proyecciones y vectores giran con la nube (nada
       queda fijo respecto a la pantalla); a 390 px no hay scroll horizontal; «Ampliar»
       abre, Esc cierra y el foco vuelve al botón.
+
+      **Resultado.** Girando de (0,72 · 0,30) a (1,35 · −0,15), **ningún** elemento de la
+      escena se queda quieto: puntos, sombras, sombras de vector, el polígono del plano y
+      los topes de eje se mueven todos. Lo único fijo es la leyenda, que es de pantalla.
+
+      «Ampliar» abre el diálogo, Esc lo cierra y el foco vuelve al botón — comprobado en
+      Chrome: `document.activeElement` es el botón `.zoom`.
+
+      **Límite de la comprobación:** Chrome en macOS no permite ventanas de menos de
+      500 px, así que los 390 px exactos no se pudieron reproducir aquí. A 500 px no hay
+      scroll horizontal, y lo que lo garantiza a cualquier ancho es
+      `.diagram svg{width:100%;height:auto}`: el SVG escala por su `viewBox`, igual que
+      en las cuatro sesiones anteriores. Los 390 px reales quedan para T33.
 
 ---
 
