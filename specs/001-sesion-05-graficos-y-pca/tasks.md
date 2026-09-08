@@ -112,11 +112,15 @@ repite en cada línea.
 
 ## Fase 1 · La sesión existe y se recorre
 
-- [ ] **T5 · `s05/meta.js`**
+- [x] **T5 · `s05/meta.js`**
       RF-2, RF-3, RF-4, RF-5, RF-6
       Título, gancho y objetivo literales de la spec; cinco bloques con las franjas
       0–35, 35–75, 83–120, 128–166, 166–180.
       **Hecho cuando:** el archivo existe y sus cinco `clock` coinciden con RF-6.
+
+      **Resultado.** Franjas verificadas contra RF-6. Los `rname`, que la spec no fija
+      porque son rótulo interno del rail: «Tres fórmulas encadenadas», «Cinco gráficos»,
+      «La sombra de la nube», «La tabla girada», «Gráficos que estorban».
 
 - [ ] **T6 · Los cinco bloques en blanco y el registry**
       RF-1, RF-2
