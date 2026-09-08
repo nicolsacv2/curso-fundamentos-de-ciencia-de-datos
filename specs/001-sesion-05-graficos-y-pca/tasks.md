@@ -175,12 +175,25 @@ repite en cada línea.
       El `pitch` se limita a ±1,25 rad: pasado el polo la escena se da la vuelta y los
       rótulos se leen en espejo, que parece un fallo y no lo quiere nadie.
 
-- [ ] **T10 · El plano y la proyección de los puntos**
+- [x] **T10 · El plano y la proyección de los puntos**
       RF-29, RF-30
       El plano de las dos primeras componentes de `PCA3`, dibujado dentro de la nube, y
       la caída de cada punto sobre él.
       **Hecho cuando:** al girar la figura hasta ver el plano de canto, las proyecciones
       quedan alineadas sobre él.
+
+      **Resultado.** Verificado por barrido de ángulos, no a ojo: en yaw 0,72 / pitch
+      −0,67 el plano se ve de canto y las 183 sombras caen en una recta con **0,061 px**
+      de desviación máxima. Si el plano fuera otro, o la proyección estuviera mal
+      centrada, no existiría ningún ángulo así.
+
+      La trampa que había que evitar: la proyección se calcula sobre los z-scores, cuyo
+      origen es la media, y solo después se pasa a coordenadas de dibujo. El centro de
+      la nube no es el centro de la caja que la contiene, y confundirlos inclina el
+      plano sin que nada parezca roto.
+
+      Se dibuja la sombra de los 183 países pero solo una línea de caída de cada ocho:
+      183 líneas convierten el plano en una estera gris y tapan lo que explican.
 
 - [ ] **T11 · Los vectores de variables y sus proyecciones**
       RF-31, RF-32

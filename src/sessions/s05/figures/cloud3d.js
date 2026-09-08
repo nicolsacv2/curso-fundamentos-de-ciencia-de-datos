@@ -1,5 +1,5 @@
 import { C, SERIF, svg, txt, arrow } from '../../../svg/kit.js';
-import { camera, dot, farFirst, pline, z, MONO } from './shared.js';
+import { camera, dot, farFirst, pline, poly, z, MONO } from './shared.js';
 import { PAISES, ESTAD, VARS, PCA3, CAMPOS, ANIO } from '../data/paises.js';
 
 /* The point cloud the class turns with the mouse: 183 countries on three axes.
@@ -44,7 +44,37 @@ function points() {
     const vs = raw.map(r => r.at[i]);
     return (Math.min(...vs) + Math.max(...vs)) / 2;
   });
-  return { raw: raw.map(r => ({ ...r, at: r.at.map((v, i) => v - mid[i]) })), mid };
+  return {
+    raw: raw.map(r => ({ ...r, z: r.at, at: r.at.map((v, i) => v - mid[i]) })),
+    mid,
+  };
+}
+
+
+const dotp = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+
+/* Where a country lands on the plane of the first two components.
+
+   The projection is computed on the z scores, whose origin is the mean, and only then
+   moved into drawing coordinates: the plane passes through the centre of the cloud,
+   which is not the centre of the box that contains it. Getting that wrong tilts the
+   plane by the difference and nothing looks obviously broken — it just stops being
+   the plane the eigenvectors describe. */
+function onPlane(zpt, mid) {
+  const [e1, e2] = PCA3.vectores;
+  const s1 = dotp(zpt, e1), s2 = dotp(zpt, e2);
+  return e1.map((_, i) => e1[i] * s1 + e2[i] * s2 - mid[i]);
+}
+
+/* The plane itself, as the parallelogram the two components span, big enough to hold
+   every country's shadow. */
+function planeCorners(raw, mid) {
+  const [e1, e2] = PCA3.vectores;
+  const s1 = raw.map(r => dotp(r.z, e1)), s2 = raw.map(r => dotp(r.z, e2));
+  const a = Math.max(...s1.map(Math.abs)) * 1.06;
+  const b = Math.max(...s2.map(Math.abs)) * 1.12;
+  return [[a, b], [-a, b], [-a, -b], [a, -b]]
+    .map(([u, v]) => e1.map((_, i) => e1[i] * u + e2[i] * v - mid[i]));
 }
 
 const project = (cam, at) => {
@@ -86,6 +116,26 @@ export default function cloud3d(o) {
   let b = arrow('ar-s5-cloud', C.ink3);
   b += `<rect x="0" y="0" width="${W}" height="${H}" fill="${C.ground2}" opacity=".35"/>`;
   b += axes3d(cam, mid, span);
+
+  if (o.plane) {
+    const corners = planeCorners(raw, mid).map(c => project(cam, c)).map(p => [p.x, p.y]);
+    b += poly(corners, C.ask, { op: 0.12, stroke: C.ask, sw: 1.2 });
+  }
+
+  if (o.projections) {
+    const shadows = raw.map(r => ({ ...project(cam, onPlane(r.z, mid)), region: r.region }));
+    /* Every country's shadow, but only one line in eight. A hundred and eighty-three
+       droplines turn the plane into a grey mat and hide the very thing they explain. */
+    b += '<g class="proj">';
+    shadows.forEach((sh, i) => {
+      if (i % 8 === 0) {
+        const from = project(cam, raw[i].at);
+        b += pline([[from.x, from.y], [sh.x, sh.y]], C.ink3, { sw: 0.8, op: 0.5, dash: '2 3' });
+      }
+      b += dot(sh.x, sh.y, 1.8, C.ask, { op: 0.55 });
+    });
+    b += '</g>';
+  }
 
   /* Far points dimmer and slightly smaller: without it the cloud reads as a flat
      spray and turning it tells you nothing. */
