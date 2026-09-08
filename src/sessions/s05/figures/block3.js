@@ -305,13 +305,16 @@ export function pasosCirculo() {
     if (hl) b += `<rect x="${p2.x0 - 4}" y="${y - 14}" width="${PW - 10}" height="20"
       fill="${C.ask}" opacity=".12"/>`;
     b += txt(p2.x0, y, SHORT[k], { fs: 9.5, ff: MONO, fill: hl ? C.ask : C.ink3 });
-    rows.forEach((p, j) => {
+    /* Three countries, not four: centred GDP runs to five digits and at four columns the
+       numbers ran into each other, which defeats a panel whose whole job is to show that
+       these rows are not on the same scale. */
+    rows.slice(0, 3).forEach((p, j) => {
       const c = p[col(k)] - ESTAD[k].media;
-      b += txt(p2.x0 + 58 + j * 26, y,
+      b += txt(p2.x0 + 56 + j * 34, y,
                (Math.abs(c) >= 1000 ? Math.round(c) : c.toFixed(1)).toString().replace('-', '−'),
-               { fs: 7.5, ff: MONO, fill: C.ink, ta: 'middle' });
+               { fs: 8, ff: MONO, fill: C.ink, ta: 'middle' });
     });
-    b += txt(p2.x0 + 58 + 4 * 26, y, '⋯', { fs: 9, fill: C.ink3, ta: 'middle' });
+    b += txt(p2.x0 + 56 + 3 * 34, y, '⋯', { fs: 9, fill: C.ink3, ta: 'middle' });
   });
   b += txt(p2.x0, PY + 134, 'una fila = un vector', { fs: 9, fill: C.ask });
   b += txt(p2.x0, PY + 146, `con un eje por país (${PAISES.length})`, { fs: 9, fill: C.ink3 });
