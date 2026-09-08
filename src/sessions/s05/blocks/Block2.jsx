@@ -69,6 +69,10 @@ export default function Block2({ id, tabId }) {
             entrada, cada variable contra cada variable. De ella se sacan sus
             <b> autovectores</b>, que son las direcciones, y sus <b>autovalores</b>, que
             dicen cuánto se estira la nube en cada una.</p>
+          <p>Con un detalle que importa: como las variables se centraron y se dividieron por
+            su desviación en el paso 01, esa matriz de covarianzas <b>es</b> la matriz de
+            correlaciones. Es la misma tabla con otro nombre, y es la razón de que más
+            adelante las cargas salgan directamente como correlaciones.</p>
           <p>El cálculo no lo hacemos aquí: se hace una vez, fuera, y lo que llega a esta
             pantalla son sus resultados. Lo que sí hay que saber leer es qué significan.</p>
         </Prose>

@@ -1,10 +1,18 @@
 import { Panel, Diagram, Pair, Prose, List, Idea, Task }
   from '../../../components/content/index.jsx';
 import { transpuesta, circuloCorrelaciones, tresAngulos, pasosCirculo } from '../figures/block3.js';
-import { PAISES, PCA4, VARS, CORR, ANIO, FUENTE } from '../data/paises.js';
+import { PAISES, PCA4, VARS, CORR, CAMPOS, ESTAD, ANIO, FUENTE } from '../data/paises.js';
 
 export default function Block3({ id, tabId }) {
   const dos = (PCA4.porcentajes[0] + PCA4.porcentajes[1]).toFixed(1);
+  /* One country, before and after, with its real numbers: the abstract version of this
+     paragraph is true and persuades nobody. */
+  const col = k => CAMPOS.indexOf(k);
+  const catar = PAISES.find(p => p[col('nombre')] === 'Catar');
+  const zc = k => ((catar[col(k)] - ESTAD[k].media) / ESTAD[k].desv).toFixed(2).replace('-', '−');
+  /* Thin-spaced thousands, so an interpolated 132900 reads like the 132 900 written in
+     the prose beside it. */
+  const miles = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   const iv = VARS.findIndex(v => v[0] === 'vida');
   const if_ = VARS.findIndex(v => v[0] === 'fertilidad');
   const rVidaFert = CORR[iv][if_];
@@ -55,9 +63,9 @@ export default function Block3({ id, tabId }) {
       <h3>De la tabla girada al dibujo</h3>
       <Prose>
         <p>Cuidado aquí, porque hay un paso que es fácil saltarse. La tabla de arriba
-          muestra los <b>valores reales</b>: Catar con 132 900 dólares y 1,98 hijos por
+          muestra los <b>valores reales</b>: Catar con 132 900 dólares y 1.98 hijos por
           mujer. Con esos números tal cual, el vector de Catar lo decide su PIB y nada más
-          — 132 900 aplasta a 1,98 —, y el ángulo entre dos flechas no significaría nada.</p>
+          — 132 900 aplasta a 1.98 —, y el ángulo entre dos flechas no significaría nada.</p>
       </Prose>
 
       <Diagram fig={pasosCirculo}>
@@ -70,17 +78,32 @@ export default function Block3({ id, tabId }) {
         <List>
           <li><b>01 · La tabla girada.</b> Cada variable es ahora una fila con
             {' '}{PAISES.length} valores: un registro, como lo era cada país.</li>
-          <li><b>02 · Centrar y dividir por la desviación típica.</b> Exactamente la misma
-            normalización de la entrada, la que convertía la covarianza en correlación.
-            Después de esto, las cuatro filas se mueven entre −3 y +6 en vez de entre 1,3 y
-            132 900, y ya se pueden comparar.</li>
+          <li><b>02 · Centrar y dividir por la desviación típica.</b> Son dos operaciones,
+            y conviene separarlas. <b>Centrar</b> es restarle a cada valor <b>la media de su
+            propia variable</b>: el PIB de un país deja de ser «12 760 dólares» y pasa a ser
+            «tanto por encima o por debajo del PIB medio». <b>Dividir</b> es partir ese
+            resultado por <b>la desviación típica de esa misma variable</b>, para que un
+            paso valga lo mismo en las cuatro.
+            <br />Es exactamente la normalización de la entrada — restar la media y dividir
+            por las desviaciones típicas es lo que convertía la covarianza en correlación.
+            Mira a Catar: pasa de <b>{miles(catar[col('pib')])}</b> dólares y
+            {' '}<b>{catar[col('fertilidad')]}</b> hijos por mujer a <b>{zc('pib')}</b> y
+            {' '}<b>{zc('fertilidad')}</b>. Dos números comparables donde antes había uno
+            enorme y uno diminuto.
+            <br />Después de esto, las cuatro filas se mueven entre −3 y +6 en vez de entre
+            1.3 y 132 900. Y el <b>origen</b> del círculo deja de ser el cero de los dólares:
+            es <b>la media de cada variable</b>, el país promedio.</li>
           <li><b>03 · Correlacionar cada variable con cada componente.</b> Ese número —la
             correlación entre una variable y una componente— es lo que se llama su
-            {' '}<b>carga</b>.</li>
+            {' '}<b>carga</b>. Y aquí se cierra un detalle del bloque anterior: como las
+            variables ya vienen centradas y divididas, la matriz de covarianzas que se
+            diagonaliza <b>es</b> la matriz de correlaciones. Por eso las cargas salen ya en
+            forma de correlación, sin convertir nada.</li>
           <li><b>04 · Las dos cargas son las coordenadas.</b> La carga con la primera
             componente es la x de la flecha; la de la segunda, su y. Nada más.</li>
-          <li><b>05 · Las cuatro, dentro del círculo de radio 1.</b> Como son
-            correlaciones, ninguna puede pasar de 1, y por eso todas caben en el círculo.
+          <li><b>05 · Las cuatro, dentro del círculo de radio 1.</b> Las cargas
+            <b> son correlaciones</b>, y una correlación nunca pasa de 1: por eso ninguna
+            flecha puede salirse del círculo.
             Lo que le falte a una flecha para llegar al borde es lo que esa variable vive
             fuera de este plano.</li>
         </List>

@@ -169,6 +169,20 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-87**: EL SISTEMA describirá con texto cada uno de los pasos de esa construcción.
 - **RF-88**: EL SISTEMA incluirá en esa construcción el paso de estandarizar cada fila de
   la tabla girada.
+- **RF-89**: EL SISTEMA explicará que centrar una variable consiste en restarle su propia
+  media.
+- **RF-90**: EL SISTEMA explicará que la escala se iguala dividiendo cada variable por su
+  propia desviación típica.
+- **RF-91**: EL SISTEMA mostrará los valores de un mismo país antes y después de centrarlos
+  y dividirlos.
+- **RF-92**: EL SISTEMA enunciará que, una vez centradas las variables, el origen del
+  círculo de correlaciones corresponde a la media de cada una.
+- **RF-93**: EL SISTEMA enunciará que la matriz que se diagonaliza después de ese paso es
+  la de correlaciones.
+- **RF-94**: SI las variables no se centraran ni se dividieran por su desviación típica,
+  ENTONCES EL SISTEMA advertirá que la de mayor escala decidiría por sí sola el resultado.
+- **RF-95**: EL SISTEMA enunciará que las cargas son correlaciones y que por eso ninguna
+  flecha sale del círculo de radio 1.
 
 ### Cierre — gráficos basura
 
@@ -294,9 +308,16 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
    números en pantalla son comprobables.
 12. **La tabla girada muestra valores crudos, y el círculo no se construye con ellos.**
    La figura de la transpuesta imprime los valores tal como vienen —Catar con 132900
-   dólares— y el texto pasa de «la variable es un registro» a «un registro es un vector»
+   dólares— y el texto pasaba de «la variable es un registro» a «un registro es un vector»
    sin decir que antes hay que centrar y dividir por la desviación típica. Sin ese paso,
-   el vector de Catar lo decide el PIB y el ángulo no significa nada. RF-88 lo cubre.
+   el vector de Catar lo decide el PIB y el ángulo no significa nada.
+
+   Lo destapó una pregunta sobre esa figura: «¿son las coordenadas de las componentes o
+   los valores reales?». Son los reales, y el material no explicaba el puente. Cubierto
+   ahora por RF-88 a RF-95, que exigen decir qué es centrar (restar la media), por qué se
+   divide (igualar escalas), qué pasa si no se hace (manda la variable más grande), qué
+   queda en el origen (la media de cada una) y qué matriz se acaba diagonalizando (la de
+   correlaciones).
 13. **La transpuesta no cabe en la pantalla.** Un conjunto célebre tiene decenas o
    cientos de filas, así que su transpuesta tiene decenas o cientos de columnas y no se
    proyecta entera. RF-36 exige mostrar ambas, de modo que hay que decidir qué recorte se
