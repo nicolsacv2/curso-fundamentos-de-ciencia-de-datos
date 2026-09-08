@@ -24,84 +24,6 @@ function sample() {
     sorted[Math.round((i * (sorted.length - 1)) / 5)]);
 }
 
-/* ── The table, and the same table turned ──────────────────
-   Both are cut: 183 rows do not fit on a wall and neither do 183 columns. What has to
-   survive the cut is that it is the same table — same six countries, same four
-   indicators, same numbers — so one variable is tinted in both, and the eye can follow
-   a column becoming a row.
-
-   The values are the centred ones, not the raw figures. With the raw ones the figure
-   invited exactly the wrong question — whether the arrows of the circle are drawn from
-   those numbers — and by this point in the block the centring has already happened. */
-export function transpuesta() {
-  const W = 980, H = 470;
-  const rows = sample();
-  const HL = 'fertilidad';                 /* the one tinted in both halves */
-
-  let b = arrow('ar-s5-turn', C.ask);
-  const cw = 62, rh = 26;
-
-  /* left: countries down, indicators across */
-  const lx = 70, ly = 116;
-  b += txt(lx, ly - 58, 'LA TABLA', { fs: 11.5, fill: C.ink3, ls: 1.6 });
-  b += txt(lx, ly - 38, `${PAISES.length} países × ${KEYS.length} indicadores`,
-           { fs: 12, fill: C.ink2 });
-  b += txt(lx, ly - 20, 'valores centrados', { fs: 10, fill: C.ink3 });
-  KEYS.forEach((k, j) => {
-    b += txt(lx + 96 + j * cw + cw / 2, ly, SHORT[k],
-             { fs: 11, fill: k === HL ? C.ask : C.ink3, ta: 'middle' });
-  });
-  rows.forEach((p, i) => {
-    const y = ly + 22 + i * rh;
-    b += txt(lx, y, p[col('nombre')].slice(0, 12), { fs: 11.5, ff: MONO, fill: C.ink3 });
-    KEYS.forEach((k, j) => {
-      const x = lx + 96 + j * cw;
-      if (k === HL) b += `<rect x="${x}" y="${y - 15}" width="${cw}" height="${rh - 4}"
-        fill="${C.ask}" opacity=".12"/>`;
-      b += txt(x + cw / 2, y, centrado(p, k), { fs: 10, ff: MONO, fill: C.ink, ta: 'middle' });
-    });
-  });
-  b += txt(lx, ly + 22 + 6 * rh, '⋮', { fs: 14, fill: C.ink3 });
-  b += txt(lx + 96, ly + 22 + 6 * rh + 4, `y ${PAISES.length - 6} países más`,
-           { fs: 11, fill: C.ink3 });
-
-  /* right: indicators down, countries across — the same numbers, turned */
-  const rx = 540, ry = 116;
-  b += txt(rx, ry - 58, 'LA TABLA GIRADA', { fs: 11.5, fill: C.ask, ls: 1.6 });
-  b += txt(rx, ry - 38, `${KEYS.length} indicadores × ${PAISES.length} países`,
-           { fs: 12, fill: C.ink2 });
-  b += txt(rx, ry - 20, 'los mismos, centrados', { fs: 10, fill: C.ink3 });
-  rows.forEach((p, j) => {
-    b += txt(rx + 92 + j * 52 + 26, ry, p[col('codigo')].toUpperCase(),
-             { fs: 10.5, ff: MONO, fill: C.ink3, ta: 'middle' });
-  });
-  b += txt(rx + 92 + 6 * 52 + 10, ry, '⋯', { fs: 14, fill: C.ink3 });
-  KEYS.forEach((k, i) => {
-    const y = ry + 22 + i * rh;
-    if (k === HL) b += `<rect x="${rx}" y="${y - 15}" width="${92 + 6 * 52}" height="${rh - 4}"
-      fill="${C.ask}" opacity=".12"/>`;
-    b += txt(rx, y, SHORT[k], { fs: 11.5, ff: MONO, fill: k === HL ? C.ask : C.ink3 });
-    rows.forEach((p, j) => {
-      b += txt(rx + 92 + j * 52 + 26, y, centrado(p, k),
-               { fs: 9.5, ff: MONO, fill: C.ink, ta: 'middle' });
-    });
-  });
-
-  /* the turn itself */
-  b += `<path d="M420,250 C468,250 470,206 512,206" fill="none" stroke="${C.ask}"
-    stroke-width="1.4" marker-end="url(#ar-s5-turn)"/>`;
-  b += txt(466, 286, 'transponer', { fs: 12, fill: C.ask, ta: 'middle' });
-
-  b += box(70, 386, 840, 62, C.ask, { fill: C.ground2, sw: 1.2, stroke: C.ask });
-  b += txt(92, 412, 'Los mismos números, ya centrados.', { fs: 13.5, ff: SERIF, fill: C.ink });
-  b += txt(92, 434, `Lo que era una columna —${LABEL[HL].toLowerCase()}— es ahora una fila: `
-    + 'la variable pasó a ser un registro.', { fs: 13.5, ff: SERIF, fill: C.ink });
-
-  return svg(W, H, 'La tabla de países e indicadores junto a su transpuesta, con los '
-    + 'valores ya centrados: los mismos números girados, de modo que cada variable, que era '
-    + `una columna, pasa a ser una fila. Se muestran 6 de los ${PAISES.length} países`, b);
-}
-
 /* ── The correlation circle ────────────────────────────────
    Each variable as an arrow in the plane of the first two components. Starting from the
    correlation matrix, a loading *is* the correlation between that variable and that
@@ -270,8 +192,8 @@ export function tresAngulos() {
    twice. What this block adds is the last two: turning the table to look at variables
    instead of countries, and setting each vector's length to one.
 
-   Panel 2 keeps the centred values in their own units on purpose — GDP in the thousands
-   next to fertility in decimals — because that disparity is what panel 3 resolves.
+   Panel 2 draws the four vectors with the lengths their own scales gave them, unequal
+   and mostly wrong, because that disparity is exactly what panel 3 resolves.
 
    The last two panels are where the two explanations of this block meet: the shadow of
    one of those unit vectors on the plane of the first two components IS its loading. One
@@ -309,28 +231,30 @@ export function pasosCirculo() {
   b += txt(p1.x0, PY + 134, 'ya hecho en el bloque 2,', { fs: 9, fill: C.ask });
   b += txt(p1.x0, PY + 146, 'para hallar las componentes', { fs: 9, fill: C.ink3 });
 
-  /* 2. now turn it: each variable becomes a row of centred values */
-  const p2 = panel(1, 'Transponer: cada variable pasa a ser una fila');
+  /* 2. turned: four vectors, each as long as its own scale made it.
+
+     The lengths here are a sketch. In the data the GDP vector is about 14 000 times the
+     one for children per woman — a ratio no drawing survives — so what the panel shows
+     is that the lengths are unequal and arbitrary, and the note says by how much. */
+  const p2 = panel(1, 'Transponer: cuatro vectores, largos como su escala');
+  const R2 = 40, cy2 = PY + 62;
   b += p2.b;
+  b += `<circle cx="${p2.cx}" cy="${cy2}" r="${R2}" fill="none" stroke="${C.line}"
+    stroke-width="1" stroke-dasharray="3 3"/>`;
+  b += pline([[p2.cx - R2 - 8, cy2], [p2.cx + R2 + 8, cy2]], C.lineSoft, { sw: 1 });
+  b += pline([[p2.cx, cy2 - R2 - 8], [p2.cx, cy2 + R2 + 8]], C.lineSoft, { sw: 1 });
+  const largos = [1.85, 1.15, 0.55, 0.78];
   KEYS.forEach((k, i) => {
-    const y = PY + 30 + i * 22;
-    const hl = i === 0;
-    if (hl) b += `<rect x="${p2.x0 - 4}" y="${y - 14}" width="${PW - 10}" height="20"
-      fill="${C.ask}" opacity=".12"/>`;
-    b += txt(p2.x0, y, SHORT[k], { fs: 9.5, ff: MONO, fill: hl ? C.ask : C.ink3 });
-    /* Three countries, not four: centred GDP runs to five digits and at four columns the
-       numbers ran into each other, which defeats a panel whose whole job is to show that
-       these rows are not on the same scale. */
-    rows.slice(0, 3).forEach((p, j) => {
-      const c = p[col(k)] - ESTAD[k].media;
-      b += txt(p2.x0 + 56 + j * 34, y,
-               (Math.abs(c) >= 1000 ? Math.round(c) : c.toFixed(1)).toString().replace('-', '−'),
-               { fs: 8, ff: MONO, fill: C.ink, ta: 'middle' });
-    });
-    b += txt(p2.x0 + 56 + 3 * 34, y, '⋯', { fs: 9, fill: C.ink3, ta: 'middle' });
+    const dir = Math.hypot(L[i][0], L[i][1]);
+    const ux = L[i][0] / dir, uy = L[i][1] / dir;
+    const x = p2.cx + ux * R2 * largos[i], y = cy2 - uy * R2 * largos[i];
+    b += `<path d="M${p2.cx},${cy2} L${x.toFixed(1)},${y.toFixed(1)}" stroke="${C.ink2}"
+      stroke-width="1.6" fill="none" marker-end="url(#ar-s5-load)"/>`;
   });
-  b += txt(p2.x0, PY + 134, 'una fila = un vector', { fs: 9, fill: C.ask });
-  b += txt(p2.x0, PY + 146, `con un eje por país (${PAISES.length})`, { fs: 9, fill: C.ink3 });
+  b += txt(p2.cx + R2 + 6, cy2 - R2 + 4, 'radio 1', { fs: 9, fill: C.ink3 });
+  b += txt(p2.x0, PY + 134, 'unas más largas que 1,', { fs: 9, fill: C.ink3 });
+  b += txt(p2.x0, PY + 146, 'otras más cortas: el del PIB', { fs: 9, fill: C.ink3 });
+  b += txt(p2.x0, PY + 158, 'mide 14 000 veces el de hijos', { fs: 9, fill: C.reveal });
 
   /* 3. unit length, and the cosine that follows */
   const p3 = panel(2, 'Normalizar: cada vector a longitud 1');

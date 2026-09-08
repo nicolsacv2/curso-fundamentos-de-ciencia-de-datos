@@ -168,8 +168,6 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 
 ### Bloque 3 — círculo de correlaciones
 
-- **RF-36**: EL SISTEMA mostrará en el bloque 3 la tabla del ejemplo junto a su
-  transpuesta.
 - **RF-37**: EL SISTEMA explicará que transponer la tabla convierte cada variable en un
   registro.
 - **RF-38**: EL SISTEMA explicará que cada variable, convertida en registro, se representa

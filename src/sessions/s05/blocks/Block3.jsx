@@ -1,6 +1,6 @@
 import { Panel, Diagram, Pair, Prose, List, Idea }
   from '../../../components/content/index.jsx';
-import { transpuesta, circuloCorrelaciones, tresAngulos, pasosCirculo }
+import { circuloCorrelaciones, tresAngulos, pasosCirculo }
   from '../figures/block3.js';
 import { PAISES, PCA4, VARS, CORR, CAMPOS, ESTAD, ANIO, FUENTE } from '../data/paises.js';
 
@@ -29,11 +29,6 @@ export default function Block3({ id, tabId }) {
       <p className="eyebrow">Bloque 3 · 128–166</p>
       <h2>La tabla girada</h2>
 
-      <Diagram fig={transpuesta}>
-        Los mismos números, girados. Se muestran 6 de los {PAISES.length} países; con las
-        cuatro filas está la tabla entera. Datos de {FUENTE.nombre} ({ANIO}).
-      </Diagram>
-
       <Pair>
         <Prose>
           <h4>Una variable pasa a ser un registro</h4>
@@ -57,11 +52,11 @@ export default function Block3({ id, tabId }) {
 
       <h3>De la tabla girada al dibujo</h3>
       <Prose>
-        <p>La tabla de arriba <b>ya viene centrada</b>: cada número es la distancia de ese
-          país a la media de su variable, y por eso hay negativos. Con los valores tal como
-          llegaron —Catar con 132 900 dólares y 1.98 hijos por mujer— el vector de Catar lo
-          decidiría su PIB y nada más, porque 132 900 aplasta a 1.98, y el coseno del ángulo
-          entre dos flechas no significaría nada.</p>
+        <p>Los valores con los que se trabaja <b>ya vienen centrados</b>: cada número es la
+          distancia de ese país a la media de su variable. Con los valores tal como llegaron
+          —Catar con 132 900 dólares y 1.98 hijos por mujer— el vector de Catar lo decidiría
+          su PIB y nada más, porque 132 900 aplasta a 1.98, y el coseno del ángulo entre dos
+          flechas no significaría nada.</p>
         <p>El camino completo son tres operaciones: <b>centrar</b>, <b>transponer</b> y
           {' '}<b>normalizar</b>. La primera <b>ya está hecha</b> — es la del bloque
           anterior, la que nos permitió encontrar las componentes —, así que lo único nuevo
@@ -85,9 +80,13 @@ export default function Block3({ id, tabId }) {
             Lo que sí conviene mirar ahora es <i>qué significa</i>, y a eso vamos abajo.</li>
           <li><b>02 · Transponer.</b> Se gira la tabla. Cada variable pasa a ser una fila:
             un <b>vector con {PAISES.length} números</b>, uno por país. Aquí empieza lo
-            propio de este bloque.</li>
-          <li><b>03 · Normalizar.</b> Cada uno de esos vectores se lleva a <b>longitud
-            1</b> — dividirlo por su desviación típica es hacer justo eso, salvo un factor
+            propio de este bloque — y fíjate en las <b>longitudes</b>: cada vector es tan
+            largo como su escala lo hizo. El del PIB mide unas <b>14 000 veces</b> el de
+            hijos por mujer, porque una cosa va en dólares y la otra en niños. Con
+            longitudes así, comparar dos flechas no significa nada todavía.</li>
+          <li><b>03 · Normalizar.</b> De ahí este paso: cada uno de esos vectores se lleva
+            a <b>longitud 1</b>, y así lo único que los distingue es <b>hacia dónde
+            apuntan</b> — dividirlo por su desviación típica es hacer justo eso, salvo un factor
             que no cambia ningún ángulo. Y aquí está lo importante: el coseno del ángulo
             entre dos vectores centrados y de longitud 1 <b>es</b> su correlación.
             Exactamente, no aproximadamente, usando los {PAISES.length} números de cada
