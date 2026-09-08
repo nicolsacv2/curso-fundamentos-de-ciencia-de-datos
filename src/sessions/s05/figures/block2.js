@@ -1,6 +1,6 @@
 import { C, SERIF, svg, txt, arrow, wrap } from '../../../svg/kit.js';
 import { camera, dot, farFirst, pline, poly, scale, z, MONO } from './shared.js';
-import { PAISES, ESTAD, CAMPOS, PCA3, VARS, ANIO } from '../data/paises.js';
+import { PAISES, ESTAD, CAMPOS, PCA3, PCA4, VARS, ANIO } from '../data/paises.js';
 
 const col = k => CAMPOS.indexOf(k);
 const REGION = { africa: '#E0A458', americas: '#5BC8CE', asia: '#7FB069', europe: '#9EB0C3' };
@@ -87,9 +87,9 @@ export function antesYDespues() {
    The percentages are read out of PCA3, never typed. They are the answer to the only
    question that matters after a projection — what did we lose — and a number on a wall
    that no longer matches its data is worse than no number. */
-export function varianzaExplicada() {
+function varianzaDe(pca, nVars) {
   const W = 980, H = 380, L = 210, B = 96, T = 78;
-  const pct = PCA3.porcentajes;
+  const pct = pca.porcentajes;
   const sy = scale([0, 100], [H - B, T]);
   const wide = (W - L - 120) / pct.length;
   let acc = 0;
@@ -115,13 +115,16 @@ export function varianzaExplicada() {
   const dos = pct[0] + pct[1];
   b += txt(L, 44, `Las dos primeras conservan el ${dos.toFixed(1)} % de la variación`,
            { fs: 15, ff: SERIF, fill: C.ink });
-  b += txt(L, 64, `de los ${PAISES.length} países. La tercera es lo que se pierde al aplanar.`,
-           { fs: 12, fill: C.ink3 });
+  b += txt(L, 64, `de los ${PAISES.length} países con ${nVars} indicadores. El resto es lo `
+    + 'que se pierde al aplanar.', { fs: 12, fill: C.ink3 });
 
-  return svg(W, H, `Varianza explicada por cada componente: ${pct.map((v, i) =>
-    `la ${i + 1} conserva el ${v} por ciento`).join(', ')}; entre las dos primeras, `
-    + `el ${dos.toFixed(1)} por ciento`, b);
+  return svg(W, H, `Varianza explicada por cada componente de ${nVars} indicadores: `
+    + pct.map((v, i) => `la ${i + 1} conserva el ${v} por ciento`).join(', ')
+    + `; entre las dos primeras, el ${dos.toFixed(1)} por ciento`, b);
 }
+
+export const varianzaExplicada = () => varianzaDe(PCA3, 3);
+export const varianzaCuatro = () => varianzaDe(PCA4, 4);
 
 /* ── Who sits at each end of a component ───────────────────
    Read from the data, not written down: the countries at the extremes are the argument
@@ -243,4 +246,62 @@ export function pasosPlano() {
     + 'la dirección en la que más se estira, que es la primera componente; la perpendicular '
     + 'que más estira de lo que queda, que es la segunda; el plano que forman las dos; y la '
     + 'sombra de cada país sobre ese plano', b);
+}
+
+/* ── The factorial plane of all four ───────────────────────
+   The block argues that four variables have no scene to turn, and this is the answer to
+   it: there is no cloud, but there is a plane. The 183 countries placed by the first two
+   components of the four-variable analysis — the same drawing as the right half of the
+   before-and-after, with one more variable folded in and barely any more loss. */
+export function planoCuatro() {
+  const W = 980, H = 470, T = 60, B = 74;
+  const [e1, e2] = PCA4.vectores;
+  const keys = PCA4.vars;
+  const pts = PAISES.map(p => {
+    const at = keys.map(k => z(p[col(k)], ESTAD[k]));
+    return {
+      s1: at.reduce((s, v, i) => s + v * e1[i], 0),
+      s2: at.reduce((s, v, i) => s + v * e2[i], 0),
+      region: p[col('region')], nombre: p[col('nombre')],
+    };
+  });
+  const pad = 0.5;
+  const sx = scale([Math.min(...pts.map(p => p.s1)) - pad, Math.max(...pts.map(p => p.s1)) + pad],
+                   [150, W - 60]);
+  const sy = scale([Math.min(...pts.map(p => p.s2)) - pad, Math.max(...pts.map(p => p.s2)) + pad],
+                   [H - B, T]);
+
+  let b = pline([[130, sy(0)], [W - 40, sy(0)]], C.lineSoft, { sw: 1 });
+  b += pline([[sx(0), T - 20], [sx(0), H - B + 16]], C.lineSoft, { sw: 1 });
+  pts.forEach(p => {
+    b += dot(sx(p.s1), sy(p.s2), 3.6, REGION[p.region] || C.ink2, { op: 0.72 });
+  });
+
+  const co = pts.find(p => p.nombre === 'Colombia');
+  if (co) {
+    /* Colombia lands in the crowded middle of the U, so its label carries its own ground
+       — the same fix the block 1 scatter needed. */
+    const cx = sx(co.s1), cy = sy(co.s2);
+    b += dot(cx, cy, 5.5, C.reveal);
+    b += `<rect x="${(cx + 10).toFixed(1)}" y="${(cy - 22).toFixed(1)}" width="76" height="19"
+      rx="3" fill="${C.ground2}" opacity=".88" stroke="${C.reveal}" stroke-width=".8"/>`;
+    b += txt(cx + 20, cy - 8, 'Colombia', { fs: 11.5, ff: MONO, fill: C.reveal });
+  }
+
+  b += txt(W - 60, sy(0) + 20, `componente 1 · ${PCA4.porcentajes[0]} % →`,
+           { fs: 11, fill: C.ink3, ta: 'end' });
+  b += txt(sx(0) + 10, T - 24, `↑ componente 2 · ${PCA4.porcentajes[1]} %`,
+           { fs: 11, fill: C.ink3 });
+  b += txt(56, 40, 'PLANO FACTORIAL', { fs: 11.5, fill: C.ask, ls: 1.6 });
+  b += txt(56, 64, 'las cuatro', { fs: 12.5, fill: C.ink3 });
+  b += txt(56, 82, 'variables', { fs: 12.5, fill: C.ink3 });
+  Object.entries(REGION).forEach(([key, c], i) => {
+    const nombre = { africa: 'África', americas: 'América', asia: 'Asia', europe: 'Europa' }[key];
+    b += `<circle cx="61" cy="${118 + i * 20}" r="4.5" fill="${c}"/>`;
+    b += txt(74, 122 + i * 20, nombre, { fs: 11, fill: C.ink3 });
+  });
+
+  return svg(W, H, `Plano factorial de los ${PAISES.length} países con los cuatro `
+    + `indicadores: la primera componente conserva el ${PCA4.porcentajes[0]} por ciento y `
+    + `la segunda el ${PCA4.porcentajes[1]}, con Colombia señalada`, b);
 }

@@ -159,6 +159,12 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-114**: EL SISTEMA enunciará que la suma de los autovalores del análisis sobre
   correlaciones es el número de variables.
 - **RF-115**: EL SISTEMA indicará en qué caso conviene cada uno de los dos análisis.
+- **RF-116**: EL SISTEMA mostrará la varianza explicada por cada componente del análisis
+  de las cuatro variables.
+- **RF-117**: EL SISTEMA mostrará el plano factorial de las cuatro variables con un punto
+  por país.
+- **RF-118**: EL SISTEMA indicará cuánta varianza se pierde al pasar de cuatro variables a
+  ese plano.
 
 ### Bloque 3 — círculo de correlaciones
 

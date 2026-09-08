@@ -1,12 +1,15 @@
 import { Panel, Diagram, Pair, Prose, List, Idea, Task, Cards, Card }
   from '../../../components/content/index.jsx';
-import { antesYDespues, varianzaExplicada, extremos, pasosPlano } from '../figures/block2.js';
+import { antesYDespues, varianzaExplicada, varianzaCuatro, planoCuatro, extremos, pasosPlano }
+  from '../figures/block2.js';
 import { COMPONENTES } from '../figures/cloud3d.js';
 import Cloud3D from '../views/Cloud3D.jsx';
-import { PCA3, PAISES, VARS, ANIO, FUENTE } from '../data/paises.js';
+import { PCA3, PCA4, PAISES, VARS, ANIO, FUENTE } from '../data/paises.js';
 
 export default function Block2({ id, tabId }) {
   const dos = (PCA3.porcentajes[0] + PCA3.porcentajes[1]).toFixed(1);
+  const cuatro = PCA4.porcentajes;
+  const dosDeCuatro = (cuatro[0] + cuatro[1]).toFixed(1);
   const nombre = k => VARS.find(v => v[0] === k)[1].toLowerCase();
   const carga = (i, j) => PCA3.cargas[i][j].toFixed(2).replace('-', '−');
 
@@ -229,11 +232,33 @@ export default function Block2({ id, tabId }) {
       <Prose>
         <p>Y aquí es donde el PCA deja de ser un truco de dibujo para ser una herramienta: si
           {' '}<b>dos</b> componentes conservan el {dos} % de lo que tenían <b>tres</b>
-          {' '}variables, quizá dos conserven casi todo lo que tienen cuatro. El PCA es la
-          respuesta clásica a la maldición de la dimensionalidad: cambiar muchas variables
-          por unas pocas combinaciones, y saber exactamente cuánto se dejó por el camino.</p>
-        <p>El bloque siguiente hace justo eso con las cuatro, y para conseguirlo tendremos que
-          girar la tabla entera.</p>
+          {' '}variables, ¿cuánto conservarían de cuatro? Se calcula igual — la cuarta
+          variable entra en la matriz y salen cuatro componentes en vez de tres.</p>
+      </Prose>
+
+      <Diagram fig={varianzaCuatro}>
+        Con los cuatro indicadores: {cuatro[0]} % y {cuatro[1]} %, que suman {dosDeCuatro} %.
+        Añadir una variable entera nos costó {(Number(dos) - Number(dosDeCuatro)).toFixed(1)}
+        {' '}puntos.
+      </Diagram>
+
+      <Prose>
+        <p>Y con eso hay <b>plano</b>. No hay escena de cuatro ejes que girar —esa no existe—,
+          pero sí hay una hoja donde caben los {PAISES.length} países con sus cuatro
+          indicadores, y sabemos exactamente cuánto se dejó fuera: el
+          {' '}{(100 - Number(dosDeCuatro)).toFixed(1)} %.</p>
+      </Prose>
+
+      <Diagram fig={planoCuatro}>
+        Los {PAISES.length} países en el plano factorial de las cuatro variables. Cada punto
+        es un país; los ejes ya no son indicadores, son componentes.
+      </Diagram>
+
+      <Prose>
+        <p>Eso es el PCA como herramienta y no como dibujo: cambiar muchas variables por unas
+          pocas combinaciones, y <b>saber el precio</b>. Lo que no dice este plano es qué
+          significa cada eje ni qué variable tira de cuál — para eso hay que mirar las
+          variables en vez de los países, y eso es el bloque siguiente.</p>
       </Prose>
 
       <Idea>Toda sombra pierde algo; la gracia es elegir el ángulo y saber cuánto.{' '}
