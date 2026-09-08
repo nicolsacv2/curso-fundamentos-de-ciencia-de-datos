@@ -1,6 +1,6 @@
 import { Panel, Diagram, Pair, Prose, List, Idea, Task }
   from '../../../components/content/index.jsx';
-import { transpuesta, circuloCorrelaciones, tresAngulos, pasosCirculo, geometriaCentrado }
+import { transpuesta, circuloCorrelaciones, tresAngulos, pasosCirculo }
   from '../figures/block3.js';
 import { PAISES, PCA4, VARS, CORR, CAMPOS, ESTAD, ANIO, FUENTE } from '../data/paises.js';
 
@@ -109,44 +109,6 @@ export default function Block3({ id, tabId }) {
             plano.</li>
         </List>
       </Prose>
-
-      <h3>Qué es centrar, geométricamente</h3>
-      <Prose>
-        <p>El paso 02 se dice en una línea y esconde una transformación concreta. Restarle a
-          un vector su media es <b>restarle un múltiplo del vector (1, 1, …, 1)</b> — la
-          dirección en la que todos los países valen lo mismo. Y quitarle a un vector su
-          componente en una dirección es <b>proyectarlo</b> sobre lo perpendicular a ella.</p>
-        <p>Centrar, entonces, es una <b>proyección ortogonal</b>: se tira la parte del vector
-          que apuntaba a «nivel general» y se conserva la que apunta a «variación alrededor
-          de la media». Por eso después el origen del dibujo es el país promedio.</p>
-      </Prose>
-
-      <Diagram fig={geometriaCentrado}>
-        Con dos países en vez de {PAISES.length}, que es lo que cabe en una hoja. La
-        geometría es la misma.
-      </Diagram>
-
-      <Pair>
-        <Prose>
-          <h4>Por qué esto no es un tecnicismo</h4>
-          <p>Todos nuestros indicadores son positivos: no hay países con PIB negativo ni con
-            −2 hijos por mujer. Así que <b>sin centrar, los cuatro vectores apuntan al mismo
-            rincón del espacio</b>, recostados sobre esa diagonal. La esperanza de vida se
-            recuesta un 99,4 % sobre ella; la fertilidad, un 90 %.</p>
-          <p>Con vectores así, el ángulo entre dos de ellos mide sobre todo cuánto comparten
-            esa inclinación — es decir, <b>que ambos son positivos</b> — y casi nada de si
-            se mueven juntos.</p>
-        </Prose>
-        <Prose>
-          <h4>Y no es un matiz: cambia el signo</h4>
-          <p>Sin centrar, esperanza de vida y fertilidad forman un ángulo de <b>31°</b>: casi
-            la misma dirección, «van juntas». Centradas, forman <b>140°</b>, que es la
-            correlación real de <b>−0,77</b>: cuando una sube, la otra baja.</p>
-          <p>El dibujo sin centrar no exagera la relación, la <b>invierte</b>. Y no habría
-            forma de notarlo mirando el círculo, porque un ángulo de 31° se lee perfectamente
-            — solo que estaría contando otra cosa.</p>
-        </Prose>
-      </Pair>
 
       <Prose>
         <p><b>Y de aquí sale el «aproxima».</b> La correlación no se estropea en el paso 3:
