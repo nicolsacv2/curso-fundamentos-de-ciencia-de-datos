@@ -396,7 +396,7 @@ repite en cada línea.
       que los 24 de la otra —, y una variable va teñida en ambas para que el ojo siga una
       columna convirtiéndose en fila.
 
-- [ ] **T24 · `figures/block3.js`: el círculo de variables**
+- [x] **T24 · `figures/block3.js`: el círculo de variables**
       RF-41, RF-46
 
       **Aviso de T3.** Las cuatro flechas son largas (0,94 a 0,99), así que el plano
@@ -407,7 +407,12 @@ repite en cada línea.
       **Hecho cuando:** las cuatro flechas salen de las cargas del archivo generado, y la
       diferencia de longitud entre ellas es visible.
 
-- [ ] **T25 · `figures/block3.js`: los tres ángulos**
+      **Resultado.** 0,99 · 0,94 · 0,94 · 0,96, leídas de `PCA4` y todas dentro del
+      círculo unidad. Las reglas de lectura van a la derecha, donde no pelean con el
+      dibujo, y el pie dice que el plano representa bien a las cuatro — que es lo que hay
+      que afirmar antes de que la figura siguiente se apoye en sus ángulos.
+
+- [x] **T25 · `figures/block3.js`: los tres ángulos**
       RF-43, RF-44, RF-45
 
       **Aviso de T3: el ángulo recto no existe en estos datos.** Medidos sobre las cargas
@@ -419,6 +424,12 @@ repite en cada línea.
       saliera de estos países. El círculo de T24 sigue mostrando lo que hay.
       **Hecho cuando:** las tres parejas están dibujadas con su ángulo y su correlación
       rotulada: cerca de +1, de 0 y de −1.
+
+      **Resultado.** 3° con r = 0,84 (hijos y mortalidad), el recto **ilustrativo** con
+      r ≈ 0, y 167° con r = −0,87 (vida y mortalidad). Los dos reales salen de las cargas;
+      el recto lleva su propia caja diciendo que no sale de estos países y por qué: los
+      cuatro indicadores miden desarrollo y ninguno es independiente de otro. Fingirlo con
+      una pareja que no lo tiene habría sido más cómodo y menos cierto.
 
 - [ ] **T26 · `blocks/Block3.jsx`**
       RF-37, RF-38, RF-39, RF-40, RF-42, RF-47, RF-60

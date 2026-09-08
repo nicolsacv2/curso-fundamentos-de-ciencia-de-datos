@@ -143,3 +143,78 @@ export function circulo() {
     + 'de las dos primeras componentes. ' + KEYS.map((k, i) =>
       `${LABEL[k]} con longitud ${Math.hypot(L[i][0], L[i][1]).toFixed(2)}`).join(', '), b);
 }
+
+/* ── The three angles ──────────────────────────────────────
+   Two of them come out of the data. The third does not, and says so.
+
+   Measuring the real circle turned up something the session has to be honest about:
+   these four indicators all measure development, so no pair of them is anywhere near
+   independent — the closest to a right angle is GDP against life expectancy at 44°.
+   The right angle is therefore drawn as a worked illustration, marked as such, instead
+   of being faked out of a pair that does not have it. */
+function miniCircle(cx, cy, r, arrows, tag, caption, ilustrativo) {
+  let b = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+    stroke="${ilustrativo ? C.lineSoft : C.line}" stroke-width="1.1"/>`;
+  b += pline([[cx - r - 10, cy], [cx + r + 10, cy]], C.lineSoft, { sw: 1 });
+  b += pline([[cx, cy - r - 10], [cx, cy + r + 10]], C.lineSoft, { sw: 1 });
+  arrows.forEach(([ang, name]) => {
+    const x = cx + Math.cos(ang) * r, y = cy - Math.sin(ang) * r;
+    b += `<path d="M${cx},${cy} L${x.toFixed(1)},${y.toFixed(1)}"
+      stroke="${ilustrativo ? C.ink3 : C.ask}" stroke-width="2" fill="none"
+      marker-end="url(#ar-s5-ang)"/>`;
+    const tx = cx + Math.cos(ang) * (r + 22), ty = cy - Math.sin(ang) * (r + 22);
+    b += txt(tx, ty + 4, name, { fs: 10.5, ff: MONO, fill: C.ink2,
+             ta: tx < cx - 4 ? 'end' : tx > cx + 4 ? 'start' : 'middle' });
+  });
+  b += txt(cx, cy - r - 42, tag, { fs: 11.5, fill: ilustrativo ? C.ink3 : C.ask, ls: 1.6, ta: 'middle' });
+  b += txt(cx, cy + r + 52, caption, { fs: 13, ff: SERIF, fill: C.ink, ta: 'middle' });
+  return b;
+}
+
+export function tresAngulos() {
+  const W = 980, H = 470, R = 96, CY = 214;
+  const idx = k => KEYS.indexOf(k);
+  const ang = k => Math.atan2(PCA4.cargas[idx(k)][1], PCA4.cargas[idx(k)][0]);
+  const between = (a, b) => {
+    const [va, vb] = [PCA4.cargas[idx(a)], PCA4.cargas[idx(b)]];
+    const cos = (va[0] * vb[0] + va[1] * vb[1])
+      / (Math.hypot(va[0], va[1]) * Math.hypot(vb[0], vb[1]));
+    return { grados: Math.acos(Math.max(-1, Math.min(1, cos))) * 180 / Math.PI, cos };
+  };
+
+  const juntas = between('fertilidad', 'mortalidad');
+  const opuestas = between('vida', 'mortalidad');
+  const rReal = (a, b) => CORR[VARS.findIndex(v => v[0] === a)][VARS.findIndex(v => v[0] === b)];
+
+  let b = arrow('ar-s5-ang', C.ask);
+
+  b += miniCircle(180, CY, R,
+    [[ang('fertilidad'), 'hijos'], [ang('mortalidad'), 'mortal.']],
+    `${juntas.grados.toFixed(0)}° · CASI JUNTAS`,
+    `r = ${rReal('fertilidad', 'mortalidad').toFixed(2)}`, false);
+
+  b += miniCircle(490, CY, R,
+    [[0.32, 'variable A'], [0.32 + Math.PI / 2, 'variable B']],
+    '90° · PERPENDICULARES', 'r ≈ 0', true);
+
+  b += miniCircle(800, CY, R,
+    [[ang('vida'), 'vida'], [ang('mortalidad'), 'mortal.']],
+    `${opuestas.grados.toFixed(0)}° · CASI OPUESTAS`,
+    `r = ${rReal('vida', 'mortalidad').toFixed(2)}`, false);
+
+  /* The one that is not from the data says so, in its own words. */
+  b += box(330, 366, 320, 62, C.ink3, { fill: C.ground2, sw: 1, stroke: C.lineSoft });
+  b += txt(490, 390, 'Caso ilustrativo, no de estos países:', { fs: 11.5, fill: C.ink3, ta: 'middle' });
+  b += txt(490, 410, 'los cuatro indicadores miden desarrollo', { fs: 11.5, fill: C.ink3, ta: 'middle' });
+  b += txt(490, 428, 'y ninguno es independiente de otro.', { fs: 11.5, fill: C.ink3, ta: 'middle' });
+
+  b += txt(490, 60, 'El coseno del ángulo entre dos flechas aproxima su correlación',
+           { fs: 14, ff: SERIF, fill: C.ink, ta: 'middle' });
+
+  return svg(W, H, 'Tres casos del ángulo entre dos flechas del círculo: hijos por mujer y '
+    + `mortalidad infantil a ${juntas.grados.toFixed(0)} grados con correlación `
+    + `${rReal('fertilidad', 'mortalidad').toFixed(2)}; un caso ilustrativo de dos variables `
+    + 'perpendiculares con correlación cero; y esperanza de vida contra mortalidad infantil '
+    + `a ${opuestas.grados.toFixed(0)} grados con correlación `
+    + `${rReal('vida', 'mortalidad').toFixed(2)}`, b);
+}
