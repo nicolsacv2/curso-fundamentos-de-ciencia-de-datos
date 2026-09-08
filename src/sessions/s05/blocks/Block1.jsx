@@ -1,5 +1,5 @@
-import { Panel, Diagram } from '../../../components/content/index.jsx';
-import cloud3d from '../figures/cloud3d.js';
+import { Panel } from '../../../components/content/index.jsx';
+import Cloud3D from '../views/Cloud3D.jsx';
 import { FUENTE, ANIO } from '../data/paises.js';
 
 export default function Block1({ id, tabId }) {
@@ -8,10 +8,10 @@ export default function Block1({ id, tabId }) {
       <p className="eyebrow">Bloque 1 · 35–75</p>
       <h2>Cinco gráficos</h2>
 
-      <Diagram fig={cloud3d}>
+      <Cloud3D>
         Tres de los cuatro indicadores, un punto por país. Datos de {FUENTE.nombre} ({ANIO}),
         {' '}{FUENTE.licencia}.
-      </Diagram>
+      </Cloud3D>
     </Panel>
   );
 }

@@ -160,12 +160,20 @@ repite en cada línea.
       Probados **1953 ángulos** (yaw × pitch, paso 0,1): la nube nunca se sale del
       lienzo, con 28,5 px del margen más estrecho.
 
-- [ ] **T9 · `s05/views/Cloud3D.jsx` y la regla `.rotor`**
+- [x] **T9 · `s05/views/Cloud3D.jsx` y la regla `.rotor`**
       RF-22, RF-74, RF-76, RF-78
       Estado `{yaw, pitch}`, eventos de puntero, `<Diagram>` con `fig` en `useCallback`
       dependiente del ángulo. En `panel.css`, `.rotor { cursor: grab; touch-action: pan-y }`.
       **Hecho cuando:** arrastrar gira la nube; cambiar de bloque y volver la devuelve al
       ángulo inicial; `grep -rn "localStorage\|document.cookie" src/` sigue vacío.
+
+      **Resultado, comprobado en Chrome sobre el servidor de desarrollo** (no deducido):
+      arrastrar recoloca los 190 círculos; ir al bloque 2 y volver deja los `cx` en su
+      valor inicial exacto. RF-78 sale gratis del desmontaje que ya hace `Session.jsx`,
+      sin una línea que lo gestione. `cursor: grab` y `touch-action: pan-y`, aplicados.
+
+      El `pitch` se limita a ±1,25 rad: pasado el polo la escena se da la vuelta y los
+      rótulos se leen en espejo, que parece un fallo y no lo quiere nadie.
 
 - [ ] **T10 · El plano y la proyección de los puntos**
       RF-29, RF-30

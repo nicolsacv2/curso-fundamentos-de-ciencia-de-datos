@@ -388,3 +388,11 @@ figure:hover > .zoom{opacity:1}
    painted in the top layer — so the zoomed table inherits the same borders, the same
    sticky headers and the same reveal state without repeating a single rule. */
 .zoom-body{flex:1 1 auto;overflow:auto;padding:14px;touch-action:pinch-zoom}
+
+/* ── The cloud you turn ──
+   Session 5 draws a point cloud in three dimensions and the angle is the reader's.
+   `pan-y` is the whole compromise on a phone: a vertical drag still scrolls the page,
+   a horizontal one turns the figure. Taking the gesture outright would trap the
+   reader inside a figure halfway down a long panel. */
+.rotor{touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none}
+.rotor:active{cursor:grabbing}
