@@ -526,13 +526,25 @@ repite en cada línea.
 
 ## Fase 9 · Cierre de la implementación
 
-- [ ] **T32 · Recorrido de la constitución**
+- [x] **T32 · Recorrido de la constitución**
       RF-62, RF-73, RF-74, RF-75
       **Hecho cuando:** `package.json` sigue con cuatro dependencias;
       `grep -rl "from 'react'" src/svg src/sessions/*/figures` vacío;
       `grep -rn "localStorage\|document.cookie" src/` vacío; ningún import de `s03` o
       `s04` dentro de `s05`; ningún `<Plate>` en la sesión 5;
       `grep -c 'id="s5-'` confirma que todos los ids llevan prefijo de sesión.
+
+      **Resultado, los ocho en verde.** `package.json` sigue con cuatro entradas (react,
+      react-dom, @vitejs/plugin-react, vite); ningún `figures/` importa React; no hay
+      `localStorage`, `sessionStorage` ni cookies en todo `src/`; `s05` no importa nada de
+      `s01`–`s04`; no hay `<Plate>` ni ninguna URL salvo la del crédito de Gapminder;
+      `paises.js` abre con «do not edit by hand»; `pnpm build` compila y `check_pca.py`
+      sale 0.
+
+      El grep de ids que pedía esta tarea no servía: los ids se generan dentro de
+      `arrow(...)`, así que buscar `id="s5-` en el fuente no encuentra nada y habría dado
+      un falso verde. Comprobado sobre el markup emitido por las quince figuras: los siete
+      ids llevan prefijo `ar-s5-` y ninguno choca con los diez que usan las sesiones 1 a 4.
 
 - [ ] **T33 · Recorrido manual completo**
       RF-69, RF-70, RF-71, RF-72, RF-75, RF-77, RF-78
