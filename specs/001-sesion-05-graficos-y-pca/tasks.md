@@ -358,13 +358,25 @@ repite en cada línea.
       barra (75,7 → 93,3 → 100,0). El titular dice lo único que importa después de
       proyectar: las dos primeras conservan el 93,3 % y la tercera es lo que se pierde.
 
-- [ ] **T22 · `blocks/Block2.jsx`**
+- [x] **T22 · `blocks/Block2.jsx`**
       RF-23, RF-24, RF-27, RF-28, RF-34, RF-35, RF-60
       La dirección que más estira; matriz de covarianza, autovector y autovalor
       nombrados sin desarrollar; la componente como combinación; la figura rotable
       completa; y el cierre: con una cuarta variable ya no hay nube que dibujar.
       **Hecho cuando:** los siete requisitos se localizan en pantalla, y el paso a la
       maldición de la dimensionalidad enlaza con la cuarta variable.
+
+      **Resultado.** Los siete localizados. El enlace queda explícito: hasta aquí tres
+      indicadores porque tres caben en una escena que se puede girar, y la cuarta —la
+      mortalidad infantil— no tiene eje donde ir. De ahí la maldición, y de ahí que el PCA
+      deje de ser un truco de dibujo: si dos componentes conservan el 93,3 % de lo que
+      tenían tres variables, quizá conserven casi todo lo que tienen cuatro.
+
+      **Dos arreglos vistos en pantalla, no en el markup:** los rótulos de los vectores
+      caían dentro de la nube y se leían a través de 183 puntos —ahora van más allá de la
+      punta y con su propio fondo—, y ejes y vectores nombraban lo mismo, así que la
+      escena parecía tener dos objetos por variable. Con vectores, los rótulos de eje ya
+      no se dibujan.
 
 ---
 

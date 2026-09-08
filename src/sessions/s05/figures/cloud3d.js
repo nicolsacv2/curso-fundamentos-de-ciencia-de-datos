@@ -84,7 +84,7 @@ const project = (cam, at) => {
 
 /* The three axes, drawn from the low corner of the box so the orientation can be read
    even when the cloud hides the origin. */
-function axes3d(cam, mid, span) {
+function axes3d(cam, mid, span, named) {
   const low = KEYS.map((_, i) => -span[i] / 2 - 0.35);
   let s = '';
   KEYS.forEach((k, i) => {
@@ -93,9 +93,9 @@ function axes3d(cam, mid, span) {
     const a = project(cam, low), b = project(cam, to);
     s += pline([[a.x, a.y], [b.x, b.y]], C.line, { sw: 1.2 });
     s += `<circle cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="3" fill="${C.line}"/>`;
-    s += txt(b.x, b.y - 9, LABEL[k], {
-      fs: 12, fill: C.ink3, ta: 'middle', ff: MONO,
-    });
+    if (named) {
+      s += txt(b.x, b.y - 9, LABEL[k], { fs: 12, fill: C.ink3, ta: 'middle', ff: MONO });
+    }
   });
   return s;
 }
@@ -115,7 +115,7 @@ export default function cloud3d(o) {
 
   let b = arrow('ar-s5-cloud', C.ink3) + arrow('ar-s5-vec', C.reveal);
   b += `<rect x="0" y="0" width="${W}" height="${H}" fill="${C.ground2}" opacity=".35"/>`;
-  b += axes3d(cam, mid, span);
+  b += axes3d(cam, mid, span, !o.vectors);
 
   if (o.plane) {
     const corners = planeCorners(raw, mid).map(c => project(cam, c)).map(p => [p.x, p.y]);
@@ -161,7 +161,13 @@ export default function cloud3d(o) {
       b += `<path d="M${origin.x.toFixed(1)},${origin.y.toFixed(1)}
         L${tip.x.toFixed(1)},${tip.y.toFixed(1)}" stroke="${C.reveal}" stroke-width="1.8"
         fill="none" marker-end="url(#ar-s5-vec)"/>`;
-      b += txt(tip.x, tip.y - 8, LABEL[k], { fs: 11, fill: C.reveal, ta: 'middle' });
+      /* The label goes past the arrowhead, not on it: at the tip it fell inside the
+         cloud and had 183 dots reading through it. */
+      const out = project(cam, dir.map((v, j) => v * 1.34 - mid[j]));
+      const w = LABEL[k].length * 6.6 + 14;
+      b += `<rect x="${(out.x - w / 2).toFixed(1)}" y="${(out.y - 9).toFixed(1)}"
+        width="${w.toFixed(1)}" height="18" rx="3" fill="${C.ground2}" opacity=".82"/>`;
+      b += txt(out.x, out.y + 4, LABEL[k], { fs: 11.5, fill: C.reveal, ta: 'middle' });
     });
     b += '</g>';
   }
