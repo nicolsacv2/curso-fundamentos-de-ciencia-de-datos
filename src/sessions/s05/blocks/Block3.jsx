@@ -1,4 +1,4 @@
-import { Panel, Diagram, Pair, Prose, List, Idea, Task }
+import { Panel, Diagram, Pair, Prose, List, Idea }
   from '../../../components/content/index.jsx';
 import { transpuesta, circuloCorrelaciones, tresAngulos, pasosCirculo }
   from '../figures/block3.js';
@@ -28,13 +28,6 @@ export default function Block3({ id, tabId }) {
     <Panel id={id} tabId={tabId}>
       <p className="eyebrow">Bloque 3 · 128–166</p>
       <h2>La tabla girada</h2>
-
-      <Task label="El giro" big="Si las cuatro variables no caben en una escena, dejemos de
-        mirar los países y miremos las variables.">
-        <p>Hasta ahora cada fila era un país y cada columna un indicador. La nube dibujaba
-          {' '}<b>países</b>. Pero la tabla se puede girar, y entonces lo que se dibuja son
-          las <b>variables</b> — y de esas solo hay cuatro.</p>
-      </Task>
 
       <Diagram fig={transpuesta}>
         Los mismos números, girados. Se muestran 6 de los {PAISES.length} países; con las
