@@ -9,6 +9,7 @@ export default function Block3({ id, tabId }) {
      paragraph is true and persuades nobody. */
   const col = k => CAMPOS.indexOf(k);
   const catar = PAISES.find(p => p[col('nombre')] === 'Catar');
+  const perdido = (100 - PCA4.porcentajes[0] - PCA4.porcentajes[1]).toFixed(1);
   const zc = k => ((catar[col(k)] - ESTAD[k].media) / ESTAD[k].desv).toFixed(2).replace('-', '−');
   /* Thin-spaced thousands, so an interpolated 132900 reads like the 132 900 written in
      the prose beside it. */
@@ -66,47 +67,52 @@ export default function Block3({ id, tabId }) {
           muestra los <b>valores reales</b>: Catar con 132 900 dólares y 1.98 hijos por
           mujer. Con esos números tal cual, el vector de Catar lo decide su PIB y nada más
           — 132 900 aplasta a 1.98 —, y el ángulo entre dos flechas no significaría nada.</p>
+        <p>El camino completo son tres operaciones <b>en este orden</b>: <b>centrar</b>,
+          {' '}<b>transponer</b> y <b>normalizar</b>. El orden no es un detalle: se centra
+          primero porque la media que se resta es la de cada variable, y una variable solo
+          es una columna mientras no hayas girado la tabla.</p>
       </Prose>
 
       <Diagram fig={pasosCirculo}>
-        Del valor real a la flecha, en cinco pasos. El segundo es el que hace que los demás
-        tengan sentido.
+        Centrar, transponer, normalizar. Y lo que se pierde está en el paso 4, no en el 3.
       </Diagram>
 
       <Prose>
         <h4>Los cinco pasos, uno a uno</h4>
         <List>
-          <li><b>01 · La tabla girada.</b> Cada variable es ahora una fila con
-            {' '}{PAISES.length} valores: un registro, como lo era cada país.</li>
-          <li><b>02 · Centrar y dividir por la desviación típica.</b> Son dos operaciones,
-            y conviene separarlas. <b>Centrar</b> es restarle a cada valor <b>la media de su
-            propia variable</b>: el PIB de un país deja de ser «12 760 dólares» y pasa a ser
-            «tanto por encima o por debajo del PIB medio». <b>Dividir</b> es partir ese
-            resultado por <b>la desviación típica de esa misma variable</b>, para que un
-            paso valga lo mismo en las cuatro.
-            <br />Es exactamente la normalización de la entrada — restar la media y dividir
-            por las desviaciones típicas es lo que convertía la covarianza en correlación.
-            Mira a Catar: pasa de <b>{miles(catar[col('pib')])}</b> dólares y
-            {' '}<b>{catar[col('fertilidad')]}</b> hijos por mujer a <b>{zc('pib')}</b> y
-            {' '}<b>{zc('fertilidad')}</b>. Dos números comparables donde antes había uno
-            enorme y uno diminuto.
-            <br />Después de esto, las cuatro filas se mueven entre −3 y +6 en vez de entre
-            1.3 y 132 900. Y el <b>origen</b> del círculo deja de ser el cero de los dólares:
-            es <b>la media de cada variable</b>, el país promedio.</li>
-          <li><b>03 · Correlacionar cada variable con cada componente.</b> Ese número —la
-            correlación entre una variable y una componente— es lo que se llama su
-            {' '}<b>carga</b>. Y aquí se cierra un detalle del bloque anterior: como las
-            variables ya vienen centradas y divididas, la matriz de covarianzas que se
-            diagonaliza <b>es</b> la matriz de correlaciones. Por eso las cargas salen ya en
-            forma de correlación, sin convertir nada.</li>
-          <li><b>04 · Las dos cargas son las coordenadas.</b> La carga con la primera
-            componente es la x de la flecha; la de la segunda, su y. Nada más.</li>
-          <li><b>05 · Las cuatro, dentro del círculo de radio 1.</b> Las cargas
-            <b> son correlaciones</b>, y una correlación nunca pasa de 1: por eso ninguna
-            flecha puede salirse del círculo.
-            Lo que le falte a una flecha para llegar al borde es lo que esa variable vive
-            fuera de este plano.</li>
+          <li><b>01 · Centrar.</b> A cada valor se le resta <b>la media de su propia
+            variable</b>: el PIB de Catar deja de ser {miles(catar[col('pib')])} dólares y
+            pasa a ser «tanto por encima del PIB medio». Esto ocurre mientras la tabla
+            sigue por columnas, que es donde una variable existe como tal.</li>
+          <li><b>02 · Transponer.</b> Ahora sí se gira. Cada variable pasa a ser una fila:
+            un <b>vector con {PAISES.length} números</b>, uno por país. Es la tabla girada
+            del principio, pero con los valores ya centrados.</li>
+          <li><b>03 · Normalizar.</b> Cada uno de esos vectores se lleva a <b>longitud
+            1</b> — dividirlo por su desviación típica es hacer justo eso, salvo un factor
+            que no cambia ningún ángulo. Y aquí está lo importante: el coseno del ángulo
+            entre dos vectores centrados y de longitud 1 <b>es</b> su correlación.
+            Exactamente, no aproximadamente, usando los {PAISES.length} números de cada
+            uno.</li>
+          <li><b>04 · Proyectar.</b> Los cuatro vectores, aunque lleven
+            {' '}{PAISES.length} números cada uno, ocupan entre todos un espacio de
+            {' '}<b>cuatro</b> dimensiones — hay cuatro variables y nada más. La hoja tiene
+            dos, así que se proyectan sobre el plano de las dos primeras componentes. <b>La sombra de un vector es su carga</b> — y aquí se juntan los
+            dos caminos de este bloque: girar la tabla explica <i>por qué</i> el ángulo es
+            una correlación; las cargas son <i>cómo</i> se calcula. Es el mismo dibujo.</li>
+          <li><b>05 · El círculo.</b> Su radio es 1 porque los vectores medían 1. Lo que le
+            falte a una flecha para tocar el borde es lo que esa variable dejó fuera del
+            plano.</li>
         </List>
+      </Prose>
+
+      <Prose>
+        <p><b>Y de aquí sale el «aproxima».</b> La correlación no se estropea en el paso 3:
+          allí el coseno es exacto. Lo que aproxima es el <b>paso 4</b>, aplastar cuatro
+          dimensiones contra dos — y eso tiene precio conocido: el {perdido} % de la
+          información que las dos primeras componentes no conservan.</p>
+        <p>Por eso una flecha larga —una variable que cabe casi entera en el plano— tiene un
+          ángulo fiable, y una corta no: de ella estás viendo una sombra pequeña de algo que
+          apunta a otro sitio.</p>
       </Prose>
 
       <h3>El círculo de correlaciones</h3>
@@ -117,10 +123,11 @@ export default function Block3({ id, tabId }) {
 
       <h3>El ángulo es la correlación</h3>
       <Prose>
-        <p>Aquí está el cierre del recorrido, y no es una metáfora. Recuerda la fórmula de la
-          entrada: <b>r = cov(x, y) / (s<sub>x</sub> · s<sub>y</sub>)</b>. Esa división por
-          las desviaciones típicas es, geométricamente, dividir cada vector por su longitud.
-          Y el producto de dos vectores unitarios <b>es el coseno del ángulo que forman</b>.</p>
+        <p>Mira otra vez la fórmula de la entrada: <b>r = cov(x, y) / (s<sub>x</sub> ·
+          s<sub>y</sub>)</b>. Esa división por las desviaciones típicas es, palabra por
+          palabra, el paso 3 de arriba: dividir cada vector por su longitud. La fórmula que
+          escribimos al empezar la sesión y el dibujo que tenemos delante son la misma
+          operación.</p>
         <p>Por eso el círculo de correlaciones se lee sin calcular nada: dos flechas juntas son dos variables
           que suben juntas; dos flechas opuestas, una que sube cuando la otra baja; y dos
           flechas en ángulo recto, dos variables que no se dicen nada.</p>
@@ -133,14 +140,13 @@ export default function Block3({ id, tabId }) {
 
       <Pair>
         <Prose>
-          <h4>Por qué «aproxima» y no «es»</h4>
-          <p>El coseno del ángulo <b>aproxima</b> la correlación, y la palabra hay que
-            tomársela en serio: el círculo solo tiene dos dimensiones, y las variables viven
-            en cuatro.</p>
-          <p>En estos datos, esperanza de vida y fertilidad forman un ángulo cuyo coseno es
+          <h4>Cuánto exagera, en estos datos</h4>
+          <p>Esperanza de vida y fertilidad forman en el dibujo un ángulo cuyo coseno es
             {' '}{cosVidaFert.toFixed(2)}, mientras que su correlación real es
-            {' '}{rVidaFert.toFixed(2)}. El dibujo exagera. Sigue siendo la mejor forma de
-            ver cuatro variables a la vez, pero para citar un número se va a la tabla.</p>
+            {' '}{rVidaFert.toFixed(2)}. Esa diferencia es el paso 4 en acción: la sombra
+            junta lo que en cuatro dimensiones estaba algo más separado.</p>
+          <p>Sigue siendo la mejor forma de ver cuatro variables a la vez. Pero para
+            <b> citar</b> un número se va a la tabla, no al dibujo.</p>
         </Prose>
         <Prose>
           <h4>Y por eso importa la longitud</h4>

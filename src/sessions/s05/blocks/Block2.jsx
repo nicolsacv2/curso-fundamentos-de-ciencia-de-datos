@@ -33,29 +33,61 @@ export default function Block2({ id, tabId }) {
       </Prose>
 
       <Diagram fig={pasosPlano}>
-        La misma nube en los cinco pasos: lo que cambia es lo que se le añade encima.
+        En el paso 01 no hay nube, hay una línea: son los mismos países en sus unidades
+        originales. El volumen aparece en el 03, y esa es toda la razón de estandarizar.
       </Diagram>
 
       <Prose>
-        <h4>Los cinco pasos, uno a uno</h4>
+        <h4>Los siete pasos, uno a uno</h4>
         <List>
-          <li><b>01 · La nube en desviaciones típicas.</b> Antes de buscar nada, cada
-            variable se centra en su media y se divide por su desviación. Si no, el PIB
-            —que va en decenas de miles— decidiría solo la respuesta, y estaríamos midiendo
-            las unidades en vez de los países.</li>
-          <li><b>02 · La dirección en la que más se estira.</b> Se prueba, en todas las
+          <li><b>01 · La nube en sus unidades.</b> Así, tal cual, no hay nube: hay una
+            línea. El PIB llega a seis cifras y los hijos por mujer no pasan de ocho, así
+            que en una escala compartida solo queda un eje — el del PIB.</li>
+          <li><b>02 · El punto medio.</b> Se calcula la media de cada variable, y eso da un
+            punto: el <b>país promedio</b>, que no existe pero marca el centro. Restarlo es
+            {' '}<b>centrar</b>, y mover ahí el origen es lo que permite hablar de
+            direcciones en vez de posiciones.</li>
+          <li><b>03 · Estandarizar.</b> Cada variable se divide por su desviación típica,
+            para que un paso valga lo mismo en los tres ejes. Aquí aparece el volumen que en
+            el paso 01 no se veía.</li>
+          <li><b>04 · La dirección en la que más se estira.</b> Se busca, entre todas las
             direcciones posibles, en cuál queda la nube más larga al proyectarse. Esa es la
-            primera componente: la que conserva más variación.</li>
-          <li><b>03 · La perpendicular que más queda.</b> La segunda se busca igual, pero
-            obligada a formar ángulo recto con la primera. Esa obligación es lo que impide
-            que las dos cuenten lo mismo dos veces.</li>
-          <li><b>04 · Las dos juntas son un plano.</b> Dos direcciones definen un plano, y
-            ese es el <b>plano factorial</b>: la hoja sobre la que vamos a dibujar.</li>
-          <li><b>05 · Cada país cae sobre el plano.</b> Se proyecta, como una sombra a
-            plomo. Las dos coordenadas de esa sombra son el país en el plano factorial, y
-            lo que se pierde es la distancia que ha caído.</li>
+            primera componente.</li>
+          <li><b>05 · La perpendicular que más queda.</b> La segunda se busca igual, pero
+            obligada a formar ángulo recto con la primera. Esa obligación impide que las dos
+            cuenten lo mismo dos veces.</li>
+          <li><b>06 · Las dos juntas son un plano.</b> Y ese es el <b>plano factorial</b>:
+            la hoja sobre la que vamos a dibujar.</li>
+          <li><b>07 · Cada país cae sobre el plano.</b> Se proyecta, como una sombra a
+            plomo. Las dos coordenadas de esa sombra son el país en el plano, y lo que se
+            pierde es la distancia que ha caído.</li>
         </List>
       </Prose>
+
+      <Pair>
+        <Prose>
+          <h4>¿Hace falta estandarizar?</h4>
+          <p><b>Centrar sí</b>: es parte de lo que el análisis <i>es</i>. Las componentes son
+            direcciones de máxima varianza, y la varianza se mide respecto a la media. Sin
+            centrar, la primera componente apuntaría a donde está la nube respecto al cero,
+            no a donde se estira.</p>
+          <p><b>Estandarizar no</b>, y conviene saberlo. Es una decisión entre dos análisis
+            igual de legítimos: sobre la matriz de <b>covarianzas</b> —sin estandarizar— o
+            sobre la de <b>correlaciones</b> —estandarizando—. Con variables en la misma
+            unidad, la primera opción es la buena, porque las diferencias de escala son
+            parte del fenómeno.</p>
+        </Prose>
+        <Prose>
+          <h4>Aquí no hay elección</h4>
+          <p>Con dólares, años e hijos por mujer no hay escala común, y esto es lo que pasa
+            si no se estandariza: la primera componente explica el <b>100,0 %</b> de la
+            varianza, con un peso de <b>1,0000</b> para el PIB y de 0,0003, 0,0000 y 0,0009
+            para las otras tres.</p>
+          <p>Es decir, la «primera componente» sería el PIB, y las otras tres variables
+            habrían desaparecido del análisis. Estandarizando, los pesos quedan repartidos
+            —0,42, 0,54, 0,51 y 0,53— y las cuatro cuentan.</p>
+        </Prose>
+      </Pair>
 
       <Diagram fig={antesYDespues}>
         Los mismos {PAISES.length} países antes y después de proyectarse. Colombia está

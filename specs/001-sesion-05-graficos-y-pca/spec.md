@@ -135,6 +135,15 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-84**: EL SISTEMA mostrará en el bloque 2 la construcción del plano factorial como
   una secuencia de pasos dibujados.
 - **RF-85**: EL SISTEMA describirá con texto cada uno de los pasos de esa construcción.
+- **RF-103**: EL SISTEMA mostrará la nube en sus unidades originales antes de
+  estandarizarla.
+- **RF-104**: EL SISTEMA mostrará el punto medio de la nube como un paso propio de la
+  construcción.
+- **RF-105**: EL SISTEMA enunciará que centrar forma parte de la definición del análisis de
+  componentes principales.
+- **RF-106**: EL SISTEMA enunciará que estandarizar es una decisión y no un requisito del
+  método.
+- **RF-107**: EL SISTEMA mostrará qué primera componente resulta cuando no se estandariza.
 
 ### Bloque 3 — círculo de correlaciones
 
@@ -167,8 +176,8 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-86**: EL SISTEMA mostrará en el bloque 3 la construcción del círculo de
   correlaciones como una secuencia de pasos dibujados.
 - **RF-87**: EL SISTEMA describirá con texto cada uno de los pasos de esa construcción.
-- **RF-88**: EL SISTEMA incluirá en esa construcción el paso de estandarizar cada fila de
-  la tabla girada.
+- **RF-88**: EL SISTEMA presentará esa construcción en el orden centrar, transponer y
+  normalizar.
 - **RF-89**: EL SISTEMA explicará que centrar una variable consiste en restarle su propia
   media.
 - **RF-90**: EL SISTEMA explicará que la escala se iguala dividiendo cada variable por su
@@ -183,6 +192,20 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
   ENTONCES EL SISTEMA advertirá que la de mayor escala decidiría por sí sola el resultado.
 - **RF-95**: EL SISTEMA enunciará que las cargas son correlaciones y que por eso ninguna
   flecha sale del círculo de radio 1.
+- **RF-96**: EL SISTEMA explicará que se centra antes de transponer porque la media que se
+  resta es la de cada variable.
+- **RF-97**: EL SISTEMA explicará que, tras transponer, cada variable es un vector con un
+  componente por país.
+- **RF-98**: EL SISTEMA explicará que normalizar es llevar cada uno de esos vectores a
+  longitud 1.
+- **RF-99**: EL SISTEMA enunciará que el coseno del ángulo entre dos de esos vectores
+  normalizados es exactamente su correlación.
+- **RF-100**: EL SISTEMA enunciará que el radio 1 del círculo es consecuencia de esa
+  normalización.
+- **RF-101**: EL SISTEMA enunciará que la sombra de uno de esos vectores sobre el plano de
+  las dos primeras componentes es su carga.
+- **RF-102**: EL SISTEMA enunciará que la aproximación entre el coseno y la correlación
+  nace de esa proyección y no del cálculo de la correlación.
 
 ### Cierre — gráficos basura
 

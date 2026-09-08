@@ -139,88 +139,108 @@ export function extremos(j, cuantos) {
   };
 }
 
-/* ── How the factorial plane is built, in five drawings ────
-   Each panel adds one thing to the one before it, and the cloud is the same cloud in all
-   five — a sample of the real countries, at a fixed angle. Five different sketches would
-   have shown five ideas; the same sketch growing shows one construction. */
+/* ── How the factorial plane is built, in seven drawings ───
+   The first three are the reason this figure grew from five panels to seven.
+
+   Panel 1 draws the cloud in its own units, and it comes out as a line: GDP runs to six
+   figures while children per woman stays under eight, so on a shared scale there is only
+   one axis left. Panel 2 finds the middle. Panel 3 standardises and the volume appears.
+
+   That sequence answers a question worth asking out loud — centring is part of what PCA
+   is, standardising is a decision — and answers it with the drawing rather than with an
+   assurance. */
 export function pasosPlano() {
-  const W = 980, H = 386, PY = 112, PW = 168, GAP = 18;
+  const W = 980, H = 400, PY = 128, PW = 118, GAP = 19;
   const cam = camera(0.72, 0.30);
-  const pts = scored().filter((_, i) => i % 4 === 0);        /* 46 países, deterministas */
+  const pts = scored().filter((_, i) => i % 4 === 0);
   const mid = KEYS.map((_, i) => {
     const vs = pts.map(p => p.at[i]);
     return (Math.min(...vs) + Math.max(...vs)) / 2;
   });
   const [e1, e2] = PCA3.vectores;
+  const U = 13;
 
   const panel = (i, titulo) => {
-    const x0 = 34 + i * (PW + GAP);
-    const cx = x0 + PW / 2, cy = PY + 116;
-    /* Sized so the widest panel — the box is 7 standard deviations along GDP — still
-       clears its neighbour: any bigger and the five sketches start touching. */
-    const U = 22;
+    const x0 = 22 + i * (PW + GAP);
+    const cx = x0 + PW / 2, cy = PY + 84;
     const proj = at => {
       const [x, y] = cam(at.map((v, k) => v - mid[k]));
       return [cx + x * U, cy - y * U];
     };
-    let b = txt(x0, PY - 46, String(i + 1).padStart(2, '0'),
-                { fs: 22, ff: SERIF, fill: C.ask });
-    wrap(titulo, 24).forEach((l, k) => {
-      b += txt(x0, PY - 22 + k * 15, l, { fs: 11, fill: C.ink2 });
+    let b = txt(x0, PY - 58, String(i + 1).padStart(2, '0'), { fs: 19, ff: SERIF, fill: C.ask });
+    wrap(titulo, 17).forEach((l, k) => {
+      b += txt(x0, PY - 38 + k * 13, l, { fs: 10, fill: C.ink2 });
     });
     return { b, proj, cx, cy, x0 };
   };
 
-  const nube = proj => pts.map(p => {
-    const [x, y] = proj(p.at);
-    return dot(x, y, 2.2, REGION[p.region] || C.ink2, { op: 0.6 });
+  const nube = (proj, at) => (at || pts.map(p => p.at)).map((a, i) => {
+    const [x, y] = proj(a);
+    return dot(x, y, 2, REGION[pts[i].region] || C.ink2, { op: 0.6 });
   }).join('');
 
   const eje = (proj, e, len, color, rot) => {
     const [x0, y0] = proj(KEYS.map(() => 0));
     const [x1, y1] = proj(e.map(v => v * len));
-    return pline([[x0, y0], [x1, y1]], color, { sw: 1.8 })
-      + (rot ? txt(x1, y1 - 8, rot, { fs: 9.5, fill: color, ta: 'middle' }) : '');
+    return pline([[x0, y0], [x1, y1]], color, { sw: 1.6 })
+      + (rot ? txt(x1, y1 - 7, rot, { fs: 9, fill: color, ta: 'middle' }) : '');
   };
+
+  const plano = proj => poly([[2.4, 1.8], [-2.4, 1.8], [-2.4, -1.8], [2.4, -1.8]]
+    .map(([u, v]) => proj(e1.map((_, i) => e1[i] * u + e2[i] * v))),
+    C.ask, { op: 0.16, stroke: C.ask, sw: 1 });
 
   let b = '';
 
-  const p1 = panel(0, 'La nube, en desviaciones típicas — no en dólares ni en años');
-  b += p1.b + nube(p1.proj);
+  /* 1. raw units: one variable swallows the other two */
+  const p1 = panel(0, 'La nube en sus unidades: el PIB se lo come todo');
+  const crudo = pts.map(p => KEYS.map((k, i) =>
+    (p.at[i] * ESTAD[k].desv) / ESTAD.pib.desv * 1.2));
+  const medioCrudo = KEYS.map((_, i) => crudo.reduce((s, c) => s + c[i], 0) / crudo.length);
+  b += p1.b + nube(p1.proj, crudo.map(c => c.map((v, i) => v - medioCrudo[i])));
 
-  const p2 = panel(1, 'La dirección en la que más se estira: la primera componente');
-  b += p2.b + nube(p2.proj) + eje(p2.proj, e1, 2.4, C.ask, 'CP 1');
+  /* 2. the middle of it */
+  const p2 = panel(1, 'El punto medio: el país promedio');
+  b += p2.b + nube(p2.proj, crudo.map(c => c.map((v, i) => v - medioCrudo[i])));
+  const [mx, my] = p2.proj(KEYS.map(() => 0));
+  b += `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="5" fill="none"
+    stroke="${C.reveal}" stroke-width="1.6"/>`;
+  b += `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="1.6" fill="${C.reveal}"/>`;
 
-  const p3 = panel(2, 'La perpendicular que más estira de lo que queda: la segunda');
-  b += p3.b + nube(p3.proj) + eje(p3.proj, e1, 2.4, C.line)
-     + eje(p3.proj, e2, 1.8, C.ask, 'CP 2');
+  /* 3. standardise, and the volume appears */
+  const p3 = panel(2, 'Estandarizar: un paso vale igual en los tres ejes');
+  b += p3.b + nube(p3.proj);
+  const [sx, sy] = p3.proj(KEYS.map(() => 0));
+  b += `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="1.6" fill="${C.reveal}"/>`;
 
-  const p4 = panel(3, 'Las dos juntas son un plano: el plano factorial');
-  const c4 = [[2.4, 1.8], [-2.4, 1.8], [-2.4, -1.8], [2.4, -1.8]]
-    .map(([u, v]) => p4.proj(e1.map((_, i) => e1[i] * u + e2[i] * v)));
-  b += p4.b + poly(c4, C.ask, { op: 0.16, stroke: C.ask, sw: 1 }) + nube(p4.proj);
+  const p4 = panel(3, 'La dirección que más estira: CP 1');
+  b += p4.b + nube(p4.proj) + eje(p4.proj, e1, 2.4, C.ask, 'CP 1');
 
-  const p5 = panel(4, 'Cada país cae sobre el plano: esa sombra son sus coordenadas');
-  const c5 = [[2.4, 1.8], [-2.4, 1.8], [-2.4, -1.8], [2.4, -1.8]]
-    .map(([u, v]) => p5.proj(e1.map((_, i) => e1[i] * u + e2[i] * v)));
-  b += p5.b + poly(c5, C.ask, { op: 0.16, stroke: C.ask, sw: 1 });
+  const p5 = panel(4, 'La perpendicular que más queda: CP 2');
+  b += p5.b + nube(p5.proj) + eje(p5.proj, e1, 2.4, C.line)
+     + eje(p5.proj, e2, 1.8, C.ask, 'CP 2');
+
+  const p6 = panel(5, 'Las dos son un plano: el plano factorial');
+  b += p6.b + plano(p6.proj) + nube(p6.proj);
+
+  const p7 = panel(6, 'Cada país cae: esa sombra son sus coordenadas');
+  b += p7.b + plano(p7.proj);
   pts.forEach((p, i) => {
     const s1 = dotp(p.at, e1), s2 = dotp(p.at, e2);
-    const sombra = p5.proj(e1.map((_, k) => e1[k] * s1 + e2[k] * s2));
-    if (i % 3 === 0) {
-      const alto = p5.proj(p.at);
-      b += pline([alto, sombra], C.ink3, { sw: 0.7, op: 0.5, dash: '2 2' });
-    }
-    b += dot(sombra[0], sombra[1], 2, C.ask, { op: 0.7 });
+    const sombra = p7.proj(e1.map((_, k) => e1[k] * s1 + e2[k] * s2));
+    if (i % 3 === 0) b += pline([p7.proj(p.at), sombra], C.ink3, { sw: 0.6, op: 0.5, dash: '2 2' });
+    b += dot(sombra[0], sombra[1], 1.7, C.ask, { op: 0.7 });
   });
-  b += nube(p5.proj);
+  b += nube(p7.proj);
 
-  b += txt(34, 46, 'CÓMO SE CONSTRUYE EL PLANO FACTORIAL', { fs: 11.5, fill: C.ask, ls: 1.6 });
-  b += txt(34, H - 18, 'La misma nube en los cinco: lo que cambia es lo que se le añade encima.',
-           { fs: 11.5, fill: C.ink3 });
+  b += txt(22, 46, 'CÓMO SE CONSTRUYE EL PLANO FACTORIAL', { fs: 11.5, fill: C.ask, ls: 1.6 });
+  b += txt(22, H - 18, 'Centrar es parte de lo que el PCA es. Estandarizar es una decisión, '
+    + 'y aquí la toma el paso 01: sin ella no hay más que un eje.', { fs: 11, fill: C.ink3 });
 
-  return svg(W, H, 'La construcción del plano factorial en cinco pasos: la nube en '
-    + 'desviaciones típicas; la dirección en la que más se estira, que es la primera '
-    + 'componente; la perpendicular que más estira de lo que queda, que es la segunda; el '
-    + 'plano que forman las dos; y la sombra de cada país sobre ese plano', b);
+  return svg(W, H, 'La construcción del plano factorial en siete pasos: la nube en sus '
+    + 'unidades originales, donde el PIB aplasta a las otras dos variables y todo queda en '
+    + 'una línea; el punto medio de la nube; la nube estandarizada, que ya tiene volumen; '
+    + 'la dirección en la que más se estira, que es la primera componente; la perpendicular '
+    + 'que más estira de lo que queda, que es la segunda; el plano que forman las dos; y la '
+    + 'sombra de cada país sobre ese plano', b);
 }
