@@ -24,7 +24,7 @@ function byRegion(key) {
 
 /* ── Bars: one length per category ────────────────────── */
 export function barras() {
-  const W = 980, H = 430, L = 150, B = 74, T = 46;
+  const W = 980, H = 430, L = 196, B = 74, T = 46;
   const data = byRegion('vida');
   const top = Math.ceil(Math.max(...data.map(d => d.media)) / 10) * 10;
   const sy = scale([0, top], [H - B, T]);
@@ -119,7 +119,7 @@ function fiveNumbers(values) {
 }
 
 export function caja() {
-  const W = 980, H = 430, L = 150, B = 74, T = 46;
+  const W = 980, H = 430, L = 196, B = 74, T = 46;
   const groups = REGIONES.map(([id, nombre]) => ({
     id, nombre,
     ...fiveNumbers(PAISES.filter(p => p[col('region')] === id).map(p => p[col('fertilidad')])),

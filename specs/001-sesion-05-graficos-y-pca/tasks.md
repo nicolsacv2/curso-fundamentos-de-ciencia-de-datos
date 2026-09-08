@@ -315,12 +315,20 @@ repite en cada línea.
       hasta los ejes y sus cifras leídas del archivo (12760 dólares · 75.8 años): así la
       construcción se ve entera, de la fila de la tabla al punto.
 
-- [ ] **T19 · `blocks/Block1.jsx`**
+- [x] **T19 · `blocks/Block1.jsx`**
       RF-17, RF-18, RF-19, RF-20, RF-21, RF-22, RF-60
       Cinco fichas con la misma estructura —dato que admite, pregunta que responde, cómo
       se construye, ejemplo— y, al cierre, la nube 3D.
       **Hecho cuando:** las cinco fichas tienen las cuatro casillas rellenas, ninguna
       vacía, y la nube se gira desde este bloque.
+
+      **Resultado.** Cinco fichas con la misma estructura —dato, pregunta, construcción,
+      ejemplo—, seis figuras y la nube rotable al final. La repetición es deliberada:
+      comparar cinco gráficos solo funciona si se describen igual.
+
+      Dos construcciones adelantan el cierre sin nombrarlo: la base cero de las barras y
+      el ancho del intervalo del histograma. Y el circular lleva su punto débil escrito
+      en la propia ficha, que por eso muestra las cifras al lado.
 
 ---
 
