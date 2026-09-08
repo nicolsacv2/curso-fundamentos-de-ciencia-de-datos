@@ -25,7 +25,8 @@ export default function Block2({ id, tabId }) {
         <p>El análisis de componentes principales busca justamente eso: la dirección en la que
           la nube <b>más se estira</b>. Esa es la primera componente. La segunda es la
           dirección que más estira de lo que queda, obligada a ser perpendicular a la
-          primera. Con las dos ya hay un plano, y ese plano es la hoja.</p>
+          primera. Con las dos ya hay un plano, y ese plano es la hoja: se llama
+          {' '}<b>plano factorial</b>, y es donde vamos a colocar a los países.</p>
       </Prose>
 
       <Diagram fig={antesYDespues}>
@@ -62,8 +63,8 @@ export default function Block2({ id, tabId }) {
 
       <h3>Todo junto, y girando</h3>
       <Prose>
-        <p>Aquí está la escena completa: la nube, el plano de las dos primeras componentes
-          dentro de ella, la sombra de cada país sobre el plano y una flecha por indicador
+        <p>Aquí está la escena completa: la nube, el plano factorial dentro de ella, la
+          sombra de cada país sobre él y una flecha por indicador
           con su propia sombra. Gírala hasta ver el plano de canto — las sombras caen en una
           línea, porque todas viven en él.</p>
       </Prose>

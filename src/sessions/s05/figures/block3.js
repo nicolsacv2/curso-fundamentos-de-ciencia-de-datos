@@ -89,12 +89,12 @@ export function transpuesta() {
     + `fila. Se muestran 6 de los ${PAISES.length} países`, b);
 }
 
-/* ── The factorial plane ───────────────────────────────────
+/* ── The correlation circle ────────────────────────────────
    Each variable as an arrow in the plane of the first two components. Starting from the
    correlation matrix, a loading *is* the correlation between that variable and that
    component, so every arrow fits inside a circle of radius one — and how close it gets
    to the edge is how well the plane represents it (RF-46). */
-export function planoFactorial() {
+export function circuloCorrelaciones() {
   const W = 980, H = 520, CXP = 400, CY = 262, R = 190;
   const L = PCA4.cargas;
 
@@ -159,7 +159,7 @@ export function planoFactorial() {
     + `${Math.max(...L.map(l => Math.hypot(l[0], l[1]))).toFixed(2)}: el plano las `
     + 'representa bien a las cuatro.', { fs: 12, fill: C.ink3, ta: 'middle' });
 
-  return svg(W, H, 'Plano factorial: las cuatro variables como flechas en el plano '
+  return svg(W, H, 'Círculo de correlaciones: las cuatro variables como flechas en el plano '
     + 'de las dos primeras componentes. ' + KEYS.map((k, i) =>
       `${LABEL[k]} con longitud ${Math.hypot(L[i][0], L[i][1]).toFixed(2)}`).join(', '), b);
 }
@@ -240,7 +240,7 @@ export function tresAngulos() {
   b += txt(490, 60, 'El coseno del ángulo entre dos flechas aproxima su correlación',
            { fs: 14, ff: SERIF, fill: C.ink, ta: 'middle' });
 
-  return svg(W, H, 'Tres casos del ángulo entre dos flechas del plano factorial: hijos por mujer y '
+  return svg(W, H, 'Tres casos del ángulo entre dos flechas del círculo de correlaciones: hijos por mujer y '
     + `mortalidad infantil a ${juntas.grados.toFixed(0)} grados con correlación `
     + `${rReal('fertilidad', 'mortalidad').toFixed(2)}; un caso ilustrativo de dos variables `
     + 'perpendiculares con correlación cero; y esperanza de vida contra mortalidad infantil '

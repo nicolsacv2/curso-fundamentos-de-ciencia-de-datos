@@ -574,6 +574,18 @@ repite en cada línea.
 
 ---
 
+## Terminología, fijada después de implementar
+
+Los dos objetos del análisis tienen nombre propio y no son el mismo:
+
+- **Plano factorial** — el plano de las dos primeras componentes, donde se proyectan los
+  **individuos**: un punto por país. Se nombra en el bloque 2, que es donde aparece.
+- **Círculo de correlaciones** — donde se proyectan las **variables**: una flecha por
+  indicador, dentro del círculo de radio 1. Es el bloque 3.
+
+RF-40 se lee mejor con los dos nombres puestos: el plano factorial de los individuos y el
+círculo de correlaciones de las variables son dos vistas del mismo análisis.
+
 ## Lo que estas tareas no resuelven
 
 Tres decisiones quedan para el momento de dibujar, y están en «Casos límite» de la spec:
