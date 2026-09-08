@@ -249,11 +249,16 @@ repite en cada línea.
       pared. Ahora hay un compositor de doce líneas: una fila es una lista de piezas y el
       cursor avanza, así que una barra queda sobre su letra por construcción.
 
-- [ ] **T14 · `figures/intro.js`: la dispersión donde se lee la correlación**
+- [x] **T14 · `figures/intro.js`: la dispersión donde se lee la correlación**
       RF-15
       Esperanza de vida contra fertilidad, con su coeficiente rotulado.
       **Hecho cuando:** el valor de r rotulado coincide con el que emite `check_pca.py`
       para ese par.
+
+      **Resultado.** r = −0,77 rotulado sobre la nube, y el número **sale de `CORR`** en
+      el archivo generado, no del teclado: escribir −0,77 aquí funcionaría hasta el día
+      en que cambien los datos, y entonces sería una cifra proyectada que ya no pertenece
+      a los puntos que tiene debajo. Comprobado que coincide con `CORR[vida][fertilidad]`.
 
 - [ ] **T15 · `blocks/Intro.jsx`**
       RF-4, RF-10, RF-11, RF-12, RF-13, RF-14, RF-16, RF-58, RF-60, RF-61, RF-63

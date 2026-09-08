@@ -1,5 +1,5 @@
 import { Panel, Diagram } from '../../../components/content/index.jsx';
-import formulas from '../figures/intro.js';
+import formulas, { scatter } from '../figures/intro.js';
 
 export default function Intro({ id, tabId }) {
   return (
@@ -10,6 +10,11 @@ export default function Intro({ id, tabId }) {
       <Diagram fig={formulas}>
         Las tres se construyen una sobre otra: la correlación no es una medida nueva, es la
         covarianza a la que se le quitaron las unidades.
+      </Diagram>
+
+      <Diagram fig={scatter}>
+        Ese <b>r</b> no es una abstracción: es la inclinación de esta nube. Cada punto es un
+        país.
       </Diagram>
     </Panel>
   );

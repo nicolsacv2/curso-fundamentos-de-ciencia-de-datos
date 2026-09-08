@@ -1,5 +1,6 @@
 import { C, SERIF, svg, txt, arrow, wrap } from '../../../svg/kit.js';
-import { MONO } from './shared.js';
+import { axes, box, dot, pline, scale, MONO } from './shared.js';
+import { PAISES, CAMPOS, VARS, CORR } from '../data/paises.js';
 
 /* The three formulas the entry chains together, drawn rather than typeset.
 
@@ -118,4 +119,57 @@ export default function formulas() {
     + 'variables; y la correlación es la covarianza dividida por el producto de las dos '
     + 'desviaciones típicas, lo que la deja sin unidades y entre menos uno y más uno',
     s);
+}
+
+/* ── Where that r is read ──────────────────────────────────
+   The scatter the entry names but does not build: block 1 explains how it is made. Here
+   it is only the surface the correlation lives on, so the class sees that r is not an
+   abstraction but the tilt of this cloud.
+
+   The coefficient comes out of CORR in the generated file. Typing −0.77 here would work
+   until the day the data changes, and then it would be a number on a wall that no
+   longer belongs to the dots underneath it. */
+export function scatter() {
+  const iVida = VARS.findIndex(v => v[0] === 'vida');
+  const iFert = VARS.findIndex(v => v[0] === 'fertilidad');
+  const r = CORR[iVida][iFert];
+  const col = k => CAMPOS.indexOf(k);
+
+  const SW = 980, SH = 470;
+  const L = 96, RG = 40, T = 40, B = 62;
+  const xs = PAISES.map(p => p[col('fertilidad')]);
+  const ys = PAISES.map(p => p[col('vida')]);
+  const sx = scale([Math.min(...xs) - 0.2, Math.max(...xs) + 0.2], [L, SW - RG]);
+  const sy = scale([Math.min(...ys) - 2, Math.max(...ys) + 2], [SH - B, T]);
+
+  let b = axes(L, SH - B, SW - RG - L, SH - B - T);
+
+  [2, 3, 4, 5, 6, 7].forEach(v => {
+    b += txt(sx(v), SH - B + 20, String(v), { fs: 11, fill: C.ink3, ta: 'middle' });
+    b += pline([[sx(v), SH - B], [sx(v), SH - B + 5]], C.line, { sw: 1 });
+  });
+  [50, 60, 70, 80].forEach(v => {
+    b += txt(L - 12, sy(v) + 4, String(v), { fs: 11, fill: C.ink3, ta: 'end' });
+    b += pline([[L - 5, sy(v)], [L, sy(v)]], C.line, { sw: 1 });
+  });
+
+  const REGION = { africa: '#E0A458', americas: '#5BC8CE', asia: '#7FB069', europe: '#9EB0C3' };
+  PAISES.forEach(p => {
+    b += dot(sx(p[col('fertilidad')]), sy(p[col('vida')]), 4,
+             REGION[p[col('region')]] || C.ink2, { op: 0.72 });
+  });
+
+  b += txt(SW - RG, SH - B + 38, 'Hijos por mujer →', { fs: 12, fill: C.ink3, ta: 'end' });
+  b += txt(L - 12, T - 14, '↑ Esperanza de vida (años)', { fs: 12, fill: C.ink3 });
+
+  /* The number the entry has just defined, sitting on the cloud it describes. */
+  b += box(L + 18, T + 14, 232, 74, C.ask, { fill: C.ground2, sw: 1.2, stroke: C.ask });
+  b += txt(L + 38, T + 40, 'CORRELACIÓN', { fs: 11, fill: C.ask, ls: 1.6 });
+  b += txt(L + 38, T + 70, `r = ${r.toFixed(2)}`, { fs: 22, ff: SERIF, fill: C.ink });
+
+  return svg(SW, SH,
+    `Diagrama de dispersión de ${PAISES.length} países: hijos por mujer en el eje `
+    + `horizontal y esperanza de vida en el vertical. La correlación entre las dos es `
+    + `${r.toFixed(2)}: la nube baja de izquierda a derecha`,
+    b);
 }
