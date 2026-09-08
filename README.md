@@ -1,7 +1,7 @@
 # Fundamentos de Ciencia de Datos
 
 Material del curso de la Universidad Nacional de Colombia, como aplicación React.
-Ocho sesiones de tres horas; tres construidas hasta ahora.
+Ocho sesiones de tres horas; cuatro construidas hasta ahora.
 
 El diseño, el contenido y las imágenes son los del curso original. Lo que cambia es
 cómo se entrega: la página ya no carga de una vez, sino por pasos, y las láminas ya no
@@ -102,22 +102,36 @@ sirve si perdiste de vista su letra. También pueden ampliarse.
 ## Las actividades en vivo de la sesión 4
 
 La sesión 4 trae dos actividades que toda la clase juega a la vez — los dados de Méré y
-el triángulo — respaldadas por dos servicios externos que viven en su propio
-repositorio: una **API de Actividades** (estado en Supabase, activación por key del
-instructor) y una **API de Render** (estado → SVG). La arquitectura completa, los
-endpoints y los mockups están en [`docs/apis/`](docs/apis/README.md).
+el triángulo — respaldadas por [verquo](https://github.com/nicolsacv2/verquo), que las
+sirve como **dos servicios independientes**: cada actividad es su propio despliegue, con
+su propia base de datos y su propia URL. El frontend no habla con ninguna otra cosa.
 
-El frontend solo conoce una variable:
+De ahí que sean dos variables, horneadas en el build, más una tercera que solo nombra el
+entorno para el aviso en pantalla:
 
 ```sh
-VITE_ACTIVITIES_API=https://…  pnpm build   # ver .env.example
+VITE_DEMERE_API=https://…  VITE_TRIANGLE_API=https://…  VITE_ENV=prod  pnpm build
 ```
 
-Sin la variable — o en el momento en que una petición falle — el cliente
+Las URL salen de `make urls ENV=<entorno>` en verquo, y en producción viven versionadas
+en `.env.production` — ver [`.env.example`](.env.example) y [DEPLOY.md](DEPLOY.md).
+
+Toda respuesta trae el SVG ya dibujado en su campo `render`, que el componente inserta
+tal cual, y cada pantalla pregunta un par de veces por segundo si hay algo nuevo: eso es
+lo que hace que el marcador sea de toda la clase y no de cada portátil.
+
+Sin las variables — o en el momento en que una petición falle — el cliente
 (`src/sessions/s04/activities/api.js`) degrada a un **mock local** con la misma
-interfaz: dados con `Math.random`, geometría calculada en el navegador y el mismo SVG.
-Es el estándar de las láminas (Commons → bucket) aplicado a las APIs: la clase
-proyectada nunca se cae, solo pierde el marcador compartido y lo dice en un aviso.
+interfaz: dados con `Math.random`, geometría calculada en el navegador y el mismo SVG,
+armado con los helpers de dibujo de la propia sesión. Es el estándar de las láminas
+(Commons → bucket) aplicado a las APIs: la clase proyectada nunca se cae, solo pierde el
+marcador compartido y lo dice en un aviso.
+
+Los endpoints, el esquema de datos y los mockups de pantalla están en
+[`docs/apis/`](docs/apis/README.md). Es la especificación con la que se arrancó verquo,
+así que se lee como el contrato, no como el inventario: el despliegue acabó partido en
+dos servicios en vez de uno, y los endpoints de clase quedaron en `/v1/sessions/*` y no
+en `/v1/class-sessions`. Ante la duda, manda `api.js`.
 
 ## Desarrollo
 
