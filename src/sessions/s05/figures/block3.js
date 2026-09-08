@@ -105,24 +105,44 @@ export function circulo() {
     stroke-width="1" stroke-dasharray="3 4"/>`;
   b += pline([[CXP - R - 18, CY], [CXP + R + 18, CY]], C.lineSoft, { sw: 1 });
   b += pline([[CXP, CY - R - 18], [CXP, CY + R + 18]], C.lineSoft, { sw: 1 });
-  b += txt(CXP + R + 24, CY + 4, 'CP 1', { fs: 11, fill: C.ink3 });
-  b += txt(CXP, CY - R - 26, 'CP 2', { fs: 11, fill: C.ink3, ta: 'middle' });
+  b += txt(CXP + R + 24, CY + 66, 'CP 1', { fs: 11, fill: C.ink3 });
+  b += txt(CXP + 10, CY - R - 26, 'CP 2', { fs: 11, fill: C.ink3 });
 
   KEYS.forEach((k, i) => {
     const x = CXP + L[i][0] * R, y = CY - L[i][1] * R;
-    const largo = Math.hypot(L[i][0], L[i][1]);
     b += `<path d="M${CXP},${CY} L${x.toFixed(1)},${y.toFixed(1)}" stroke="${C.ask}"
       stroke-width="2" fill="none" marker-end="url(#ar-s5-load)"/>`;
+  });
+
+  /* Labels are placed after every arrow is drawn, and pushed apart when they collide.
+
+     Two of these variables sit three degrees from each other, so their labels landed on
+     top of one another: two names and two numbers in the same twelve pixels. Nudging
+     them apart in y keeps each one beside its own arrow and readable, which a circle
+     whose whole subject is the angle between arrows rather needs. */
+  const placed = [];
+  KEYS.map((k, i) => {
+    const largo = Math.hypot(L[i][0], L[i][1]);
     const away = 1 + 26 / (largo * R);
-    const tx = CXP + L[i][0] * R * away, ty = CY - L[i][1] * R * away;
-    b += txt(tx, ty + 4, LABEL[k], { fs: 12.5, ff: SERIF, fill: C.ink,
-             ta: tx < CXP ? 'end' : 'start' });
-    b += txt(tx, ty + 20, `${largo.toFixed(2)}`, { fs: 10.5, ff: MONO, fill: C.ink3,
-             ta: tx < CXP ? 'end' : 'start' });
+    return { k, largo, x: CXP + L[i][0] * R * away, y: CY - L[i][1] * R * away };
+  }).sort((a, b2) => a.y - b2.y).forEach(lab => {
+    const side = lab.x < CXP;
+    let y = lab.y;
+    placed.filter(o => (o.x < CXP) === side).forEach(o => {
+      if (Math.abs(y - o.y) < 40) y = o.y + 40;
+    });
+    placed.push({ ...lab, y });
+    if (Math.abs(y - lab.y) > 2) {
+      b += pline([[lab.x, lab.y], [lab.x, y - 4]], C.lineSoft, { sw: 1, dash: '2 3' });
+    }
+    b += txt(lab.x, y + 4, LABEL[lab.k], { fs: 12.5, ff: SERIF, fill: C.ink,
+             ta: side ? 'end' : 'start' });
+    b += txt(lab.x, y + 20, `${lab.largo.toFixed(2)}`, { fs: 10.5, ff: MONO, fill: C.ink3,
+             ta: side ? 'end' : 'start' });
   });
 
   /* The reading rules, on the right, where they do not fight the drawing. */
-  const rx = 700;
+  const rx = 742;
   b += txt(rx, 96, 'CÓMO SE LEE', { fs: 11.5, fill: C.ask, ls: 1.6 });
   [['Ángulo pequeño', 'las dos variables suben juntas'],
    ['Ángulo recto', 'no se dicen nada'],
@@ -162,9 +182,18 @@ function miniCircle(cx, cy, r, arrows, tag, caption, ilustrativo) {
     b += `<path d="M${cx},${cy} L${x.toFixed(1)},${y.toFixed(1)}"
       stroke="${ilustrativo ? C.ink3 : C.ask}" stroke-width="2" fill="none"
       marker-end="url(#ar-s5-ang)"/>`;
-    const tx = cx + Math.cos(ang) * (r + 22), ty = cy - Math.sin(ang) * (r + 22);
-    b += txt(tx, ty + 4, name, { fs: 10.5, ff: MONO, fill: C.ink2,
-             ta: tx < cx - 4 ? 'end' : tx > cx + 4 ? 'start' : 'middle' });
+  });
+  /* Same pushing apart as the big circle needs, and for the same reason: the pair this
+     figure exists to show sits three degrees apart, so their names land on each other. */
+  const placed = [];
+  arrows.map(([ang, name]) => ({
+    name, x: cx + Math.cos(ang) * (r + 13), y: cy - Math.sin(ang) * (r + 13),
+  })).sort((a, b2) => a.y - b2.y).forEach(lab => {
+    let y = lab.y;
+    placed.forEach(o => { if (Math.abs(y - o.y) < 18) y = o.y + 18; });
+    placed.push({ ...lab, y });
+    b += txt(lab.x, y + 4, lab.name, { fs: 10.5, ff: MONO, fill: C.ink2,
+             ta: lab.x < cx - 4 ? 'end' : lab.x > cx + 4 ? 'start' : 'middle' });
   });
   b += txt(cx, cy - r - 42, tag, { fs: 11.5, fill: ilustrativo ? C.ink3 : C.ask, ls: 1.6, ta: 'middle' });
   b += txt(cx, cy + r + 52, caption, { fs: 13, ff: SERIF, fill: C.ink, ta: 'middle' });
@@ -172,7 +201,7 @@ function miniCircle(cx, cy, r, arrows, tag, caption, ilustrativo) {
 }
 
 export function tresAngulos() {
-  const W = 980, H = 470, R = 96, CY = 214;
+  const W = 980, H = 470, R = 84, CY = 214;
   const idx = k => KEYS.indexOf(k);
   const ang = k => Math.atan2(PCA4.cargas[idx(k)][1], PCA4.cargas[idx(k)][0]);
   const between = (a, b) => {

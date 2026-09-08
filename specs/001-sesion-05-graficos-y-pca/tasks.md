@@ -431,13 +431,28 @@ repite en cada línea.
       cuatro indicadores miden desarrollo y ninguno es independiente de otro. Fingirlo con
       una pareja que no lo tiene habría sido más cómodo y menos cierto.
 
-- [ ] **T26 · `blocks/Block3.jsx`**
+- [x] **T26 · `blocks/Block3.jsx`**
       RF-37, RF-38, RF-39, RF-40, RF-42, RF-47, RF-60
       Transponer convierte cada variable en registro; el registro es un vector; el ángulo
       entre vectores es el del círculo; individuos y variables son dos vistas; el coseno
       es la correlación, remitiendo a la fórmula de la entrada.
       **Hecho cuando:** la remisión a la entrada es explícita y nombra la fórmula, no
       solo la idea.
+
+      **Resultado.** El bloque cita la fórmula entera —r = cov(x, y) / (sₓ · s_y)— y
+      explica por qué dividir por las desviaciones típicas *es* normalizar los vectores,
+      y por qué el producto de dos unitarios es el coseno. Ahí se cierra el círculo que
+      abrió la entrada.
+
+      Sostiene además la palabra «aproxima» con el número que la incomoda: vida y
+      fertilidad dan coseno −0,96 en el dibujo y correlación real −0,77. El dibujo
+      exagera, y para citar una cifra se va a la tabla.
+
+      **Y un tercer solape encontrado en pantalla:** las dos flechas que están a 3° se
+      pisaban los rótulos, en el círculo y en los tres ángulos. Ahora se separan en
+      vertical con una guía punteada. Escribí un verificador de solapes para las trece
+      figuras y encontró uno más que se me había pasado, entre rótulos de dos círculos
+      distintos que se extendían hacia el mismo hueco.
 
 ---
 
