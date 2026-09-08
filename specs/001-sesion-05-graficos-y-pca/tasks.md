@@ -233,11 +233,21 @@ repite en cada línea.
 
 ## Fase 3 · Entrada · 0–35
 
-- [ ] **T13 · `figures/intro.js`: las tres fórmulas**
+- [x] **T13 · `figures/intro.js`: las tres fórmulas**
       RF-7, RF-8, RF-9
       Varianza, covarianza y Pearson en una figura, con `aria-label` que las describe en
       palabras.
       **Hecho cuando:** las tres se leen completas a 390 px tras pulsar «Ampliar».
+
+      **Resultado.** Varianza, covarianza y Pearson, con las dos flechas que las encadenan
+      —la covarianza consigo misma es la varianza; dividida por las desviaciones típicas
+      es la correlación—. Sin ellas la entrada son tres definiciones; con ellas, una.
+
+      **El primer intento salió mal de una forma instructiva:** colocando cada glifo en
+      una coordenada fija, las barras de la media cayeron sobre la `xᵢ` en vez de sobre
+      la media. Se veía deliberado, que es la peor manera de estar equivocado en una
+      pared. Ahora hay un compositor de doce líneas: una fila es una lista de piezas y el
+      cursor avanza, así que una barra queda sobre su letra por construcción.
 
 - [ ] **T14 · `figures/intro.js`: la dispersión donde se lee la correlación**
       RF-15
