@@ -1,6 +1,6 @@
-import { C, SERIF, svg, txt, arrow } from '../../../svg/kit.js';
-import { box, dot, pline, scale, MONO } from './shared.js';
-import { PAISES, CAMPOS, VARS, PCA4, CORR, ANIO } from '../data/paises.js';
+import { C, SERIF, svg, txt, arrow, wrap } from '../../../svg/kit.js';
+import { box, dot, pline, scale, z, MONO } from './shared.js';
+import { PAISES, CAMPOS, VARS, PCA4, CORR, ESTAD, ANIO } from '../data/paises.js';
 
 const col = k => CAMPOS.indexOf(k);
 const KEYS = PCA4.vars;
@@ -246,4 +246,110 @@ export function tresAngulos() {
     + 'perpendiculares con correlación cero; y esperanza de vida contra mortalidad infantil '
     + `a ${opuestas.grados.toFixed(0)} grados con correlación `
     + `${rReal('vida', 'mortalidad').toFixed(2)}`, b);
+}
+
+/* ── How the correlation circle is built, in five drawings ──
+   The second panel is the reason this figure exists. The turned table shows real values
+   — Qatar at 132900 — and the text used to go straight from "a variable is a record" to
+   "a record is a vector", which leaves a class thinking the arrows are drawn from those
+   numbers. They are not: without centring and dividing by the standard deviation, Qatar's
+   vector is decided by its GDP alone and the angle means nothing. */
+export function pasosCirculo() {
+  const W = 980, H = 430, PY = 116, PW = 168, GAP = 18;
+  const rows = sample().slice(0, 4);
+  const L = PCA4.cargas;
+
+  const panel = (i, titulo) => {
+    const x0 = 34 + i * (PW + GAP);
+    let b = txt(x0, PY - 46, String(i + 1).padStart(2, '0'), { fs: 22, ff: SERIF, fill: C.ask });
+    wrap(titulo, 24).forEach((l, k) => {
+      b += txt(x0, PY - 22 + k * 15, l, { fs: 11, fill: C.ink2 });
+    });
+    return { b, x0, cx: x0 + PW / 2 };
+  };
+
+  let b = '';
+
+  /* 1. the turned table, real values */
+  const p1 = panel(0, 'La tabla girada: cada variable, una fila de valores reales');
+  b += p1.b;
+  KEYS.forEach((k, i) => {
+    const y = PY + 26 + i * 22;
+    b += txt(p1.x0, y, SHORT[k], { fs: 9.5, ff: MONO, fill: i === 0 ? C.ask : C.ink3 });
+    rows.forEach((p, j) => {
+      b += txt(p1.x0 + 62 + j * 28, y, String(p[col(k)]).slice(0, 6),
+               { fs: 8.5, ff: MONO, fill: C.ink, ta: 'middle' });
+    });
+  });
+
+  /* 2. the step that was missing */
+  const p2 = panel(1, 'Centrar y dividir por la desviación: ahora todas comparables');
+  b += p2.b;
+  const zc = PY + 26 + 44;
+  b += pline([[p2.x0, zc], [p2.x0 + PW - 20, zc]], C.lineSoft, { sw: 1 });
+  b += txt(p2.x0 + PW - 16, zc + 4, '0', { fs: 9, fill: C.ink3 });
+  KEYS.forEach((k, i) => {
+    rows.forEach((p, j) => {
+      const zv = z(p[col(k)], ESTAD[k]);
+      const x = p2.x0 + 26 + i * 34 + j * 6;
+      b += dot(x, zc - zv * 16, 2.6, i === 0 ? C.ask : C.ink3, { op: 0.85 });
+    });
+    b += txt(p2.x0 + 26 + i * 34, PY + 132, SHORT[k].slice(0, 5),
+             { fs: 8.5, ff: MONO, fill: C.ink3, ta: 'middle' });
+  });
+  b += txt(p2.x0, PY + 156, 'entre −3 y +6, no entre', { fs: 9, fill: C.reveal });
+  b += txt(p2.x0, PY + 168, '1,3 y 132 900', { fs: 9, fill: C.reveal });
+
+  /* 3. the correlation of each variable with each component */
+  const p3 = panel(2, 'Correlacionar variable y componente: eso es la carga');
+  b += p3.b;
+  b += box(p3.x0, PY + 20, 62, 26, C.ask);
+  b += txt(p3.x0 + 31, PY + 37, SHORT[KEYS[0]], { fs: 9.5, ff: MONO, fill: C.ask, ta: 'middle' });
+  [['CP 1', L[0][0]], ['CP 2', L[0][1]]].forEach(([n, v], i) => {
+    const y = PY + 76 + i * 40;
+    b += box(p3.x0 + 78, y, 62, 26, C.ink3);
+    b += txt(p3.x0 + 109, y + 17, n, { fs: 9.5, ff: MONO, fill: C.ink2, ta: 'middle' });
+    b += `<path d="M${p3.x0 + 40},${PY + 48} L${p3.x0 + 88},${y - 2}" stroke="${C.ask}"
+      stroke-width="1" fill="none" opacity=".8" marker-end="url(#ar-s5-load)"/>`;
+    b += txt(p3.x0 + 146, y + 17, v.toFixed(2).replace('-', '−'),
+             { fs: 11, ff: MONO, fill: C.ink });
+  });
+
+  /* 4. those two numbers are the coordinates of the arrow */
+  const p4 = panel(3, 'Esas dos cargas son las coordenadas de su flecha');
+  const R4 = 52, cy4 = PY + 84;
+  b += p4.b;
+  b += pline([[p4.cx - R4 - 8, cy4], [p4.cx + R4 + 8, cy4]], C.lineSoft, { sw: 1 });
+  b += pline([[p4.cx, cy4 - R4 - 8], [p4.cx, cy4 + R4 + 8]], C.lineSoft, { sw: 1 });
+  const tipx = p4.cx + L[0][0] * R4, tipy = cy4 - L[0][1] * R4;
+  b += pline([[tipx, cy4], [tipx, tipy]], C.ink3, { sw: 0.8, dash: '2 2' });
+  b += pline([[p4.cx, tipy], [tipx, tipy]], C.ink3, { sw: 0.8, dash: '2 2' });
+  b += `<path d="M${p4.cx},${cy4} L${tipx.toFixed(1)},${tipy.toFixed(1)}" stroke="${C.ask}"
+    stroke-width="1.8" fill="none" marker-end="url(#ar-s5-load)"/>`;
+  b += txt(p4.cx, PY + 168, `(${L[0][0].toFixed(2)}, ${L[0][1].toFixed(2)})`,
+           { fs: 10, ff: MONO, fill: C.ink, ta: 'middle' });
+
+  /* 5. all four, inside a circle of radius one */
+  const p5 = panel(4, 'Las cuatro, dentro del círculo de radio 1');
+  const R5 = 56, cy5 = PY + 84;
+  b += p5.b;
+  b += `<circle cx="${p5.cx}" cy="${cy5}" r="${R5}" fill="none" stroke="${C.line}" stroke-width="1"/>`;
+  b += pline([[p5.cx - R5 - 6, cy5], [p5.cx + R5 + 6, cy5]], C.lineSoft, { sw: 1 });
+  b += pline([[p5.cx, cy5 - R5 - 6], [p5.cx, cy5 + R5 + 6]], C.lineSoft, { sw: 1 });
+  KEYS.forEach((k, i) => {
+    b += `<path d="M${p5.cx},${cy5} L${(p5.cx + L[i][0] * R5).toFixed(1)},${(cy5 - L[i][1] * R5).toFixed(1)}"
+      stroke="${C.ask}" stroke-width="1.6" fill="none" marker-end="url(#ar-s5-load)"/>`;
+  });
+  b += txt(p5.cx, PY + 168, 'la longitud dice cuánto', { fs: 9, fill: C.ink3, ta: 'middle' });
+  b += txt(p5.cx, PY + 180, 'cabe en el plano', { fs: 9, fill: C.ink3, ta: 'middle' });
+
+  b += arrow('ar-s5-load', C.ask);
+  b += txt(34, 46, 'CÓMO SE CONSTRUYE EL CÍRCULO DE CORRELACIONES',
+           { fs: 11.5, fill: C.ask, ls: 1.6 });
+
+  return svg(W, H, 'La construcción del círculo de correlaciones en cinco pasos: la tabla '
+    + 'girada con sus valores reales; centrar y dividir cada fila por su desviación típica '
+    + 'para que sean comparables; correlacionar cada variable con cada componente, que es '
+    + 'la carga; usar esas dos cargas como coordenadas de la flecha; y dibujar las cuatro '
+    + 'dentro del círculo de radio uno', b);
 }

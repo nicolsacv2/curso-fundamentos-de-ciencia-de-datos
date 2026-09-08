@@ -580,7 +580,7 @@ Dos tareas añadidas después de ver la sesión funcionando. La segunda nace de 
 sobre la figura de la tabla girada —«¿son las coordenadas de las componentes o los valores
 reales?»— que el material no respondía.
 
-- [x] **T34 · Bautizar las dos componentes en el bloque 2**
+- [x] **T34 · Rotular las dos componentes en el bloque 2** *(era «bautizar»)*
       RF-80, RF-81, RF-82, RF-83
       Un nombre para cada una de las dos primeras componentes del plano factorial, con las
       cargas que lo justifican y los países de cada extremo. Y la advertencia de que el
@@ -589,15 +589,15 @@ reales?»— que el material no respondía.
       en el texto, cada uno con sus cargas y sus países extremos leídos del archivo
       generado; y la advertencia está a la vista, no en letra pequeña.
 
-      **Resultado.** Los dos ejes del plano van rotulados dentro de la escena: **CP 1 ·
-      nivel de vida** (PIB +0,80, vida +0,93, hijos −0,87; de Malí y Níger a Catar y
-      Singapur) y **CP 2 · riqueza con familias grandes** (casi solo PIB, con la esperanza
-      de vida en cero; separa Catar y Kuwait de Moldavia y Bosnia). Los extremos se
-      calculan de `PAISES`, no se escriben.
+      **Resultado, después de una corrección.** La primera versión les puso nombre —«nivel
+      de vida», «riqueza con familias grandes»— y se descartó: **se llaman CP 1 y CP 2, sin
+      interpretación**. El cálculo produce direcciones, no significados, y una componente
+      bautizada se trata enseguida como una variable que alguien midió.
 
-      La advertencia tiene su propio párrafo: en cuanto una componente se llama «nivel de
-      vida» es facilísimo tratarla como una variable que alguien midió, y el nombre es
-      justo la parte que no salió de ningún cálculo.
+      Lo que sí se muestra, porque son datos y no lectura: las **cargas** de cada una
+      (CP 1 → PIB +0,80, vida +0,93, hijos −0,87) y **quién queda en cada extremo**,
+      calculado de `PAISES`. La advertencia de que ponerles nombre sería interpretar tiene
+      su propio párrafo.
 
       **Y obligó a un arreglo de fondo.** Al añadir dos rótulos más, quedaron encima de los
       de los vectores: cuatro etiquetas disputándose el centro de la nube. Ahora todos los
@@ -606,7 +606,7 @@ reales?»— que el material no respondía.
       elige quien mira, así que un ajuste fijo estaría bien en una posición y mal en la
       siguiente.
 
-- [ ] **T35 · El paso a paso de las dos construcciones**
+- [x] **T35 · El paso a paso de las dos construcciones**
       RF-84, RF-85, RF-86, RF-87, RF-88
       Una figura de pasos numerados en cada bloque, cada paso dibujado y descrito: en el
       bloque 2, cómo se llega al plano factorial; en el bloque 3, cómo se llega al círculo
@@ -615,6 +615,22 @@ reales?»— que el material no respondía.
       **Hecho cuando:** cada figura tiene sus pasos numerados y dibujados, cada paso tiene
       su descripción en el texto del bloque, y la construcción del círculo pasa
       explícitamente por centrar y dividir por la desviación típica.
+
+      **Resultado.** Dos figuras de cinco pasos, cada uno dibujado y descrito debajo.
+
+      *Plano factorial (bloque 2).* Los cinco paneles llevan **la misma nube**: lo que
+      cambia es lo que se le añade encima — la dirección que más estira, la perpendicular,
+      el plano que forman, y las sombras cayendo sobre él. Cinco bocetos distintos habrían
+      enseñado cinco ideas; el mismo boceto creciendo enseña una construcción.
+
+      *Círculo de correlaciones (bloque 3).* El paso 02 es la razón de ser de la figura:
+      centrar y dividir por la desviación típica. Es el paso que faltaba y que la pregunta
+      de clase destapó — sin él, el vector de Catar lo decide su PIB (132 900 aplasta a
+      1,98) y el ángulo no significa nada. El bloque lo dice antes de la figura, con esos
+      números.
+
+      Los títulos se comprobaron con `wrap`: ninguno pasa de tres líneas, porque el
+      cuarto renglón caía encima del dibujo del panel.
 
 ---
 

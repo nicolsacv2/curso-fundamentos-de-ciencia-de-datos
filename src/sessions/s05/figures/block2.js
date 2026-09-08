@@ -1,5 +1,5 @@
-import { C, SERIF, svg, txt, arrow } from '../../../svg/kit.js';
-import { camera, dot, farFirst, pline, scale, z, MONO } from './shared.js';
+import { C, SERIF, svg, txt, arrow, wrap } from '../../../svg/kit.js';
+import { camera, dot, farFirst, pline, poly, scale, z, MONO } from './shared.js';
 import { PAISES, ESTAD, CAMPOS, PCA3, VARS, ANIO } from '../data/paises.js';
 
 const col = k => CAMPOS.indexOf(k);
@@ -137,4 +137,90 @@ export function extremos(j, cuantos) {
     bajos: puntuados.slice(0, n).map(p => p.nombre),
     altos: puntuados.slice(-n).reverse().map(p => p.nombre),
   };
+}
+
+/* ── How the factorial plane is built, in five drawings ────
+   Each panel adds one thing to the one before it, and the cloud is the same cloud in all
+   five — a sample of the real countries, at a fixed angle. Five different sketches would
+   have shown five ideas; the same sketch growing shows one construction. */
+export function pasosPlano() {
+  const W = 980, H = 386, PY = 112, PW = 168, GAP = 18;
+  const cam = camera(0.72, 0.30);
+  const pts = scored().filter((_, i) => i % 4 === 0);        /* 46 países, deterministas */
+  const mid = KEYS.map((_, i) => {
+    const vs = pts.map(p => p.at[i]);
+    return (Math.min(...vs) + Math.max(...vs)) / 2;
+  });
+  const [e1, e2] = PCA3.vectores;
+
+  const panel = (i, titulo) => {
+    const x0 = 34 + i * (PW + GAP);
+    const cx = x0 + PW / 2, cy = PY + 116;
+    /* Sized so the widest panel — the box is 7 standard deviations along GDP — still
+       clears its neighbour: any bigger and the five sketches start touching. */
+    const U = 22;
+    const proj = at => {
+      const [x, y] = cam(at.map((v, k) => v - mid[k]));
+      return [cx + x * U, cy - y * U];
+    };
+    let b = txt(x0, PY - 46, String(i + 1).padStart(2, '0'),
+                { fs: 22, ff: SERIF, fill: C.ask });
+    wrap(titulo, 24).forEach((l, k) => {
+      b += txt(x0, PY - 22 + k * 15, l, { fs: 11, fill: C.ink2 });
+    });
+    return { b, proj, cx, cy, x0 };
+  };
+
+  const nube = proj => pts.map(p => {
+    const [x, y] = proj(p.at);
+    return dot(x, y, 2.2, REGION[p.region] || C.ink2, { op: 0.6 });
+  }).join('');
+
+  const eje = (proj, e, len, color, rot) => {
+    const [x0, y0] = proj(KEYS.map(() => 0));
+    const [x1, y1] = proj(e.map(v => v * len));
+    return pline([[x0, y0], [x1, y1]], color, { sw: 1.8 })
+      + (rot ? txt(x1, y1 - 8, rot, { fs: 9.5, fill: color, ta: 'middle' }) : '');
+  };
+
+  let b = '';
+
+  const p1 = panel(0, 'La nube, en desviaciones típicas — no en dólares ni en años');
+  b += p1.b + nube(p1.proj);
+
+  const p2 = panel(1, 'La dirección en la que más se estira: la primera componente');
+  b += p2.b + nube(p2.proj) + eje(p2.proj, e1, 2.4, C.ask, 'CP 1');
+
+  const p3 = panel(2, 'La perpendicular que más estira de lo que queda: la segunda');
+  b += p3.b + nube(p3.proj) + eje(p3.proj, e1, 2.4, C.line)
+     + eje(p3.proj, e2, 1.8, C.ask, 'CP 2');
+
+  const p4 = panel(3, 'Las dos juntas son un plano: el plano factorial');
+  const c4 = [[2.4, 1.8], [-2.4, 1.8], [-2.4, -1.8], [2.4, -1.8]]
+    .map(([u, v]) => p4.proj(e1.map((_, i) => e1[i] * u + e2[i] * v)));
+  b += p4.b + poly(c4, C.ask, { op: 0.16, stroke: C.ask, sw: 1 }) + nube(p4.proj);
+
+  const p5 = panel(4, 'Cada país cae sobre el plano: esa sombra son sus coordenadas');
+  const c5 = [[2.4, 1.8], [-2.4, 1.8], [-2.4, -1.8], [2.4, -1.8]]
+    .map(([u, v]) => p5.proj(e1.map((_, i) => e1[i] * u + e2[i] * v)));
+  b += p5.b + poly(c5, C.ask, { op: 0.16, stroke: C.ask, sw: 1 });
+  pts.forEach((p, i) => {
+    const s1 = dotp(p.at, e1), s2 = dotp(p.at, e2);
+    const sombra = p5.proj(e1.map((_, k) => e1[k] * s1 + e2[k] * s2));
+    if (i % 3 === 0) {
+      const alto = p5.proj(p.at);
+      b += pline([alto, sombra], C.ink3, { sw: 0.7, op: 0.5, dash: '2 2' });
+    }
+    b += dot(sombra[0], sombra[1], 2, C.ask, { op: 0.7 });
+  });
+  b += nube(p5.proj);
+
+  b += txt(34, 46, 'CÓMO SE CONSTRUYE EL PLANO FACTORIAL', { fs: 11.5, fill: C.ask, ls: 1.6 });
+  b += txt(34, H - 18, 'La misma nube en los cinco: lo que cambia es lo que se le añade encima.',
+           { fs: 11.5, fill: C.ink3 });
+
+  return svg(W, H, 'La construcción del plano factorial en cinco pasos: la nube en '
+    + 'desviaciones típicas; la dirección en la que más se estira, que es la primera '
+    + 'componente; la perpendicular que más estira de lo que queda, que es la segunda; el '
+    + 'plano que forman las dos; y la sombra de cada país sobre ese plano', b);
 }

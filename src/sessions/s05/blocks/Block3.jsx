@@ -1,6 +1,6 @@
 import { Panel, Diagram, Pair, Prose, List, Idea, Task }
   from '../../../components/content/index.jsx';
-import { transpuesta, circuloCorrelaciones, tresAngulos } from '../figures/block3.js';
+import { transpuesta, circuloCorrelaciones, tresAngulos, pasosCirculo } from '../figures/block3.js';
 import { PAISES, PCA4, VARS, CORR, ANIO, FUENTE } from '../data/paises.js';
 
 export default function Block3({ id, tabId }) {
@@ -51,6 +51,40 @@ export default function Block3({ id, tabId }) {
             la tabla girada.</p>
         </Prose>
       </Pair>
+
+      <h3>De la tabla girada al dibujo</h3>
+      <Prose>
+        <p>Cuidado aquí, porque hay un paso que es fácil saltarse. La tabla de arriba
+          muestra los <b>valores reales</b>: Catar con 132 900 dólares y 1,98 hijos por
+          mujer. Con esos números tal cual, el vector de Catar lo decide su PIB y nada más
+          — 132 900 aplasta a 1,98 —, y el ángulo entre dos flechas no significaría nada.</p>
+      </Prose>
+
+      <Diagram fig={pasosCirculo}>
+        Del valor real a la flecha, en cinco pasos. El segundo es el que hace que los demás
+        tengan sentido.
+      </Diagram>
+
+      <Prose>
+        <h4>Los cinco pasos, uno a uno</h4>
+        <List>
+          <li><b>01 · La tabla girada.</b> Cada variable es ahora una fila con
+            {' '}{PAISES.length} valores: un registro, como lo era cada país.</li>
+          <li><b>02 · Centrar y dividir por la desviación típica.</b> Exactamente la misma
+            normalización de la entrada, la que convertía la covarianza en correlación.
+            Después de esto, las cuatro filas se mueven entre −3 y +6 en vez de entre 1,3 y
+            132 900, y ya se pueden comparar.</li>
+          <li><b>03 · Correlacionar cada variable con cada componente.</b> Ese número —la
+            correlación entre una variable y una componente— es lo que se llama su
+            {' '}<b>carga</b>.</li>
+          <li><b>04 · Las dos cargas son las coordenadas.</b> La carga con la primera
+            componente es la x de la flecha; la de la segunda, su y. Nada más.</li>
+          <li><b>05 · Las cuatro, dentro del círculo de radio 1.</b> Como son
+            correlaciones, ninguna puede pasar de 1, y por eso todas caben en el círculo.
+            Lo que le falte a una flecha para llegar al borde es lo que esa variable vive
+            fuera de este plano.</li>
+        </List>
+      </Prose>
 
       <h3>El círculo de correlaciones</h3>
       <Diagram fig={circuloCorrelaciones}>

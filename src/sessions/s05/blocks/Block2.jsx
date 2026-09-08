@@ -1,6 +1,6 @@
 import { Panel, Diagram, Pair, Prose, List, Idea, Task, Cards, Card }
   from '../../../components/content/index.jsx';
-import { antesYDespues, varianzaExplicada, extremos } from '../figures/block2.js';
+import { antesYDespues, varianzaExplicada, extremos, pasosPlano } from '../figures/block2.js';
 import { COMPONENTES } from '../figures/cloud3d.js';
 import Cloud3D from '../views/Cloud3D.jsx';
 import { PCA3, PAISES, VARS, ANIO, FUENTE } from '../data/paises.js';
@@ -32,6 +32,31 @@ export default function Block2({ id, tabId }) {
           {' '}<b>plano factorial</b>, y es donde vamos a colocar a los países.</p>
       </Prose>
 
+      <Diagram fig={pasosPlano}>
+        La misma nube en los cinco pasos: lo que cambia es lo que se le añade encima.
+      </Diagram>
+
+      <Prose>
+        <h4>Los cinco pasos, uno a uno</h4>
+        <List>
+          <li><b>01 · La nube en desviaciones típicas.</b> Antes de buscar nada, cada
+            variable se centra en su media y se divide por su desviación. Si no, el PIB
+            —que va en decenas de miles— decidiría solo la respuesta, y estaríamos midiendo
+            las unidades en vez de los países.</li>
+          <li><b>02 · La dirección en la que más se estira.</b> Se prueba, en todas las
+            direcciones posibles, en cuál queda la nube más larga al proyectarse. Esa es la
+            primera componente: la que conserva más variación.</li>
+          <li><b>03 · La perpendicular que más queda.</b> La segunda se busca igual, pero
+            obligada a formar ángulo recto con la primera. Esa obligación es lo que impide
+            que las dos cuenten lo mismo dos veces.</li>
+          <li><b>04 · Las dos juntas son un plano.</b> Dos direcciones definen un plano, y
+            ese es el <b>plano factorial</b>: la hoja sobre la que vamos a dibujar.</li>
+          <li><b>05 · Cada país cae sobre el plano.</b> Se proyecta, como una sombra a
+            plomo. Las dos coordenadas de esa sombra son el país en el plano factorial, y
+            lo que se pierde es la distancia que ha caído.</li>
+        </List>
+      </Prose>
+
       <Diagram fig={antesYDespues}>
         Los mismos {PAISES.length} países antes y después de proyectarse. Colombia está
         señalada en las dos mitades: es una sola nube, vista de dos maneras.
@@ -58,19 +83,21 @@ export default function Block2({ id, tabId }) {
         </Prose>
       </Pair>
 
-      <h3>Ponerles nombre</h3>
+      <h3>Qué pesa en cada una</h3>
       <Prose>
-        <p>Una componente llega sin nombre: el cálculo produce direcciones, no significados.
-          Bautizarla es cosa nuestra, y se hace mirando dos cosas — <b>qué variables pesan
-          en ella</b> y <b>quién queda en cada extremo</b>. Lo que sigue es una lectura, no
-          un resultado, y por eso se puede discutir.</p>
+        <p>Una componente llega <b>sin nombre</b>, y aquí se queda así: se llaman CP 1 y
+          CP 2. El cálculo produce direcciones, no significados, y en cuanto una se bautiza
+          —«nivel de vida», por ejemplo— es facilísimo empezar a tratarla como si fuera una
+          variable que alguien midió. No lo es.</p>
+        <p>Lo que sí se puede mirar sin inventar nada es <b>qué variables pesan</b> en cada
+          una y <b>quién queda en cada extremo</b>. Eso son datos; el nombre sería nuestro.</p>
       </Prose>
 
       <Cards>
         {COMPONENTES.map((c, j) => {
           const ext = extremos(j);
           return (
-            <Card key={c.eje} k={`${c.eje} · ${PCA3.porcentajes[j]} %`} t={c.nombre}>
+            <Card key={c.eje} k={`${c.eje} · ${PCA3.porcentajes[j]} %`} t="cargas">
               {PCA3.vars.map(v => `${nombre(v)} ${carga(PCA3.vars.indexOf(v), j)}`).join(' · ')}
               {' — de '}{ext.bajos.slice(0, 2).join(' y ')}{' en un extremo a '}
               {ext.altos.slice(0, 2).join(' y ')}{' en el otro.'}
@@ -78,18 +105,6 @@ export default function Block2({ id, tabId }) {
           );
         })}
       </Cards>
-
-      <Prose>
-        <p>«{COMPONENTES[0].nombre}» se sostiene solo: {COMPONENTES[0].glosa}, y va de
-          {' '}{extremos(0).bajos[0]} a {extremos(0).altos[0]}. La segunda es más incómoda de
-          nombrar — {COMPONENTES[1].glosa} — y por eso separa a {extremos(1).altos.slice(0, 2).join(' y ')},
-          ricos y con natalidad alta, de {extremos(1).bajos.slice(0, 2).join(' y ')}, de renta
-          media y natalidad muy baja.</p>
-        <p><b>Cuidado con el nombre.</b> En cuanto una componente se llama «nivel de vida»,
-          es facilísimo empezar a tratarla como si fuera una variable que alguien midió. No
-          lo es: es una mezcla que inventamos nosotros para poder dibujar, y el nombre es la
-          parte que no salió de ningún cálculo.</p>
-      </Prose>
 
       <h3>Cuánto conserva cada componente</h3>
       <Diagram fig={varianzaExplicada}>

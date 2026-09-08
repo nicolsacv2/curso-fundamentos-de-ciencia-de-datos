@@ -27,18 +27,15 @@ const COLS = Object.fromEntries(CAMPOS.map((c, i) => [c, i]));
 const KEYS = PCA3.vars;
 const LABEL = Object.fromEntries(VARS.map(([k, name]) => [k, name]));
 
-/* What the two components get called.
+/* The two components, labelled and nothing else.
 
-   These names are read off the loadings and nothing else: the first rises with GDP and
-   life expectancy and falls with children per woman; the second is almost pure GDP with
-   life expectancy sitting at zero. They are interpretations, not results — the algebra
-   produces directions, not meanings — and the block says so out loud, because a named
-   component is very easy to start treating as a measured variable. */
+   They are deliberately not given names. The algebra produces directions, not meanings,
+   and a component called "nivel de vida" is very quickly treated as a variable somebody
+   measured. What the block shows instead is what weighs in each one — its loadings — and
+   who ends up at either end, which is data rather than reading. */
 export const COMPONENTES = [
-  { eje: 'CP 1', nombre: 'nivel de vida',
-    glosa: 'sube con el PIB y la esperanza de vida, baja con los hijos por mujer' },
-  { eje: 'CP 2', nombre: 'riqueza con familias grandes',
-    glosa: 'casi solo PIB, con la esperanza de vida en cero' },
+  { eje: 'CP 1' },
+  { eje: 'CP 2' },
 ];
 
 /* Region tints. They are a help, never the message: every figure has to survive a
@@ -167,7 +164,7 @@ export default function cloud3d(o) {
       const tip = project(cam, e.map((v, i) => v * len - mid[i]));
       b += pline([[centre.x, centre.y], [tip.x, tip.y]], C.ask, { sw: 1.4, op: 0.9 });
       const out = project(cam, e.map((v, i) => v * (len + 0.5) - mid[i]));
-      const rotulo = `${comp.eje} · ${comp.nombre}`;
+      const rotulo = comp.eje;
       labels.push({ x: out.x, y: out.y, t: rotulo, color: C.ask, borde: true,
                     w: rotulo.length * 6.2 + 14 });
     });

@@ -125,14 +125,13 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 - **RF-34**: EL SISTEMA enunciará en el bloque 2 la maldición de la dimensionalidad.
 - **RF-35**: EL SISTEMA presentará en el bloque 2 el análisis de componentes principales
   como una respuesta a la maldición de la dimensionalidad.
-- **RF-80**: EL SISTEMA propondrá un nombre para cada una de las dos primeras componentes
-  del plano factorial.
-- **RF-81**: EL SISTEMA justificará cada uno de esos nombres con las cargas de su
-  componente.
+- **RF-80**: EL SISTEMA rotulará las dos primeras componentes del plano factorial como
+  CP 1 y CP 2, sin darles nombre.
+- **RF-81**: EL SISTEMA mostrará las cargas de cada una de esas dos componentes.
 - **RF-82**: EL SISTEMA mostrará qué países quedan en cada extremo de cada una de esas dos
   componentes.
-- **RF-83**: EL SISTEMA advertirá que el nombre de una componente es una interpretación y
-  no un resultado del cálculo.
+- **RF-83**: EL SISTEMA advertirá que ponerle nombre a una componente sería una
+  interpretación y no un resultado del cálculo.
 - **RF-84**: EL SISTEMA mostrará en el bloque 2 la construcción del plano factorial como
   una secuencia de pasos dibujados.
 - **RF-85**: EL SISTEMA describirá con texto cada uno de los pasos de esa construcción.
