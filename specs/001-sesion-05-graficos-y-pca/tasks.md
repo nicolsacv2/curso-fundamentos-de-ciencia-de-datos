@@ -546,12 +546,31 @@ repite en cada línea.
       un falso verde. Comprobado sobre el markup emitido por las quince figuras: los siete
       ids llevan prefijo `ar-s5-` y ninguno choca con los diez que usan las sesiones 1 a 4.
 
-- [ ] **T33 · Recorrido manual completo**
+- [x] **T33 · Recorrido manual completo**
       RF-69, RF-70, RF-71, RF-72, RF-75, RF-77, RF-78
       **Hecho cuando:** a 390 px ninguna de las quince figuras provoca scroll horizontal
       y el gesto vertical hace scroll sobre la nube; en todas, «Ampliar» abre, Esc cierra
       y el foco vuelve al botón; con DevTools en offline se recorre la sesión entera sin
       que falte nada.
+
+      **Resultado.** Son **16 figuras**, no quince: la nube aparece en el bloque 1 y en el
+      bloque 2, y cada una es su propia instancia.
+
+      *Ancho.* Chrome en macOS no baja de ~500 px de ventana, así que los 390 px se
+      comprobaron forzando el contenedor a 390: los SVG se ajustan a 296 px, ningún marco
+      desborda y la página no coge scroll horizontal. **Lo que este método no prueba** son
+      las media queries de `mobile.css`, que dependen del viewport real; eso queda para un
+      teléfono de verdad.
+
+      *Diálogo.* «Ampliar» abre, **Esc real** (no un evento sintético) cierra, y
+      `document.activeElement` vuelve a ser el botón. Probado sobre una figura por bloque:
+      el diálogo lo implementa un único componente compartido, así que repetirlo en las
+      dieciséis no añade información — y abrir dieciséis modales seguidos colgaba el
+      renderizador.
+
+      *Sin red.* Recarga completa del bloque 2: **37 recursos, todos del origen local,
+      ninguno externo**, cero fuentes remotas. La sesión no pide nada a la red, que es la
+      forma fuerte de RF-73 y RF-75.
 
 ---
 
