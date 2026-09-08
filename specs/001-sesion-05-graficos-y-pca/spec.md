@@ -227,6 +227,16 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
   las dos primeras componentes es su carga.
 - **RF-102**: EL SISTEMA enunciará que la aproximación entre el coseno y la correlación
   nace de esa proyección y no del cálculo de la correlación.
+- **RF-119**: EL SISTEMA explicará que centrar un vector es restarle un múltiplo del
+  vector de unos.
+- **RF-120**: EL SISTEMA enunciará que centrar es, geométricamente, una proyección
+  ortogonal sobre lo perpendicular a ese vector de unos.
+- **RF-121**: EL SISTEMA mostrará dibujada la diferencia entre dos vectores sin centrar y
+  los mismos vectores centrados.
+- **RF-122**: EL SISTEMA enunciará que, al ser todos los indicadores positivos, los
+  vectores sin centrar se recuestan sobre esa diagonal.
+- **RF-123**: EL SISTEMA mostrará un par de variables cuyo ángulo sin centrar tiene el
+  signo contrario al de su correlación.
 
 ### Cierre — gráficos basura
 

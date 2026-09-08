@@ -374,3 +374,81 @@ export function pasosCirculo() {
     + 'correlación; proyectar ese vector sobre el plano de las dos primeras componentes, y '
     + 'esa sombra es su carga; y las cuatro sombras dentro del círculo de radio uno', b);
 }
+
+/* ── What centring does to a vector ────────────────────────
+   Drawn with two countries instead of 183, because the geometry is the same in two
+   dimensions and can be seen there. Marked as a sketch: with two countries no real
+   correlation could be reproduced.
+
+   Left: raw vectors. Every value is positive, so both arrows lean into the same corner,
+   towards the diagonal where all countries are equal. The angle between them is mostly
+   reporting that shared lean.
+
+   Right: the same arrows after subtracting each one's mean, which is exactly removing
+   the part that pointed along that diagonal. What is left is perpendicular to it — the
+   variation around the mean — and now the angle says whether they move together. */
+export function geometriaCentrado() {
+  const W = 980, H = 460, R = 150;
+  const A = { cx: 250, cy: 250 }, B = { cx: 700, cy: 250 };
+
+  /* Two variables over two countries. The pair is chosen to show the trap: both grow
+     from left to right, so raw they look alike; around their means they disagree. */
+  const v1 = [3.2, 2.0], v2 = [2.4, 2.9];
+  const media = v => (v[0] + v[1]) / 2;
+  const c1 = v1.map(x => x - media(v1)), c2 = v2.map(x => x - media(v2));
+
+  const eje = (o, nombre1, nombre2) =>
+    pline([[o.cx - R - 14, o.cy], [o.cx + R + 14, o.cy]], C.lineSoft, { sw: 1 })
+    + pline([[o.cx, o.cy + R + 14], [o.cx, o.cy - R - 14]], C.lineSoft, { sw: 1 })
+    + txt(o.cx + R + 20, o.cy + 4, nombre1, { fs: 10, ff: MONO, fill: C.ink3 })
+    + txt(o.cx + 8, o.cy - R - 20, nombre2, { fs: 10, ff: MONO, fill: C.ink3 });
+
+  const flecha = (o, v, k, color, nombre) => {
+    const x = o.cx + v[0] * k, y = o.cy - v[1] * k;
+    return `<path d="M${o.cx},${o.cy} L${x.toFixed(1)},${y.toFixed(1)}" stroke="${color}"
+      stroke-width="2" fill="none" marker-end="url(#ar-s5-cen)"/>`
+      + txt(x + (v[0] >= 0 ? 10 : -10), y - 6, nombre,
+            { fs: 11, ff: MONO, fill: color, ta: v[0] >= 0 ? 'start' : 'end' });
+  };
+
+  let b = arrow('ar-s5-cen', C.ask);
+
+  /* left: as the data comes */
+  b += txt(A.cx - R, 60, 'SIN CENTRAR', { fs: 11.5, fill: C.reveal, ls: 1.6 });
+  b += eje(A, 'país A', 'país B');
+  b += pline([[A.cx, A.cy], [A.cx + 128, A.cy - 128]], C.reveal, { sw: 1.2, dash: '4 4' });
+  b += txt(A.cx + 134, A.cy - 132, 'la diagonal', { fs: 10, fill: C.reveal });
+  b += txt(A.cx + 134, A.cy - 120, '(1, 1)', { fs: 10, ff: MONO, fill: C.reveal });
+  b += flecha(A, v1, 42, C.ask, 'x');
+  b += flecha(A, v2, 42, C.ink2, 'y');
+  b += txt(A.cx - R, H - 78, 'Todos los valores son positivos, así que', { fs: 12, fill: C.ink3 });
+  b += txt(A.cx - R, H - 60, 'las dos flechas se recuestan sobre la diagonal.', { fs: 12, fill: C.ink3 });
+  b += txt(A.cx - R, H - 38, 'El ángulo mide sobre todo eso.', { fs: 12.5, ff: SERIF, fill: C.reveal });
+
+  /* right: after removing the component along the diagonal */
+  b += txt(B.cx - R, 60, 'CENTRADO', { fs: 11.5, fill: C.ask, ls: 1.6 });
+  b += eje(B, 'país A', 'país B');
+  b += pline([[B.cx - 128, B.cy + 128], [B.cx + 128, B.cy - 128]], C.lineSoft,
+             { sw: 1, dash: '4 4' });
+  b += pline([[B.cx - 108, B.cy - 108], [B.cx + 108, B.cy + 108]], C.reveal,
+             { sw: 1.2, op: 0.7 });
+  /* At the upper end of the same line: at the lower one it landed on the caption. */
+  b += txt(B.cx - 114, B.cy - 128, 'perpendicular', { fs: 10, fill: C.reveal, ta: 'end' });
+  b += txt(B.cx - 114, B.cy - 116, 'a la diagonal', { fs: 10, fill: C.reveal, ta: 'end' });
+  b += flecha(B, c1, 96, C.ask, 'x centrada');
+  b += flecha(B, c2, 96, C.ink2, 'y centrada');
+  b += txt(B.cx - R, H - 78, 'Quitar la media es quitar lo que apuntaba', { fs: 12, fill: C.ink3 });
+  b += txt(B.cx - R, H - 60, 'a la diagonal: queda lo perpendicular a ella.', { fs: 12, fill: C.ink3 });
+  b += txt(B.cx - R, H - 38, 'Ahora el ángulo mide la relación.', { fs: 12.5, ff: SERIF, fill: C.ask });
+
+  b += txt(56, 34, 'QUÉ LE HACE EL CENTRADO A UN VECTOR', { fs: 11.5, fill: C.ask, ls: 1.6 });
+  b += txt(W - 56, 34, 'esquema con dos países, para poder verlo',
+           { fs: 10.5, fill: C.ink3, ta: 'end' });
+
+  return svg(W, H, 'Qué le hace el centrado a un vector, dibujado con dos países para que '
+    + 'quepa en el papel: sin centrar, como todos los valores son positivos, las dos '
+    + 'flechas se recuestan sobre la diagonal donde todos los países valen lo mismo, y el '
+    + 'ángulo entre ellas mide sobre todo esa inclinación compartida. Al restar la media se '
+    + 'quita justamente la parte que apuntaba a esa diagonal, y lo que queda es '
+    + 'perpendicular a ella: la variación alrededor de la media', b);
+}
