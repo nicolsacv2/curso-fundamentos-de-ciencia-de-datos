@@ -382,12 +382,19 @@ repite en cada línea.
 
 ## Fase 6 · Bloque 3 · 128–166
 
-- [ ] **T23 · `figures/block3.js`: la tabla y su transpuesta**
+- [x] **T23 · `figures/block3.js`: la tabla y su transpuesta**
       RF-36
       Recorte que quepa proyectado sin dejar de leerse como la misma tabla girada (caso
       límite 12).
       **Hecho cuando:** las dos se ven a la vez a 390 px sin scroll horizontal, y se
       reconoce que la segunda es la primera girada.
+
+      **Resultado (caso límite 12 resuelto).** Las dos van recortadas a 6 países, y el
+      recorte no es alfabético sino repartido por el recorrido del PIB: una muestra que
+      fuera toda África enseñaría lo que no es. Lo que sobrevive al corte es que es la
+      misma tabla — comprobado que los 24 valores de una mitad son el mismo multiconjunto
+      que los 24 de la otra —, y una variable va teñida en ambas para que el ojo siga una
+      columna convirtiéndose en fila.
 
 - [ ] **T24 · `figures/block3.js`: el círculo de variables**
       RF-41, RF-46
