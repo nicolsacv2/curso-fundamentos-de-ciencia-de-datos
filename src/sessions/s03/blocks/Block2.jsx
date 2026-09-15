@@ -5,11 +5,9 @@ import {
 import { COLS, ROWS, MEDIAS } from '../data/salon.js';
 import { bitacora } from '../figures/block2.js';
 
-export default function Block2({ id, tabId }) {
+export default function Block2({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 2 · 70–108</p>
-      <h2>Limpiar es decidir</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Encontrar la suciedad fue la parte fácil. Ahora hay que hacer algo con
         ella, y no existe la opción de no decidir: dejar la tabla como está también es una
         decisión, solo que sin firmar.</p>

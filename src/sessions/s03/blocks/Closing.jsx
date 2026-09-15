@@ -1,12 +1,9 @@
 import { Panel, Task, Pair, Prose, Idea } from '../../../components/content/index.jsx';
 import { MEDIAS } from '../data/salon.js';
 
-export default function Closing({ id, tabId }) {
+export default function Closing({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Cierre · 166–180</p>
-      <h2>La decisión que cambia la conclusión</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Task
         label="Ticket de salida · chat · 2 minutos"
         big={<>Nombra una decisión que tomamos hoy y di qué conclusión cambiaría si hubiéramos

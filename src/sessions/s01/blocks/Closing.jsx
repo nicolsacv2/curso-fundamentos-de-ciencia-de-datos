@@ -1,12 +1,9 @@
 import { Panel, Task, Diagram, Prose, Idea, Milestones } from '../../../components/content/index.jsx';
 import { dataCurve, MILESTONES } from '../figures/closing.js';
 
-export default function Closing({ id, tabId }) {
+export default function Closing({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Cierre</p>
-      <h2>La curva que lo explica todo</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Diagram fig={dataCurve} width="1100px">
         Datos producidos en el mundo, en zettabytes al año. Cifras redondeadas de
         estimaciones públicas del sector: sirven para el orden de magnitud, no para citarlas al

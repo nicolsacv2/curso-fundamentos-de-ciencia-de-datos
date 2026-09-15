@@ -26,12 +26,9 @@ function Ficha({ num, nombre, dato, pregunta, construccion, children }) {
   );
 }
 
-export default function Block1({ id, tabId }) {
+export default function Block1({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 1 · 35–75</p>
-      <h2>Cinco gráficos</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Task label="La regla del bloque" big="Cada gráfico admite un tipo de dato y responde
         una pregunta. Elegir mal no es un error de estilo: deforma lo que querías mostrar.">
         <p>Los cinco salen de los mismos {PAISES.length} países, así que las diferencias que

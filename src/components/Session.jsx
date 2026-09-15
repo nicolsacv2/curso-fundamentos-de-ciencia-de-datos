@@ -33,7 +33,8 @@ export default function Session({ meta, active, onSelect, onIndex }) {
 
       <div className="wrap">
         <Suspense fallback={<div className="loading">Cargando bloque…</div>}>
-          <Block id={`s${meta.n}-pan-${active}`} tabId={`s${meta.n}-tab-${active}`} />
+          <Block id={`s${meta.n}-pan-${active}`} tabId={`s${meta.n}-tab-${active}`}
+                 block={meta.blocks[active]} />
         </Suspense>
 
         <footer className="foot">

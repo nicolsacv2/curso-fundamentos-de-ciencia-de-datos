@@ -3,11 +3,9 @@ import {
 } from '../../../components/content/index.jsx';
 import { types, fakeNumbers, structure, table, quadrants } from '../figures/block1.js';
 
-export default function Block1({ id, tabId }) {
+export default function Block1({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 1 · 22–62</p>
-      <h2>Tipos de datos y anatomía de una tabla</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Antes de analizar nada hay que saber con qué se está tratando. No todos los
         datos admiten las mismas operaciones, y la mitad de los errores del curso nacen aquí.</p>
 

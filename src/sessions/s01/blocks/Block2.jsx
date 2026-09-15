@@ -1,11 +1,9 @@
 import { Panel, Task, Diagram, Cards, Card } from '../../../components/content/index.jsx';
 import { lifecycle, timeSplit } from '../figures/block2.js';
 
-export default function Block2({ id, tabId }) {
+export default function Block2({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 2</p>
-      <h2>El ciclo de vida de un proyecto de datos</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Siete etapas, y una flecha que vuelve al principio. Casi ningún proyecto
         real recorre el círculo una sola vez.</p>
 

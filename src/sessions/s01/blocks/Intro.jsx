@@ -1,11 +1,9 @@
 import { Panel, Task, Diagram } from '../../../components/content/index.jsx';
 import { wordCloud } from '../figures/intro.js';
 
-export default function Intro({ id, tabId }) {
+export default function Intro({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <h2>Antes de cualquier definición</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Task label="Todos responden · Mentimeter" big="«Ciencia de datos es…»">
         <p>Una sola palabra. La primera que se te venga a la cabeza. No hay respuesta correcta.</p>
       </Task>

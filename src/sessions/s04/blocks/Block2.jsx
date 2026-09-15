@@ -4,11 +4,9 @@ import {
 import { MINUTOS, MINUTOS_SIN } from '../data/salon.js';
 import { enjambres, ahorros } from '../figures/block2.js';
 
-export default function Block2({ id, tabId }) {
+export default function Block2({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 2 · 78–115</p>
-      <h2>Lo que el centro no cuenta</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Tres grupos de once personas. Mismo promedio, misma mediana, misma
         moda: si el reporte trae solo el centro, son el mismo grupo. Míralos.</p>
 

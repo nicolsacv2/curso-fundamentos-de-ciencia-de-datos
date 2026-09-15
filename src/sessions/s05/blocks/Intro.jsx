@@ -3,12 +3,9 @@ import { Panel, Diagram, Cards, Card, Pair, Prose, List, Idea, Task }
 import formulas, { scatter } from '../figures/intro.js';
 import { VARS, ANIO, FUENTE, PAISES, ESTAD } from '../data/paises.js';
 
-export default function Intro({ id, tabId }) {
+export default function Intro({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Entrada · 0–35</p>
-      <h2>Tres fórmulas encadenadas</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Task label="Para empezar · 3 minutos" big="Cuatro variables no caben en un papel de dos
         dimensiones; vamos a dibujarlas todas y a perder menos de lo que crees.">
         <p>La sesión pasada resumimos con números. Hoy los volvemos dibujo, y para eso hace

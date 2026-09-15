@@ -4,11 +4,9 @@ import {
 import { COLS, ROWS } from '../data/salon.js';
 import { bogota } from '../figures/intro.js';
 
-export default function Intro({ id, tabId }) {
+export default function Intro({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Entrada · 0–22</p>
-      <h2>Esta es nuestra tabla</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Veintitrés respuestas, diez columnas. Es lo que salió del formulario
         que escribimos entre todos la sesión pasada, sin tocar una sola celda.</p>
 

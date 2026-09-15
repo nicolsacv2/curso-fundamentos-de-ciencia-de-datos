@@ -2,11 +2,9 @@ import {
   Panel, Task, Options, Cards, Card, Pair, Prose, Idea
 } from '../../../components/content/index.jsx';
 
-export default function Intro({ id, tabId }) {
+export default function Intro({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <h2>¿De dónde salió esa cifra?</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Task label="Todos juegan · Kahoot · 0–10" big="Cinco preguntas sobre la sesión pasada.">
         <p>Ranking visible. No es una evaluación: es la manera más rápida de volver a poner en la
           cabeza de todos lo que ya vimos.</p>

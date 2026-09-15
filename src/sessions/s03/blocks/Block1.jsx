@@ -4,11 +4,9 @@ import {
 import { COLS, ROWS } from '../data/salon.js';
 import { faltantes } from '../figures/block1.js';
 
-export default function Block1({ id, tabId }) {
+export default function Block1({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 1 · 22–62</p>
-      <h2>El catálogo: siete formas de estar sucio</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Siete nombres. No son categorías de un libro: cada uno está en nuestra
         tabla, con coordenadas, y los vamos a usar durante seis sesiones.</p>
 

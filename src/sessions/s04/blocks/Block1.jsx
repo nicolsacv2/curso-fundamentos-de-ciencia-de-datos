@@ -5,11 +5,9 @@ import { MINUTOS, BALANCEADA } from '../data/salon.js';
 import { centrosTriangulo, perdidas, cuantiles } from '../figures/block1.js';
 import TriangleActivity from '../activities/TriangleActivity.jsx';
 
-export default function Block1({ id, tabId }) {
+export default function Block1({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 1 · 25–70</p>
-      <h2>¿Cuál es el centro?</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Resumir una columna en un solo número suena a operación única: «el
         centro». Vamos a buscar el centro de algo mucho más simple que una columna — un
         triángulo — y ver que ni ahí existe uno solo.</p>
