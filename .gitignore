@@ -36,3 +36,8 @@ logs/
 *.njsproj
 *.sln
 *.sw?
+
+# Per-machine Claude Code settings: the PATH inside points at one home
+# directory, so it is local. The commands and skills of .claude/ are versioned;
+# this file is not.
+.claude/settings.local.json
