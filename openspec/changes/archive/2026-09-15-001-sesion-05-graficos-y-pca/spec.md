@@ -53,8 +53,7 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
   existentes.
 - **RF-2**: EL SISTEMA dividirá la sesión 5 en cinco bloques rotulados Entrada, Bloque 1,
   Bloque 2, Bloque 3 y Cierre, con las mismas etiquetas que las sesiones 1 a 4.
-- **RF-3**: EL SISTEMA mostrará como título de la sesión 5 «Ver lo que no cabe en la
-  hoja».
+- **RF-3**: EL SISTEMA mostrará como título de la sesión 5 «Entender los datos visualmente».
 - **RF-4**: EL SISTEMA abrirá la sesión 5 con el gancho «Cuatro variables no caben en un
   papel de dos dimensiones; vamos a dibujarlas todas y a perder menos de lo que crees».
 - **RF-5**: EL SISTEMA mostrará como objetivo de la sesión 5 «elegir el gráfico que
@@ -312,9 +311,8 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 ## Casos límite
 
 1. **La corrección hace divergir la sesión 2 del original.** Las sesiones 1 y 2 provienen
-   del curso original y `check_content.py` compara su texto contra él, así que RF-64 hará
-   que reporte una diferencia. Está decidido que se acepta y se anota (RF-66): el script se
-   sigue ejecutando tal cual, y esa es la única diferencia esperada.
+   del curso original, así que RF-64 separa el texto de la sesión 2 del de su fuente. Está
+   decidido que se acepta y se anota junto a la figura (RF-66).
 2. **La dispersión se nombra antes de explicarse.** La entrada apoya la correlación en un
    diagrama de dispersión (RF-15) que el bloque 1 solo desarrolla después. Está decidido
    que la entrada lo presente sin construirlo (RF-16) y que el bloque 1 lo retome; hay que
@@ -386,15 +384,12 @@ solo para los requisitos de legibilidad (proyector) y de ancho (teléfono).
 1. Cada RF verificado abriendo la sesión 5 en el navegador y comprobándolo en pantalla,
    uno por uno.
 2. `pnpm build` compila.
-3. `python3 scripts/check_content.py` ejecutado, y su única diferencia reportada es la de
-   la figura de la sesión 2 (caso límite 1). Si el proyecto original no está al lado, se
-   dice, no se omite en silencio.
-4. Recorrido manual a 390 px de ancho: ninguna figura provoca desplazamiento horizontal.
-5. En cada figura de la sesión 5: «Ampliar» abre el diálogo, Esc lo cierra y el foco
+3. Recorrido manual a 390 px de ancho: ninguna figura provoca desplazamiento horizontal.
+4. En cada figura de la sesión 5: «Ampliar» abre el diálogo, Esc lo cierra y el foco
    vuelve al control que lo abrió.
-6. `grep -rn "localStorage\|document.cookie" src/` sigue vacío (RF-74).
-7. `package.json` sigue con cuatro dependencias.
-8. Las sesiones 2 y 4 ya no prometen lo que la 5 no hace (RF-64 a RF-68).
+5. `grep -rn "localStorage\|document.cookie" src/` sigue vacío (RF-74).
+6. `package.json` sigue con cuatro dependencias.
+7. Las sesiones 2 y 4 ya no prometen lo que la 5 no hace (RF-64 a RF-68).
 
 ## Dudas abiertas
 

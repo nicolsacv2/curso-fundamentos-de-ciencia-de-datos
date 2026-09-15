@@ -24,9 +24,8 @@ export function dataset() {
      arrow up would have this figure promising something no later panel delivers.
 
      This is the one place where the ported text of session 2 no longer matches the
-     original course, so check_content.py will report these words as missing. That
-     difference is expected and it is the only one; anything else it reports is a real
-     regression. See specs/001-sesion-05-graficos-y-pca. */
+     original course, and the difference is deliberate.
+     See specs/001-sesion-05-graficos-y-pca. */
   const D = [
     ['SESIÓN 3','se limpia'],
     ['SESIÓN 4','se describe'],

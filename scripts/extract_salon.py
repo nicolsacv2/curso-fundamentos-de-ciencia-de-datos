@@ -16,7 +16,6 @@ typographic minus in «O−» are the material of the class, not noise to be tid
 away before publishing.
 
 No dependencies: an .xlsx is a zip with XML inside, and the stdlib reads that.
-Same as scripts/check_content.py.
 
     python3 scripts/extract_salon.py [path/to/file.xlsx]
 """

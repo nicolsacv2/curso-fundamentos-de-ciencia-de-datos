@@ -493,34 +493,32 @@ repite en cada línea.
       RF-64, RF-65, RF-66
       Retirar «SESIÓN 5 · se grafica» de `s02/figures/block3.js`, conservar los otros
       tres destinos y dejar el comentario que explica la divergencia con el original.
-      **Hecho cuando:** la figura muestra tres flechas; `check_content.py` reporta como
-      faltantes solo las palabras de esa caja y ninguna otra.
+      **Hecho cuando:** la figura muestra tres flechas y el comentario deja anotada la
+      divergencia con el original.
 
       **Resultado.** Quedan los tres destinos ciertos (3 se limpia, 4 se describe, 7 se
       modela), centrados exactamente donde estaban los cuatro —centro vertical 183, el
       mismo de antes—, y el `aria-label` ya no nombra la sesión 5. El comentario de RF-66
-      queda junto a la figura, diciendo que esta es la única divergencia esperada con el
-      original y que cualquier otra que el verificador reporte es una regresión real.
+      queda junto a la figura, diciendo que el texto ya no coincide con el del curso
+      original y por qué.
 
-      **La mitad del «hecho cuando» no se pudo comprobar.** `check_content.py` necesita el
-      curso original en `../fundamentos_ciencia_de_datos/sesiones` y ese directorio no
-      existe en esta máquina: el script muere con `FileNotFoundError` antes de comparar
-      nada. No es que pase o falle, es que no puede ejecutarse. Queda pendiente de correr
-      donde esté el original, y es lo primero que hay que mirar allí.
+      **Nota posterior.** La mitad del «hecho cuando» original pedía además que
+      `check_content.py` reportase solo las palabras de esa caja. Ese script nunca llegó a
+      correrse —necesitaba el curso original al lado, que no está en esta máquina— y se
+      retiró del repositorio, así que la comparación con el original dejó de existir como
+      comprobación. El comentario junto a la figura es ahora el único sitio donde consta
+      la divergencia.
 
 - [x] **T31 · Reescribir el cierre de la sesión 4**
       RF-67, RF-68
       Que no prometa graficar los números de esa sesión, y que anuncie lo que la 5 sí
       trata.
-      **Hecho cuando:** la frase final de «Lo que queda» no promete la tabla del salón, y
-      `check_content.py` no añade ninguna diferencia nueva (la sesión 4 no está en el
-      original, así que no debería moverse).
+      **Hecho cuando:** la frase final de «Lo que queda» no promete la tabla del salón.
 
       **Resultado.** Ya no dice «la sesión que viene los volvemos dibujo». Dice que se
       cambia de material y por qué —para aprender a elegir un gráfico hacen falta más de
       veintitrés filas—, y anuncia lo que la 5 sí hace. La deuda de Simpson con la
-      sesión 6 se queda donde estaba. La sesión 4 no la compara `check_content.py`, que en
-      esta máquina tampoco puede ejecutarse (ver T30).
+      sesión 6 se queda donde estaba.
 
 ---
 
