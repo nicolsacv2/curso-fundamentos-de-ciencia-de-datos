@@ -6,7 +6,7 @@ import { COMPONENTES } from '../figures/cloud3d.js';
 import Cloud3D from '../views/Cloud3D.jsx';
 import { PCA3, PCA4, PAISES, VARS, ANIO, FUENTE } from '../data/paises.js';
 
-export default function Block2({ id, tabId }) {
+export default function Block2({ id, tabId, block }) {
   const dos = (PCA3.porcentajes[0] + PCA3.porcentajes[1]).toFixed(1);
   const cuatro = PCA4.porcentajes;
   const dosDeCuatro = (cuatro[0] + cuatro[1]).toFixed(1);
@@ -14,10 +14,7 @@ export default function Block2({ id, tabId }) {
   const carga = (i, j) => PCA3.cargas[i][j].toFixed(2).replace('-', '−');
 
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 2 · 83–120</p>
-      <h2>La sombra de la nube</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Task label="El problema" big="La nube vive en tres ejes y la hoja tiene dos. Hay que
         aplanarla, y toda sombra pierde algo. La pregunta es cuánto, y desde qué ángulo se
         pierde menos.">

@@ -3,12 +3,9 @@ import {
 } from '../../../components/content/index.jsx';
 import { dayTrail, ladder, intersection } from '../figures/block1.js';
 
-export default function Block1({ id, tabId }) {
+export default function Block1({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 1</p>
-      <h2>Tu rastro de ayer</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Task label="Muro colectivo · 4 minutos" big="Tres post-its con tres datos que generaste ayer.">
         <p>El mapa que abriste, la canción que sonó, la compra, el torniquete del transporte,
           la señal de tu celular buscando antenas mientras dormías.</p>

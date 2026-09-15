@@ -3,14 +3,11 @@ import { Panel, Diagram, Task, Pair, Prose, List, Idea }
 import { tresDeMas, basura } from '../figures/closing.js';
 import { PAISES, PCA4, ANIO } from '../data/paises.js';
 
-export default function Closing({ id, tabId }) {
+export default function Closing({ id, tabId, block }) {
   const dos = (PCA4.porcentajes[0] + PCA4.porcentajes[1]).toFixed(1);
 
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Cierre · 166–180</p>
-      <h2>Gráficos que estorban</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Prose>
         <p>Los cuatro gráficos que siguen dibujan datos que ya leíste bien hoy: los mismos
           {' '}{PAISES.length} países, los mismos indicadores, el mismo año. <b>Ningún número
@@ -102,13 +99,8 @@ export default function Closing({ id, tabId }) {
           mirar más variables de las que caben en la hoja, y con la costumbre de preguntar
           qué se perdió al dibujar. La correlación de la entrada terminó siendo un ángulo; la
           nube terminó siendo una sombra de la que sabemos el precio exacto: {dos} %.</p>
-        <p>Para la próxima sesión no hay que traer nada. Volvemos a los mismos datos de
-          {' '}{ANIO} con otra pregunta: cuándo dos cosas que se mueven juntas tienen algo que
-          ver de verdad.</p>
       </Prose>
 
-      <Idea>Ningún número de estos cuatro gráficos está mal.{' '}
-        <span className="who">Lo que decide si se entiende es el dibujo, y el dibujo lo eliges tú.</span></Idea>
     </Panel>
   );
 }

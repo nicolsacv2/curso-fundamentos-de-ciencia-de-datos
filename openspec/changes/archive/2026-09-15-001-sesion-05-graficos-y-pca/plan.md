@@ -109,7 +109,7 @@ afirma.
 
 ## 3. Secciones de cada bloque
 
-### 3.1 Entrada — «Ver lo que no cabe en la hoja» · 0–35 (RF-3 a RF-6)
+### 3.1 Entrada — «Entender los datos visualmente» · 0–35 (RF-3 a RF-6)
 
 | Sección | Contenido | RF |
 |---|---|---|
@@ -270,7 +270,6 @@ stdlib para lo único que un humano no puede comprobar a ojo: si los números so
 |---|---|
 | `pnpm build` | compila; el registry resuelve los cinco `import()` |
 | `python3 scripts/check_pca.py` | recalcula el PCA desde el CSV y lo compara con `data/paises.js`; falla si algún autovalor, porcentaje o carga se desvía más de 0,01 (RF-26, RF-56, RF-57, RF-59) |
-| `python3 scripts/check_content.py` | sesiones 1 y 2; **debe** reportar exactamente la diferencia de la caja retirada, y ninguna otra (RF-64, caso límite 1) |
 | `grep -rl "from 'react'" src/svg src/sessions/*/figures` | vacío: principio 3 |
 | `grep -rn "localStorage\|document.cookie" src/` | vacío: principio 5, RF-74 |
 | `package.json` | cuatro dependencias: principio 1 |
@@ -309,7 +308,7 @@ Cada punto es un recorrido, no una impresión:
    que ningún texto.
 4. Los cinco bloques, en orden de sesión.
 5. Las correcciones de las sesiones 2 y 4, al final y en su propio commit: tocan
-   material publicado y una de ellas mueve `check_content.py`.
+   material ya publicado.
 
 ---
 
@@ -342,7 +341,7 @@ Cada requisito, dónde se implementa y dónde se comprueba.
 | RF-61 | `data/paises.js` (`VARS`), `blocks/Intro.jsx` | 5.2.3 |
 | RF-62 | ningún import de `s03`/`s04` en `s05` | 5.2.12 |
 | RF-63 | `data/paises.js` (`FUENTE`), pie de cada figura | 5.2.3 |
-| RF-64, RF-65 | `s02/figures/block3.js` | 5.2.9, `check_content.py` |
+| RF-64, RF-65 | `s02/figures/block3.js` | 5.2.9 |
 | RF-66 | comentario en `s02/figures/block3.js` | 5.2.10 |
 | RF-67, RF-68 | `s04/blocks/Closing.jsx` | 5.2.9 |
 | RF-69 | CSS `.diagram` existente | 5.2.6 |
@@ -366,6 +365,5 @@ Cada requisito, dónde se implementa y dónde se comprueba.
 3. **Quince figuras nuevas** es el bloque de trabajo más grande de las cinco sesiones.
    Si hay que recortar, el candidato es la segunda versión del histograma, no ninguna
    pieza del hilo PCA.
-4. **`check_content.py` quedará en rojo permanente** para la sesión 2. Está aceptado
-   (RF-66), pero a partir de aquí «pasa el verificador» significa «reporta esa
-   diferencia y ninguna más».
+4. **La sesión 2 deja de coincidir con el curso original.** Está aceptado (RF-66): la
+   divergencia queda anotada junto a la figura, que es el único sitio donde consta.

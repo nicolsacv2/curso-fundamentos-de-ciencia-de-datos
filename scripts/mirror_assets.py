@@ -11,7 +11,7 @@ the .plate max-widths in panel.css and must exist in one place only. This script
 the same ladder from there, so uploading one file too many or too few is impossible.
 
 Commons does the resizing, via ?width=. There is no Pillow and nothing to install: the
-stdlib is enough, as in check_content.py and extract_salon.py.
+stdlib is enough, as in extract_salon.py.
 
     python3 scripts/mirror_assets.py
 

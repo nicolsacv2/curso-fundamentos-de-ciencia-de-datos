@@ -3,11 +3,9 @@ import { MERE } from '../data/salon.js';
 import { juegosDeMere } from '../figures/intro.js';
 import DiceActivity from '../activities/DiceActivity.jsx';
 
-export default function Intro({ id, tabId }) {
+export default function Intro({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Entrada · 0–25</p>
-      <h2>La apuesta del caballero</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">París, 1654. Antoine Gombaud, caballero de Méré, vive de apostar. Tiene
         un juego con el que gana desde hace años, inventa una variante que según su cuenta es
         idéntica, y la variante lo empieza a arruinar.</p>

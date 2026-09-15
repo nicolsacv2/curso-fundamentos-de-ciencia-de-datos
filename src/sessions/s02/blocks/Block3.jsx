@@ -1,11 +1,9 @@
 import { Panel, Task, Options, Diagram, Prose, Idea } from '../../../components/content/index.jsx';
 import { dataset } from '../figures/block3.js';
 
-export default function Block3({ id, tabId }) {
+export default function Block3({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 3 · 116–166</p>
-      <h2>Construimos el dataset del salón</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Todo lo que llevamos dicho —tipos, tabla, fuentes, muestra, metadatos,
         preguntas bien formuladas— lo vamos a hacer ahora, sobre nosotros mismos.</p>
 

@@ -1,11 +1,9 @@
 import { Panel, Task, Diagram, Prose, Idea } from '../../../components/content/index.jsx';
 import { scattersPearson, rangosSpearman, simpsonTeaser } from '../figures/block3.js';
 
-export default function Block3({ id, tabId }) {
+export default function Block3({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 3 · 122–166</p>
-      <h2>Cuando una columna mira a otra</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Todo lo de hoy describe una columna a la vez. Las preguntas
         interesantes casi siempre son de a dos: ¿a más pantalla, menos lectura? ¿A más dosis,
         más mejoría? Para eso hay que medir <b>asociación</b>.</p>

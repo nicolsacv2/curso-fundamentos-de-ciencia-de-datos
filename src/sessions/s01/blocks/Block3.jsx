@@ -4,11 +4,9 @@ import {
 } from '../../../components/content/index.jsx';
 import { snowMap, fluTrends } from '../figures/block3.js';
 
-export default function Block3({ id, tabId }) {
+export default function Block3({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 3</p>
-      <h2>Cuatro historias que cambiaron algo</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">En las cuatro pasa lo mismo: hay un momento en que la respuesta obvia
         era la equivocada. Primero votamos, después se revela.</p>
 

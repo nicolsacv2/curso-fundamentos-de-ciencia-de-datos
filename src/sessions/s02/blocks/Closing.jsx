@@ -1,11 +1,8 @@
 import { Panel, Task, Pair, Prose, Idea } from '../../../components/content/index.jsx';
 
-export default function Closing({ id, tabId }) {
+export default function Closing({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Cierre · 166–180</p>
-      <h2>Tu pregunta, y de dónde saldrán sus datos</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Task
         label="Ticket de salida · encuesta · 2 minutos"
         big={<>Nombra una variable de <em>nuestro</em> dataset y di qué la puede ensuciar.</>}

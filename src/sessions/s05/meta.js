@@ -7,14 +7,14 @@
    chained in it — variance, covariance and correlation — before anything is drawn. */
 export default {
   n: 5,
-  title: 'Ver lo que no cabe en la hoja',
+  title: 'Entender los datos visualmente',
   goal: 'Elegir el gráfico que corresponde a cada dato y a cada pregunta, y leer un plano factorial y un círculo de correlaciones para ver a la vez más variables de las que caben en dos ejes.',
   hook: 'Cuatro variables no caben en un papel de dos dimensiones; vamos a dibujarlas todas y a perder menos de lo que crees.',
   blocks: [
-    { id: 'entrada',  lab: 'Entrada',  rname: 'Tres fórmulas encadenadas', clock: '0–35' },
-    { id: 'bloque-1', lab: 'Bloque 1', rname: 'Cinco gráficos',            clock: '35–75' },
-    { id: 'bloque-2', lab: 'Bloque 2', rname: 'La sombra de la nube',      clock: '83–120' },
-    { id: 'bloque-3', lab: 'Bloque 3', rname: 'Mirar las variables',       clock: '128–166' },
-    { id: 'cierre',   lab: 'Cierre',   rname: 'Gráficos que estorban',     clock: '166–180' }
+    { id: 'entrada',  lab: 'Entrada',  rname: 'Varianza, Covarianza y correlación', clock: '0–35' },
+    { id: 'bloque-1', lab: 'Bloque 1', rname: 'Los cinco gráficos más comunes',     clock: '35–75' },
+    { id: 'bloque-2', lab: 'Bloque 2', rname: 'PCA',                                clock: '83–120' },
+    { id: 'bloque-3', lab: 'Bloque 3', rname: 'Círculo de variables',               clock: '128–166' },
+    { id: 'cierre',   lab: 'Cierre',   rname: 'Gráficos que estorban',              clock: '166–180' }
   ]
 };

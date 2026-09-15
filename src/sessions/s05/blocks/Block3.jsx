@@ -4,7 +4,7 @@ import { circuloCorrelaciones, tresAngulos, pasosCirculo }
   from '../figures/block3.js';
 import { PAISES, PCA4, VARS, CORR, CAMPOS, ESTAD, ANIO, FUENTE } from '../data/paises.js';
 
-export default function Block3({ id, tabId }) {
+export default function Block3({ id, tabId, block }) {
   const dos = (PCA4.porcentajes[0] + PCA4.porcentajes[1]).toFixed(1);
   /* One country, before and after, with its real numbers: the abstract version of this
      paragraph is true and persuades nobody. */
@@ -25,10 +25,7 @@ export default function Block3({ id, tabId }) {
   })();
 
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 3 · 128–166</p>
-      <h2>Mirar las variables</h2>
-
+    <Panel id={id} tabId={tabId} block={block}>
       <Diagram fig={pasosCirculo}>
         Centrar, transponer, normalizar. El primero ya venía hecho; lo que se pierde está en
         el paso 4, no en el 3.

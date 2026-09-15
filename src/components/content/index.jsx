@@ -53,10 +53,23 @@ const svgLabel = m => (/aria-label="([^"]*)"/.exec(m) || [])[1] || 'Figura';
 
 /* ── Panel: one <section> per block ──────────────────────────
    The original kept all five panels in the DOM and hid four with `hidden`.
-   Here only the active one mounts, so there is no hidden attribute to manage. */
-export function Panel({ id, tabId, children }) {
+   Here only the active one mounts, so there is no hidden attribute to manage.
+
+   `block` is the block's entry in meta.blocks, and the eyebrow and the title are
+   drawn from it: the rail tab and the heading read the same strings, so they cannot
+   drift apart the way the hand-written copies did. The fragment matters — .panel is
+   a flex column with a 44px gap, so the two elements have to stay direct children
+   for the spacing to hold. It stays optional so a panel can still mount without
+   metadata. */
+export function Panel({ id, tabId, block, children }) {
   return (
     <section className="panel" role="tabpanel" id={id} aria-labelledby={tabId} tabIndex={0}>
+      {block && (
+        <>
+          <p className="eyebrow">{block.lab} · {block.clock}</p>
+          <h2>{block.rname}</h2>
+        </>
+      )}
       {children}
     </section>
   );
@@ -154,7 +167,8 @@ export function Source({ children }) {
 
    The URL is derived from the manifest rather than typed into the credit, so it cannot
    drift from the file the <Plate> above is actually loading. The words stay written at
-   the call site on purpose: they are course content, and check_content.py counts them.
+   the call site on purpose: they are course content, not chrome, and they belong with
+   the rest of the visible text.
 
    It opens in a new tab because these pages are read during a projected class, and
    navigating the slides away to Wikimedia mid-session is not recoverable in one step. */

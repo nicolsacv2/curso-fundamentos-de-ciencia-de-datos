@@ -9,15 +9,6 @@ viven en el repositorio.
 
 ## Cómo se renderiza por pasos
 
-El material original era un solo HTML de 1,93 MB con los diez paneles en el DOM y las
-diez imágenes incrustadas como `data:` URI. Aquí cada pieza llega cuando hace falta:
-
-| Acción | Qué se descarga | Paneles montados |
-|---|---|---|
-| Abrir el índice | solo el bundle base — ninguna sesión, ninguna imagen | 0 |
-| Entrar a una sesión | solo el bloque de entrada de esa sesión | 1 |
-| Cambiar de pestaña | solo el chunk de ese bloque (5–17 kB) | 1 |
-
 Tres mecanismos, en `src/sessions/registry.js` y `src/components/Session.jsx`:
 
 - un `import()` por bloque, así que Vite emite un chunk independiente para cada uno;
@@ -185,15 +176,7 @@ Las rutas públicas conservan los slugs originales: `#indice`, `#s1/entrada`,
 
 ## Verificación
 
-`scripts/check_content.py` compara palabra por palabra el texto visible del curso
-original (`panels.html` + `figuras.js`) con el de los componentes React, para
-comprobar que la traducción a JSX no perdió ni cambió nada. Necesita tener al lado
-el proyecto original:
-
-```sh
-python3 -m venv .venv
-.venv/bin/python scripts/check_content.py
-```
+`pnpm build` es la única comprobación automática del repositorio.
 
 Para las imágenes y las figuras, lo que hay que mirar en el navegador:
 

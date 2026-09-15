@@ -4,11 +4,9 @@ import {
 } from '../../../components/content/index.jsx';
 import { population, digest, metadata } from '../figures/block2.js';
 
-export default function Block2({ id, tabId }) {
+export default function Block2({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 2 · 70–108</p>
-      <h2>Los datos no se encuentran: se fabrican</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Nadie tropieza con una tabla en el bosque. Detrás de cada una hay alguien
         que decidió qué medir, a quién preguntarle y qué dejar por fuera.</p>
 

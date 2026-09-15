@@ -4,11 +4,9 @@ import {
 import { COLS, ROWS } from '../data/salon.js';
 import { versiones } from '../figures/block3.js';
 
-export default function Block3({ id, tabId }) {
+export default function Block3({ id, tabId, block }) {
   return (
-    <Panel id={id} tabId={tabId}>
-      <p className="eyebrow">Bloque 3 · 116–166</p>
-      <h2>Limpiamos nuestra tabla</h2>
+    <Panel id={id} tabId={tabId} block={block}>
       <p className="lead">Cinco columnas, cinco decisiones. En cada una hacemos lo mismo:{' '}
         <b>nombrar</b> el defecto con el catálogo, <b>votar</b> una opción por chat con su letra,
         y <b>dictar</b> la fila de bitácora que queda escrita.</p>
