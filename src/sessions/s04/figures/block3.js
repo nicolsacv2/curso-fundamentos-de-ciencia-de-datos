@@ -174,6 +174,8 @@ export function simpsonTeaser() {
   return svg(W, H,
     'Reacción a un medicamento: dentro de los jóvenes la mejoría sube con la dosis, ' +
     'dentro de los mayores también, y con los dos grupos revueltos la tendencia global ' +
-    'baja. La paradoja de Simpson, que la sesión 6 resuelve',
+    /* «que la sesión 6 resuelve» was here too, where a sweep of the panels does not
+       reach: session 6 turned out to be MCA and FAMD. */
+    'baja. La paradoja de Simpson',
     b);
 }

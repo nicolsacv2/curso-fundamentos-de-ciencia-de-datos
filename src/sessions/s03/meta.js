@@ -1,5 +1,6 @@
 /* Session 3. Unlike the two before it, this one does not come from an original
-   panels.html: it was written here, on the 23 answers session 2 produced. */
+   panels.html: it was written here, on the answers session 2 produced (23 when it was written; the form
+   kept taking them and src/data/salon.js now publishes 27). */
 export default {
   n: 3,
   title: 'Datos sucios: el trabajo invisible',

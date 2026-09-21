@@ -117,7 +117,13 @@ figcaption a:hover,figcaption a:focus-visible{
   position:sticky;top:0;z-index:2;background:var(--ground-2);vertical-align:bottom;
   border-bottom-color:var(--line)
 }
-.dtable thead .l{display:block;color:var(--ask);font-size:11px;letter-spacing:.16em}
+.dtable thead .l{
+  /* A variable name, not a spreadsheet letter: monospace so it reads as the
+     identifier it is, and no wide tracking, which was there to space out one
+     capital and turns a word into a ribbon. */
+  display:block;color:var(--ask);font-size:11px;
+  font-family:Menlo,Consolas,ui-monospace,monospace;letter-spacing:0
+}
 .dtable thead .h{display:block;color:var(--ink-3);font-size:11.5px;margin-top:3px}
 .dtable .n{
   position:sticky;left:0;z-index:1;background:var(--ground-2);
@@ -131,6 +137,16 @@ figcaption a:hover,figcaption a:focus-visible{
 /* Reveal: everything dims except what is being pointed at. */
 .dtable.focus td:not(.mk){opacity:.3}
 .dtable td.w{white-space:normal;max-width:32ch}
+/* A column the cleaning chain left out. It stays in the table on purpose — what got
+   dropped has to remain visible — so it is dimmed rather than removed, and its header
+   says in one word where it ended up. */
+.dtable thead th.out .l,.dtable thead th.out .h{opacity:.45}
+.dtable thead th.out .f{
+  display:block;margin-top:4px;font-size:10px;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--ink-3)
+}
+.dtable td.out{opacity:.45;background:rgba(109,128,150,.06)}
+.dtable td.out.mk{opacity:1}
 
 .pair{
   display:grid;gap:26px;grid-template-columns:1fr;align-items:start
@@ -396,3 +412,19 @@ figure:hover > .zoom{opacity:1}
    reader inside a figure halfway down a long panel. */
 .rotor{touch-action:pan-y;cursor:grab;-webkit-user-select:none;user-select:none}
 .rotor:active{cursor:grabbing}
+
+/* ── Pendiente: a block that is mounted but not written ──
+   Session 6 ships with MCA, FAMD and segmentation labelled and empty. The notice
+   has to be unmistakably NOT course material — nobody should project it thinking
+   it is a slide — so it takes none of the panel's vocabulary: no accent rule like
+   .task, no weight like .idea. Dashed, muted, centred, and it says so in words. */
+.pendiente{
+  border:1px dashed var(--line);border-radius:6px;
+  padding:56px 32px;text-align:center;color:var(--ink-3)
+}
+.pendiente .rotulo{
+  display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:14px
+}
+.pendiente p{margin:0 auto;max-width:46ch;font-size:15px;line-height:1.6}
+.pendiente p + p{margin-top:12px}

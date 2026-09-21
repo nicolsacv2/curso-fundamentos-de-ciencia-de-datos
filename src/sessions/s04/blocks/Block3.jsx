@@ -44,11 +44,14 @@ export default function Block3({ id, tabId, block }) {
       </Diagram>
 
       <Prose>
-        <p>Esto se llama la <b>paradoja de Simpson</b> y hoy no la vamos a resolver: se resuelve
-          en la sesión 6, cuando hablemos de causalidad y de cómo se decide quién recibe qué
-          dosis. Hoy basta con llevarse la incomodidad: una asociación puede ser correcta en cada
-          grupo y decir lo contrario en el total, así que <b>«¿asociado con qué, dentro de
-          qué?»</b> es parte de la pregunta, no un detalle.</p>
+        {/* This used to say the paradox gets resolved in session 6, «cuando hablemos de
+            causalidad». Session 6 turned out to be MCA and FAMD, so the promise is gone
+            and the paradox stays planted: it is the discomfort that matters here, not the
+            appointment. See the change sesion-06-mca-y-famd. */}
+        <p>Esto se llama la <b>paradoja de Simpson</b> y hoy no la vamos a resolver. Hoy basta
+          con llevarse la incomodidad: una asociación puede ser correcta en cada grupo y decir
+          lo contrario en el total, así que <b>«¿asociado con qué, dentro de qué?»</b> es parte
+          de la pregunta, no un detalle.</p>
       </Prose>
 
       <Idea>r no mide si hay relación.{' '}

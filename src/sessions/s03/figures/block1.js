@@ -1,4 +1,5 @@
 import { C, SERIF, svg, txt, wrap } from '../../../svg/kit.js';
+import { RECUENTOS } from '../../../data/salon.js';
 import { box, cell } from './shared.js';
 
 /* ═══════════ B1 · the three flavours of a missing value ═══════════
@@ -13,7 +14,7 @@ export function faltantes() {
 
   const casos = [
     ['NO EXISTE', 'La placa del auto de quien no tiene auto. La celda no está incompleta: está bien vacía, y llenarla sería inventar.', C.ink3],
-    ['NO SE PUDO MEDIR', 'Las siete vacías de la columna E. La pregunta mandaba a mirar el reporte del celular, y no todo el mundo fue a mirar.', C.ask],
+    ['NO SE PUDO MEDIR', `Las ${RECUENTOS.pantallaVacias} vacías de «pantalla». La pregunta mandaba a mirar el reporte del celular, y no todo el mundo fue a mirar.`, C.ask],
     ['NO QUISO RESPONDER', 'La sesión 2 dijo «si una pregunta te incomoda, déjala en blanco». Quien la dejó no es una persona al azar.', C.reveal]
   ];
 

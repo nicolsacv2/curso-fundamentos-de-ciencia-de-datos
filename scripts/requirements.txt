@@ -1,0 +1,18 @@
+# The only Python dependency the course has, and the only script that needs it is
+# scripts/clean_salon.py — session 6's cleaning chain, which imputes with
+# RandomSampleImputer.
+#
+# It never reaches the deploy. Hostinger builds the site with `pnpm build`, which
+# touches no Python; this lives in .venv/, which is gitignored. The four npm
+# dependencies are still four.
+#
+# The other three scripts (extract_salon.py, extract_gapminder.py, check_pca.py) and
+# the verifier (check_salon.py) are stdlib only, on purpose: regenerating the raw
+# table or auditing the published numbers must not require installing anything.
+#
+#     python3 -m venv .venv
+#     .venv/bin/pip install -r scripts/requirements.txt
+#
+# Pinned exactly: a minor bump in the imputer's sampling would silently change the
+# numbers projected in class, which is the one thing seeding it was meant to prevent.
+feature-engine==1.9.4

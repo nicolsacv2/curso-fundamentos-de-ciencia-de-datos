@@ -1,7 +1,7 @@
 import {
   Panel, Task, Options, Diagram, DataTable, Prose, Nots, Idea
 } from '../../../components/content/index.jsx';
-import { COLS, ROWS } from '../data/salon.js';
+import { COLS, ROWS, RECUENTOS } from '../../../data/salon.js';
 import { versiones } from '../figures/block3.js';
 
 export default function Block3({ id, tabId, block }) {
@@ -20,12 +20,14 @@ export default function Block3({ id, tabId, block }) {
       <DataTable
         cols={COLS}
         rows={ROWS}
-        pick={['A', 'B', 'C']}
-        mark={['C3', 'C4', 'C5', 'C7', 'C9', 'C10', 'C11', 'C12', 'C13', 'C18', 'C19', 'C21', 'C22']}
-        caption={<>Las trece filas de Bogotá, señaladas. Y al lado, la columna B, donde siete de
-          ellas dicen «Cundinamarca».</>}
+        pick={['codigo', 'depto', 'municipio']}
+        /* Which rows these are is the dataset's business, not this panel's: the form
+           kept taking answers and the set grew from thirteen to sixteen. */
+        mark={RECUENTOS.filasBogota.map(n => 'municipio:' + n)}
+        caption={<>Las {RECUENTOS.bogota} filas de Bogotá, señaladas. Y al lado, <b>depto</b>,
+          donde {RECUENTOS.bogotaEnCundinamarca} de ellas dicen «Cundinamarca».</>}
       />
-      <Task label="Votación por chat" big="¿Qué hacemos con la columna C?">
+      <Task label="Votación por chat" big="¿Qué hacemos con municipio?">
         <Options>
           <li>Unificar todo a «Bogotá D.C.» encima de la columna original.</li>
           <li>Dejarla como está: cada quien escribió lo que quiso decir.</li>
@@ -42,13 +44,14 @@ export default function Block3({ id, tabId, block }) {
       <DataTable
         cols={COLS}
         rows={ROWS}
-        pick={['A', 'F']}
-        mark={['F2', 'F3', 'F5', 'F8', 'F13', 'F14', 'F20', 'F16']}
-        caption={<>Los siete que casi seguro contestaron en horas, y el 960 que son dieciséis.</>}
+        pick={['codigo', 'minutos']}
+        mark={[...RECUENTOS.minutosEnHoras, ...RECUENTOS.minutosAtipico].map(n => 'minutos:' + n)}
+        caption={<>Los {RECUENTOS.minutosEnHoras.length} que casi seguro contestaron en horas, y
+          el 960 que son dieciséis.</>}
       />
-      <Task label="Votación por chat" big="¿Qué hacemos con la columna F?">
+      <Task label="Votación por chat" big="¿Qué hacemos con minutos?">
         <Options>
-          <li>Borrar los siete valores de 16 o menos: no sabemos qué son.</li>
+          <li>Borrar los {RECUENTOS.minutosEnHoras.length} valores de 16 o menos: no sabemos qué son.</li>
           <li>Multiplicarlos por 60, asumiendo que están en horas.</li>
           <li>Dejar la columna fuera del análisis y decirlo.</li>
         </Options>
@@ -66,15 +69,16 @@ export default function Block3({ id, tabId, block }) {
       <DataTable
         cols={COLS}
         rows={ROWS}
-        pick={['A', 'E']}
-        mark={['E1', 'E3', 'E5', 'E8', 'E9', 'E12', 'E19', 'E22']}
-        caption={<>Un imposible y siete huecos. Recuerda cómo estaba escrita la pregunta:
+        pick={['codigo', 'pantalla']}
+        mark={[...RECUENTOS.pantallaImposibles, ...RECUENTOS.pantallaFilasVacias].map(n => 'pantalla:' + n)}
+        caption={<>Un imposible y {RECUENTOS.pantallaVacias} huecos. Recuerda cómo estaba escrita
+          la pregunta:
           «según el reporte de tiempo de pantalla de tu celular».</>}
       />
-      <Task label="Votación por chat" big="¿Qué hacemos con la columna E?">
+      <Task label="Votación por chat" big="¿Qué hacemos con pantalla?">
         <Options>
-          <li>Borrar el 30 y rellenar las siete vacías con el promedio de las demás.</li>
-          <li>Borrar el 30 y dejar las siete vacías como vacías.</li>
+          <li>Borrar el 30 y rellenar las {RECUENTOS.pantallaVacias} vacías con el promedio de las demás.</li>
+          <li>Borrar el 30 y dejar las {RECUENTOS.pantallaVacias} vacías como vacías.</li>
           <li>Cambiar el 30 por 30 ÷ 7, asumiendo que respondió el total de la semana.</li>
         </Options>
       </Task>
@@ -83,7 +87,7 @@ export default function Block3({ id, tabId, block }) {
           afirma que <b>quien no fue a mirar su celular se parece a quien sí fue</b>, y no hay
           ninguna razón para creerlo: es más probable que quien no lo revisa sea justamente quien
           menos lo usa, o quien no quiere saber.</p>
-        <p>Siete de 23 es casi un tercio de la clase. Cuando el faltante es tan grande y tiene una
+        <p>{RECUENTOS.pantallaVacias} de {RECUENTOS.filas} es casi un tercio de la clase. Cuando el faltante es tan grande y tiene una
           causa nombrable, imputar no es limpiar: es <b>fabricar el resultado que esperabas.</b></p>
       </Prose>
 
@@ -91,12 +95,12 @@ export default function Block3({ id, tabId, block }) {
       <DataTable
         cols={COLS}
         rows={ROWS}
-        pick={['A', 'G', 'H']}
-        mark={['G1', 'H1', 'G16', 'H16', 'G7', 'H7']}
+        pick={['codigo', 'porciones', 'balanceada']}
+        mark={['porciones:1', 'balanceada:1', 'porciones:16', 'balanceada:16', 'porciones:7', 'balanceada:7']}
         caption={<>Tres filas para comparar. La 7 comió cero porciones y se pone 2; la 16 comió
           cero y se pone 5; la 1 comió tres y se pone 1.</>}
       />
-      <Task label="Votación por chat" big="¿Qué hacemos con la columna H?">
+      <Task label="Votación por chat" big="¿Qué hacemos con balanceada?">
         <Options>
           <li>Promediarla: da un número y todo el mundo lo entiende.</li>
           <li>Descartarla y quedarnos solo con G, que sí se contó.</li>
@@ -115,13 +119,13 @@ export default function Block3({ id, tabId, block }) {
       <DataTable
         cols={COLS}
         rows={ROWS}
-        pick={['A', 'D']}
-        wrap={['D']}
-        mark={['D2', 'D3', 'D12']}
+        pick={['codigo', 'area']}
+        wrap={['area']}
+        mark={['area:2', 'area:3', 'area:12']}
         caption={<>La fila 2 tiene dos respuestas y tres comas. La 12 trae una categoría que
           nadie ofreció. La 3 está vacía.</>}
       />
-      <Task label="Votación por chat" big="¿Qué hacemos con la columna D?">
+      <Task label="Votación por chat" big="¿Qué hacemos con área?">
         <Options>
           <li>Partir cada celda por las comas y contar las piezas.</li>
           <li>Contar los valores exactos distintos, tal como están.</li>
@@ -135,7 +139,7 @@ export default function Block3({ id, tabId, block }) {
       <Nots items={[
         'Partir por comas rompe «Economía, administración y contaduría» en tres áreas que no existen',
         'Contar valores exactos inventa ocho grupos, y dos de ellos son de una sola persona',
-        'A mano se puede con 23 filas — el mismo formulario a escala nacional trae 23.000'
+        `A mano se puede con ${RECUENTOS.filas} filas — el mismo formulario a escala nacional trae 23.000`
       ]} />
       <Prose>
         <p>El defecto no está en las respuestas. Está en la pregunta: se ofrecieron categorías que

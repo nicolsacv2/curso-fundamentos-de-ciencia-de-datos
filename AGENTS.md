@@ -12,6 +12,12 @@ automática una vez se actualiza la rama `master`.
   ya compilado: `pnpm preview` (:4173)
 - No hay linter ni runner de tests configurado: `pnpm build` es la única comprobación
   automática que existe en el repositorio.
+- El CLI de **openspec** está instalado global con pnpm, no como dependencia del
+  proyecto: no aparece en `package.json` y el builder de Hostinger no lo ve. Vive en
+  `~/Library/pnpm/bin/openspec`, que no siempre está en el `PATH` de una shell no
+  interactiva, así que si `openspec` no se encuentra:
+  `export PATH="$(pnpm bin -g 2>/dev/null || echo "$HOME/Library/pnpm/bin"):$PATH"`.
+  Ojo: `npx openspec` **no** sirve — el paquete `openspec` de npm no trae binario.
 - Despliegue: no hay comando. Hostinger compila en cada push a `master`, así que
   **mergear a `master` es desplegar a producción**, sin paso intermedio (ver `DEPLOY.md`)
 
@@ -22,6 +28,11 @@ automática una vez se actualiza la rama `master`.
 - Scripts de apoyo: Python 3 y `sh`, **solo stdlib, sin dependencias**. Cada uno abre
   con un docstring que dice qué hace y cómo se invoca; los `.sh`, con `#!/bin/sh` y
   `set -eu`.
+  La única excepción es `scripts/clean_salon.py`, que usa `feature-engine`
+  (`scripts/requirements.txt`) porque la sesión 6 imputa con `RandomSampleImputer`. Vive
+  en `.venv/`, que está en `.gitignore`, y **no afecta al despliegue**: Hostinger compila
+  con `pnpm build`, que no toca Python. Generar la tabla cruda y verificar las cifras
+  publicadas siguen sin requerir instalar nada.
 - Sangría de 2 espacios, comillas simples, punto y coma. Comentarios en bloque
   `/* … */`, también los de una sola línea.
 - Identificadores, nombres de archivo, comentarios y docstrings en inglés; el contenido
@@ -50,8 +61,9 @@ automática una vez se actualiza la rama `master`.
   desde la raíz del dominio que desde un subdirectorio.
 - Nunca ejecutes el spec sin autorización explícita. Para ejecutar el spec es necesario declarar
   de forma explícita el comando /opsx:apply.
+- Cada spec ejecutada debe poder ser desplegada en local.
 
-## Al terminar de ejcutar cualquier spec
+## Al terminar de ejecutar cualquier spec
 - Ejecuta `pnpm build` y confirma en tu respuesta que compila. Aquí no hay `make test`
   ni `make lint`: no inventes comandos que este repositorio no tiene.
 - Si tocaste figuras o CSS, comprueba a 390 px de ancho: ninguna figura debe provocar

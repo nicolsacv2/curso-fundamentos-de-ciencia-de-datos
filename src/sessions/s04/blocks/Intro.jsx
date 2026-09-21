@@ -1,5 +1,5 @@
 import { Panel, Task, Options, Diagram, Prose, Idea } from '../../../components/content/index.jsx';
-import { MERE } from '../data/salon.js';
+import { MERE } from '../data/mere.js';
 import { juegosDeMere } from '../figures/intro.js';
 import DiceActivity from '../activities/DiceActivity.jsx';
 

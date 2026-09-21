@@ -7,7 +7,7 @@ import { C } from '../../../svg/kit.js';
 export function box(x, y, w, h, col, o) {
   o = o || {};
   let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${o.fill || C.ground2}"
-    stroke="${o.stroke || C.line}" stroke-width="${o.sw || 1}"/>`;
+    stroke="${o.stroke || C.line}" stroke-width="${o.sw || 1}"${o.dash ? ` stroke-dasharray="${o.dash}"` : ''}/>`;
   if (col) s += `<rect x="${x}" y="${y}" width="3" height="${h}" fill="${col}"/>`;
   return s;
 }

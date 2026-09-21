@@ -1,4 +1,4 @@
-import { SYLLABUS, pad2 } from '../data/syllabus.js';
+import { SESIONES, PENDIENTES, pad2 } from '../data/syllabus.js';
 import { METAS } from '../sessions/registry.js';
 
 /* The course index. It renders on its own and downloads no session: only the
@@ -20,8 +20,11 @@ export default function Cover({ onOpen }) {
       </header>
 
       <div className="index">
-        {SYLLABUS.map(([n, title, goal]) => {
+        {Array.from({ length: SESIONES }, (_, i) => i + 1).map(n => {
+          /* A built session speaks for itself; an unbuilt one is announced by the
+             syllabus. Nothing declares a title twice, so nothing can disagree. */
           const m = METAS.find(s => s.n === n);
+          const [title, goal] = PENDIENTES[n] || [];
           const t = m ? m.title : title;
           const o = m ? m.goal : goal;
 

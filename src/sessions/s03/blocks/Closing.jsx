@@ -1,5 +1,5 @@
 import { Panel, Task, Pair, Prose, Idea } from '../../../components/content/index.jsx';
-import { MEDIAS } from '../data/salon.js';
+import { MEDIAS, RECUENTOS } from '../../../data/salon.js';
 
 export default function Closing({ id, tabId, block }) {
   return (
@@ -19,9 +19,9 @@ export default function Closing({ id, tabId, block }) {
           <ul className="list" style={{ marginTop: '16px' }}>
             <li>Unificamos los seis «Bogotá» — si no, la ciudad de más de la mitad del salón se
               habría partido en seis grupos de una a cinco personas.</li>
-            <li>Dejamos la columna F fuera — si hubiéramos multiplicado los valores pequeños por
+            <li>Dejamos <b>minutos</b> fuera — si hubiéramos multiplicado los valores pequeños por
               60, el promedio habría pasado de {MEDIAS.sinAtipico} a {MEDIAS.horasAMinutos} minutos.</li>
-            <li>No rellenamos las siete vacías de E — si lo hubiéramos hecho, habríamos afirmado
+            <li>No rellenamos las {RECUENTOS.pantallaVacias} vacías de <b>pantalla</b> — si lo hubiéramos hecho, habríamos afirmado
               que quien no revisa su celular lo usa como quien sí.</li>
             <li>No borramos la fila 16 — si la borramos, Boyacá y Derecho desaparecen del salón.</li>
           </ul>
