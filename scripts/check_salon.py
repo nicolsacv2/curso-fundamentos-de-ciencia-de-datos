@@ -6,7 +6,7 @@ a wall, and nobody in the room can audit them by looking. This does it, and does
 it WITHOUT feature-engine: the point of a verifier that needs the same library as
 the thing it verifies is hard to state.
 
-Four independent checks:
+Five independent checks:
 
   1. Re-reads the .xlsx and recomputes everything src/data/salon.js publishes,
      comparing value by value. Catches a hand-edited file and a file left behind
@@ -24,6 +24,15 @@ Four independent checks:
      eigenvectors, loadings = v·√λ, percentages adding to a hundred — the way
      check_pca.py does for session 5. Catches an error in the algebra itself,
      which (1) cannot, because it would repeat it.
+
+  5. Checks the FAMD of the whole clean table the same way, in both of its
+     set-ups, from LIMPIA and the published scores alone: the eigenvalues add up
+     to p_num + Σ(1 − p_j); r² and η² recomputed from the table match the
+     published ones and add up to λ_k on every axis; the scores have variance λ_k
+     and are uncorrelated; every published barycentre — active, supplementary or
+     an invented-cell marker — is the mean of its people; and the contributions
+     of every axis add up to a hundred. Nothing is recomputed with numpy: the
+     analysis is not repeated, its identities are checked.
 
 No dependencies, no network: it reads the .xlsx and two files off the disk. Exits
 1 on the first difference so it can sit in front of a commit.
@@ -375,6 +384,207 @@ def comprobar_pca(texto):
             bien('la varianza de los puntos en cada eje es su autovalor')
 
 
+# The FAMD publishes its scores to three decimals and the rest to four, and every
+# check below recomputes from those. A score off by half a thousandth moves a
+# variance by about twice that times the score, so the slack is a few thousandths —
+# still an order of magnitude under the smallest edit a hand makes, which is one
+# digit.
+TOL_F = 6e-3        # variances and covariances rebuilt from rounded scores
+TOL_G = 1.5e-3      # a barycentre: mean of rounded scores against a rounded value
+TOL_R = 2e-3        # r² and η² rebuilt from rounded scores
+TOL_CTR = 0.03      # a contribution in percent, rebuilt from rounded scores
+
+
+def comprobar_famd(texto):
+    """5 · el FAMD de la tabla entera, contra sus propias identidades."""
+    print('\n5 · el FAMD de la tabla entera, contra su propia álgebra')
+    famd = exportado(texto, 'FAMD')
+    limpia = exportado(texto, 'LIMPIA')
+    orden = exportado(texto, 'ORDEN_COLS')
+    destino = exportado(texto, 'DESTINO')
+    marcas = exportado(texto, 'MARCAS')
+    analizadas = exportado(texto, 'ANALIZADAS')
+    no_num = exportado(texto, 'NO_NUMERICAS')
+    n = famd['n']
+    col = {c: [f[i] for f in limpia] for i, c in enumerate(orden)}
+
+    if n != len(limpia):
+        mal(f'el FAMD dice {n} personas y la tabla limpia tiene {len(limpia)}')
+    if famd['numericas'] != analizadas:
+        mal('las cuantitativas del FAMD no son las columnas analizadas')
+    elif famd['categoricas'] != [c for c in no_num if destino[c] == 'limpia']:
+        mal('las cualitativas del FAMD no son las no numéricas que llegaron limpias')
+    else:
+        bien(f'entran {len(analizadas)} cuantitativas y {len(famd["categoricas"])} '
+             f'cualitativas: exactamente las columnas con destino «limpia»')
+
+    media = lambda xs: sum(xs) / len(xs)
+
+    for nombre in ('activo', 'sinRaras'):
+        m = famd[nombre]
+        F = m['puntuaciones']
+        K = m['ejes']
+        lam = m['autovalores']
+        sup = {(s['variable'], s['nivel']) for s in m['suplementarias'].get('categorias', [])}
+        activas = [(c, v) for c in famd['categoricas'] for v in sorted(set(col[c]))
+                   if (c, v) not in sup]
+        p_de = {(c, v): col[c].count(v) / n for c, v in activas}
+        print(f'  · montaje «{nombre}»: {K} ejes, {len(activas)} categorías activas'
+              + (f', {len(sup)} suplementarias' if sup else ''))
+
+        if len(F) != n or any(len(f) != K for f in F):
+            mal(f'{nombre}: las puntuaciones no son {n} × {K}')
+            continue
+        Fk = lambda k: [f[k] for f in F]
+
+        # 1 · Σλ = p_num + Σ(1 − p_j), the general formula, over the ACTIVE categories
+        inercia = len(analizadas) + sum(1 - p for p in p_de.values())
+        if m['categoriasActivas'] != len(activas):
+            mal(f'{nombre}: publica {m["categoriasActivas"]} categorías activas, hay {len(activas)}')
+        elif not casi(sum(lam), inercia, TOL * K) or not casi(m['inercia']['total'], inercia, TOL):
+            mal(f'{nombre}: Σλ = {sum(lam):.4f}, la inercia de la tabla es {inercia:.4f}')
+        else:
+            bien(f'Σλ = {inercia:.4f} = {len(analizadas)} + Σ(1 − p_j) sobre las categorías activas')
+
+        # 2 · r² and η² from LIMPIA and the scores, and Σr² + Ση² = λ_k
+        roto = False
+        for c in analizadas:
+            x = [float(v) for v in col[c]]
+            mx = media(x)
+            sx = (sum((v - mx) ** 2 for v in x) / n) ** 0.5
+            for k in range(K):
+                f = Fk(k)
+                cov = sum(a * (b - mx) for a, b in zip(f, x)) / n
+                r2 = (cov / (sx * lam[k] ** 0.5)) ** 2
+                if not casi(m['r2'][c][k], r2, TOL_R):
+                    mal(f'{nombre}: r²({c}, eje {k + 1}) publica {m["r2"][c][k]}, sale {r2:.4f}')
+                    roto = True
+                    break
+            if roto:
+                break
+        else:
+            bien(f'los r² de las {len(analizadas)} cuantitativas salen de la tabla y las puntuaciones')
+        roto = False
+        for c in famd['categoricas']:
+            for k in range(K):
+                f = Fk(k)
+                eta2 = sum(p_de[(cc, v)] * media([f[i] for i, w in enumerate(col[cc]) if w == v]) ** 2
+                           for cc, v in activas if cc == c) / lam[k]
+                if not casi(m['eta2'][c][k], eta2, TOL_R):
+                    mal(f'{nombre}: η²({c}, eje {k + 1}) publica {m["eta2"][c][k]}, sale {eta2:.4f}')
+                    roto = True
+                    break
+            if roto:
+                break
+        else:
+            bien(f'los η² de las {len(famd["categoricas"])} cualitativas salen de sus baricentros')
+        for k in range(K):
+            suma = sum(m['r2'][c][k] for c in analizadas) + sum(m['eta2'][c][k] for c in famd['categoricas'])
+            if not casi(suma, lam[k], TOL * (len(analizadas) + len(famd['categoricas']))):
+                mal(f'{nombre}: Σr² + Ση² = {suma:.4f} en el eje {k + 1}, y λ = {lam[k]}')
+                break
+        else:
+            bien('Σr² + Ση² = λ_k en cada uno de los ejes')
+
+        # 3 · var(F_k) = λ_k, cov(F_k, F_l) = 0
+        for k in range(K):
+            f = Fk(k)
+            if not casi(media(f), 0, TOL_G):
+                mal(f'{nombre}: las puntuaciones del eje {k + 1} no están centradas')
+                break
+            if not casi(sum(v * v for v in f) / n, lam[k], TOL_F):
+                mal(f'{nombre}: var(F_{k + 1}) = {sum(v * v for v in f) / n:.4f} y λ = {lam[k]}')
+                break
+            for l in range(k + 1, K):
+                g = Fk(l)
+                if not casi(sum(a * b for a, b in zip(f, g)) / n, 0, TOL_F):
+                    mal(f'{nombre}: los ejes {k + 1} y {l + 1} no son ortogonales')
+                    break
+            else:
+                continue
+            break
+        else:
+            bien('la varianza de las puntuaciones en cada eje es su autovalor, y los ejes son ortogonales')
+
+        # 4 · every published barycentre is the mean of its people
+        def bari(filas):
+            return [media([F[i][k] for i in filas]) for k in range(2)]
+        roto = False
+        for cat in m['categorias']:
+            filas = [i for i, w in enumerate(col[cat['variable']]) if w == cat['nivel']]
+            if cat['n'] != len(filas) or (cat['variable'], cat['nivel']) in sup:
+                mal(f'{nombre}: {cat["variable"]}={cat["nivel"]} dice n={cat["n"]} y hay {len(filas)}')
+                roto = True
+                break
+            g = bari(filas)
+            if any(not casi(cat['coord'][k], g[k], TOL_G) for k in range(2)):
+                mal(f'{nombre}: el baricentro de {cat["variable"]}={cat["nivel"]} no es la media '
+                    f'de sus {len(filas)} personas')
+                roto = True
+                break
+        if not roto:
+            bien(f'los {len(m["categorias"])} baricentros activos son la media de sus personas')
+        for s in m['suplementarias'].get('categorias', []):
+            filas = [i for i, w in enumerate(col[s['variable']]) if w == s['nivel']]
+            if len(filas) != 1 or s['fila'] != filas[0] + 1:
+                mal(f'{nombre}: la suplementaria {s["variable"]}={s["nivel"]} no es de una persona')
+                break
+            if any(not casi(s['coord'][k], F[filas[0]][k], TOL_G) for k in range(2)):
+                mal(f'{nombre}: la suplementaria {s["variable"]}={s["nivel"]} no está donde su persona')
+                break
+        else:
+            if sup:
+                bien(f'las {len(sup)} suplementarias están donde su única persona: '
+                     + ', '.join(f'{c}={v}' for c, v in sorted(sup)))
+        for c, s in m['suplementarias'].get('marcas', {}).items():
+            filas = [f - 1 for f in marcas[c]['filas']]
+            if s['n'] != marcas[c]['total'] or s['filas'] != marcas[c]['filas']:
+                mal(f'{nombre}: la marca de {c} no señala las celdas inventadas de MARCAS')
+                break
+            g = bari(filas)
+            if any(not casi(s['coord'][k], g[k], TOL_G) for k in range(2)):
+                mal(f'{nombre}: la marca de {c} no está en el baricentro de sus {len(filas)} personas')
+                break
+        else:
+            if m['suplementarias'].get('marcas'):
+                esperadas = [c for c in marcas if marcas[c]['total']]
+                if sorted(m['suplementarias']['marcas']) != sorted(esperadas):
+                    mal(f'{nombre}: hay marcas proyectadas que no son las variables con celdas inventadas')
+                else:
+                    bien(f'las {len(esperadas)} marcas de celda inventada están en el baricentro '
+                         f'de sus filas, y ninguna es una columna activa')
+
+        # 5 · contributions add up to 100 per axis; percentages come from λ
+        for k in range(2):
+            total = (sum(cat['ctr'][k] for cat in m['categorias'])
+                     + sum(m['variables'][c]['ctr'][k] for c in analizadas))
+            cuantas = len(m['categorias']) + len(analizadas)
+            if not casi(total, 100, 0.005 * cuantas + 0.01):
+                mal(f'{nombre}: las contribuciones del eje {k + 1} suman {total:.2f}')
+                break
+            # and each one is what the scores say it is
+            for cat in m['categorias']:
+                filas = [i for i, w in enumerate(col[cat['variable']]) if w == cat['nivel']]
+                g = media([F[i][k] for i in filas])
+                ctr = 100 * (len(filas) / n) * g * g / lam[k] ** 2
+                if not casi(cat['ctr'][k], ctr, TOL_CTR):
+                    mal(f'{nombre}: la contribución de {cat["variable"]}={cat["nivel"]} al eje '
+                        f'{k + 1} publica {cat["ctr"][k]} y sale {ctr:.2f}')
+                    break
+            else:
+                continue
+            break
+        else:
+            bien('las contribuciones de cada eje suman cien, y cada una sale de su baricentro')
+        for k in range(K):
+            if not casi(m['porcentajes'][k], 100 * lam[k] / sum(lam), PCT):
+                mal(f'{nombre}: el porcentaje del eje {k + 1} no sale de su autovalor')
+                break
+        else:
+            bien('cada porcentaje sale de su autovalor, y '
+                 f'los dos primeros ejes retienen {m["acumulado"][1]} %')
+
+
 def main():
     ruta = sys.argv[1] if len(sys.argv) > 1 else src.XLSX
     if not os.path.exists(ruta):
@@ -386,6 +596,7 @@ def main():
     _, _, col = comprobar_crudo(ruta, crudo)
     comprobar_imputacion(crudo, limpio, col)
     comprobar_pca(limpio)
+    comprobar_famd(limpio)
 
     print()
     if fallos:

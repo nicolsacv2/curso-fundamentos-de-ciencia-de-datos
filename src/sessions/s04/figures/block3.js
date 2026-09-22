@@ -168,14 +168,15 @@ export function simpsonTeaser() {
   b += txt(sx(7.2), sy(fm(7.2)) + 26, 'mayores: a más dosis, más mejoría', { fs: 12, fill: C.ink2 });
   b += txt(sx(5.1), sy(fall(5.1)) - 14, 'todos juntos: «a más dosis, menos mejoría»', { fs: 12.5, fill: C.reveal });
 
-  b += txt(x0, 36, 'LOS DOS GRUPOS MEJORAN · LA MEZCLA DICE LO CONTRARIO · SESIÓN 6',
+  b += txt(x0, 36, 'LOS DOS GRUPOS MEJORAN · LA MEZCLA DICE LO CONTRARIO · SE RESUELVE EN LA SESIÓN 7',
     { fs: 11, fill: C.reveal, ls: 1.6 });
 
   return svg(W, H,
     'Reacción a un medicamento: dentro de los jóvenes la mejoría sube con la dosis, ' +
     'dentro de los mayores también, y con los dos grupos revueltos la tendencia global ' +
-    /* «que la sesión 6 resuelve» was here too, where a sweep of the panels does not
-       reach: session 6 turned out to be MCA and FAMD. */
-    'baja. La paradoja de Simpson',
+    /* The appointment came back once session 7 existed: its entrada resolves the
+       paradox with a contingency table of three variables. See the change
+       partir-la-sesion-06-en-dos. */
+    'baja. La paradoja de Simpson, que se resuelve en la sesión 7',
     b);
 }

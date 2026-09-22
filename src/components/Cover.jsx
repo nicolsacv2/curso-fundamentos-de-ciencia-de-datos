@@ -1,4 +1,4 @@
-import { SESIONES, PENDIENTES, pad2 } from '../data/syllabus.js';
+import { SESIONES, HORAS_POR_SESION, EN_LETRAS, PENDIENTES, pad2 } from '../data/syllabus.js';
 import { METAS } from '../sessions/registry.js';
 
 /* The course index. It renders on its own and downloads no session: only the
@@ -10,11 +10,11 @@ export default function Cover({ onOpen }) {
       <header className="masthead">
         <p className="eyebrow">Universidad Nacional de Colombia</p>
         <h1>Fundamentos de ciencia de datos</h1>
-        <p className="subtitle">Ocho sesiones para aprender a mirar un número y saber qué preguntarle.
-          Elige una sesión para entrar.</p>
+        <p className="subtitle">{EN_LETRAS[SESIONES]} sesiones para aprender a mirar un número y saber
+          qué preguntarle. Elige una sesión para entrar.</p>
         <p className="stats">
-          <span><b>8</b> sesiones de <b>3</b> horas</span>
-          <span><b>24</b> horas sincrónicas</span>
+          <span><b>{SESIONES}</b> sesiones de <b>{HORAS_POR_SESION}</b> horas</span>
+          <span><b>{SESIONES * HORAS_POR_SESION}</b> horas sincrónicas</span>
           <span>100 % virtual</span>
         </p>
       </header>

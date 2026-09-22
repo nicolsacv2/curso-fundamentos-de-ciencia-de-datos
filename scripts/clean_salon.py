@@ -17,6 +17,11 @@ The chain, in the order session 6's entrada walks it:
   6. impute                 RandomSampleImputer over holes AND flagged outliers
   7. describe (after)       the same measures, to see what the cleaning moved
   8. PCA                    of the quantitative columns that survived
+  9. three pair matrices    quantity × quantity, quantity × name, name × name
+ 10. FAMD                   of EVERY column that came out clean — the twelve
+                            quantities the PCA saw and the sixteen names and ranks
+                            it could not — in two set-ups, plus the invented-cell
+                            markers projected as supplementary categories
 
 An ordinal scale does not go through step 3. The interquartile rule asks «how far
 is this from the middle, in units of spread», and on a bounded rank there are no
@@ -309,6 +314,219 @@ def pca(matriz, nombres):
         'cargas': [[src.redondear(c, 4) for c in fila] for fila in cargas],
         'puntos': [[src.redondear(p, 3) for p in fila[:2]] for fila in puntos],
     }
+
+# ── 10 · the FAMD of the whole clean table ──────────────────────────────────
+# The closing of session 6 answers «¿qué falta?» by running the mixed analysis over
+# the same imputed table the entrada showed, with every column that came out clean.
+# It is computed here, with the same data and the same seed, because the class must
+# see results and not a computation — and because the verifier has to be able to
+# recompute its identities from what gets published.
+#
+# Weights, the FactoMineR convention: individuals 1/n; a quantity centred and divided
+# by its POPULATION deviation (variance 1); an indicator z_j/√p_j − √p_j with
+# p_j = n_j/n (variance 1 − p_j). Total inertia is then p_num + Σ_q Σ_{j∈q}(1 − p_j),
+# which with every category active is p_num + Σ(J_q − 1). XᵀX/n is diagonalised;
+# F = X·v; var_n(F_k) = λ_k. Every non-null axis is published, and every person's
+# score on every one of them, so that a cos² can be checked and not believed.
+#
+# Two set-ups. `activo` has everything active, including the categories a single
+# person holds — found by frequency, n_j = 1, never by name. `sinRaras` takes those
+# columns out of X the way a specific MCA does (the person keeps the rest of their
+# columns) and projects them as supplementary: their coordinate is their one person's.
+# The invented-cell markers go in as supplementary too, in the active set-up only:
+# they never enter X, which is what «no deformaron los ejes» means.
+#
+# η² is written as Σ_{j active} p_j·ḡ_jk²/λ_k. With every category active that IS the
+# ANOVA η²; with a category set aside it is the between-groups sum over the categories
+# that shaped the axes, which is the only version for which Σr² + Ση² = λ_k still
+# holds — and that identity is what the verifier checks.
+#
+# Contributions are in percent and sum to 100 per axis: a category puts p_j·ḡ²/λ_k²,
+# a quantity r²/λ_k, a person f²/(n·λ_k). cos² is coordinate² over the sum of squared
+# coordinates across ALL axes, for categories and for people alike: it is the one
+# definition that can be verified without a closed formula, and it is the classic one
+# when every axis is kept.
+NULO = 1e-9
+
+
+def famd_salon(columna_limpia, numericas, categoricas, marcas, n):
+    """The FAMD of the clean table, in its two set-ups. See the note above."""
+    valores = {c: list(columna_limpia[c]) for c in numericas + categoricas}
+    niveles = {c: sorted(set(valores[c])) for c in categoricas}
+    conteo = {c: {v: valores[c].count(v) for v in niveles[c]} for c in categoricas}
+    # the categories one person holds, by frequency
+    raras = [(c, v) for c in categoricas for v in niveles[c] if conteo[c][v] == 1]
+
+    def montaje(excluidas):
+        cols = []                                # (tipo, variable, nivel, vector)
+        for c in numericas:
+            x = np.asarray(valores[c], dtype=float)
+            cols.append(('num', c, None, (x - x.mean()) / x.std(ddof=0)))
+        for c in categoricas:
+            for v in niveles[c]:
+                if (c, v) in excluidas:
+                    continue
+                z = np.asarray([1.0 if w == v else 0.0 for w in valores[c]])
+                p = z.mean()
+                cols.append(('cat', c, v, z / np.sqrt(p) - np.sqrt(p)))
+        X = np.column_stack([col[3] for col in cols])
+        activas = [(c, v) for t, c, v, _ in cols if t == 'cat']
+        p_de = {(c, v): conteo[c][v] / n for c, v in activas}
+
+        inercia_num = float(len(numericas))
+        inercia_cat = sum(1 - p for p in p_de.values())
+        inercia_var = {c: sum(1 - p_de[(cc, v)] for cc, v in activas if cc == c)
+                       for c in categoricas}
+
+        lam, vec = np.linalg.eigh(X.T @ X / n)
+        orden = np.argsort(lam)[::-1]
+        lam, vec = lam[orden], vec[:, orden]
+        keep = lam > NULO
+        lam, vec = lam[keep], vec[:, keep]
+        # Sign by the largest loading, as the PCA does: no sentence of the closing
+        # expects a category on a given side, and the prose says neither «left» nor
+        # «right».
+        for j in range(vec.shape[1]):
+            if vec[np.argmax(np.abs(vec[:, j])), j] < 0:
+                vec[:, j] *= -1
+        F = X @ vec                              # n × K
+        K = F.shape[1]
+        total = float(lam.sum())
+        assert abs(total - (inercia_num + inercia_cat)) < 1e-8, \
+            f'Σλ = {total} ≠ p_num + Σ(1 − p_j) = {inercia_num + inercia_cat}'
+        for k in range(K):
+            assert abs(F[:, k].var(ddof=0) - lam[k]) < 1e-8, 'var(F_k) ≠ λ_k'
+
+        # r² per quantity, correlations for the circle
+        correl = {}
+        for t, c, _, x in cols:
+            if t == 'num':
+                correl[c] = np.array([(F[:, k] * x).mean() / np.sqrt(lam[k]) for k in range(K)])
+        r2 = {c: r * r for c, r in correl.items()}
+
+        # barycentres and the partial η²
+        bari = {}
+        for c, v in activas:
+            filas = [i for i, w in enumerate(valores[c]) if w == v]
+            bari[(c, v)] = F[filas].mean(axis=0)
+        eta2 = {c: np.array([sum(p_de[(cc, v)] * bari[(cc, v)][k] ** 2
+                                 for cc, v in activas if cc == c) / lam[k]
+                             for k in range(K)]) for c in categoricas}
+        for k in range(K):
+            suma = sum(r2[c][k] for c in numericas) + sum(eta2[c][k] for c in categoricas)
+            assert abs(suma - lam[k]) < 1e-8, f'Σr² + Ση² = {suma} ≠ λ_{k + 1} = {lam[k]}'
+
+        # contributions, in percent, and cos² over all axes
+        ctr_cat = {cv: 100 * p_de[cv] * bari[cv] ** 2 / lam ** 2 for cv in activas}
+        ctr_num = {c: 100 * r2[c] / lam for c in numericas}
+        ctr_ind = 100 * F ** 2 / (n * lam)
+        for k in range(K):
+            total_k = (sum(ctr_cat[cv][k] for cv in activas) + sum(ctr_num[c][k] for c in numericas))
+            assert abs(total_k - 100) < 1e-6, f'las contribuciones del eje {k + 1} suman {total_k}'
+            assert abs(ctr_ind[:, k].sum() - 100) < 1e-6
+        cos2_plano = lambda coords: float((coords[0] ** 2 + coords[1] ** 2) / (coords ** 2).sum())
+
+        r2f = lambda x: src.redondear(float(x), 4)
+        c3 = lambda xs: [src.redondear(float(x), 3) for x in xs]
+        pct = lambda xs: [src.redondear(float(x), 2) for x in xs]
+        salida = {
+            'ejes': int(K),
+            'categoriasActivas': len(activas),
+            'inercia': {
+                'total': r2f(total),
+                'numericas': r2f(inercia_num),
+                'categoricas': r2f(inercia_cat),
+                'porVariable': {c: r2f(inercia_var[c]) for c in categoricas},
+            },
+            # the average share, which is the threshold the protocol uses
+            'aportePromedio': src.redondear(100 / (len(activas) + len(numericas)), 2),
+            'autovalores': [r2f(l) for l in lam],
+            'porcentajes': pct(100 * lam / total),
+            'acumulado': pct(100 * np.cumsum(lam) / total),
+            'puntuaciones': [c3(F[i]) for i in range(n)],
+            'r2': {c: [r2f(x) for x in r2[c]] for c in numericas},
+            'eta2': {c: [r2f(x) for x in eta2[c]] for c in categoricas},
+            'correlaciones': {c: c3(correl[c][:2]) for c in numericas},
+            'variables': {
+                **{c: {'tipo': 'num', 'ctr': pct(ctr_num[c][:2]),
+                       'cos2': r2f(r2[c][0] + r2[c][1])} for c in numericas},
+                **{c: {'tipo': 'cat',
+                       'ctr': pct([sum(ctr_cat[cv][k] for cv in activas if cv[0] == c)
+                                   for k in range(2)])} for c in categoricas},
+            },
+            'categorias': [{
+                'variable': c, 'nivel': v, 'n': conteo[c][v],
+                'coord': c3(bari[(c, v)][:2]),
+                'ctr': pct(ctr_cat[(c, v)][:2]),
+                'cos2': r2f(cos2_plano(bari[(c, v)])),
+            } for c, v in activas],
+            'personas': [{'ctr': pct(ctr_ind[i, :2]), 'cos2': r2f(cos2_plano(F[i]))}
+                         for i in range(n)],
+            'suplementarias': {},
+        }
+        return salida, F, cos2_plano, bari, ctr_cat, p_de
+
+    # ── activo: everything in, and the two kinds of supplementary that only make
+    #    sense here — the rare categories' diagnosis, and the markers ──
+    activo, F, cos2_plano, bari, ctr_cat, _ = montaje(set())
+    activo['raras'] = [{
+        'variable': c, 'nivel': v, 'n': 1,
+        'fila': valores[c].index(v) + 1,
+        'd2': src.redondear(n / 1 - 1, 4),
+        'coord': [src.redondear(float(x), 3) for x in bari[(c, v)][:2]],
+        'ctr': [src.redondear(float(x), 2) for x in ctr_cat[(c, v)][:2]],
+        'cos2': src.redondear(cos2_plano(bari[(c, v)]), 4),
+        'superaPromedio': [bool(x > 100 / (activo['categoriasActivas'] + len(numericas)))
+                           for x in ctr_cat[(c, v)][:2]],
+    } for c, v in raras]
+    marcas_sup = {}
+    for c, m in marcas.items():
+        if not m['total']:
+            continue
+        filas = [f - 1 for f in m['filas']]
+        g = F[filas].mean(axis=0)
+        marcas_sup[c] = {'n': m['total'], 'filas': list(m['filas']),
+                         'coord': [src.redondear(float(x), 3) for x in g[:2]],
+                         'cos2': src.redondear(cos2_plano(g), 4)}
+    activo['suplementarias'] = {'marcas': marcas_sup}
+
+    # ── sinRaras: the one-person categories out of X and projected ──
+    sin, F2, cos2_plano2, _, _, _ = montaje(set(raras))
+    sin['suplementarias'] = {'categorias': [{
+        'variable': c, 'nivel': v, 'n': 1, 'fila': valores[c].index(v) + 1,
+        'coord': [src.redondear(float(x), 3) for x in F2[valores[c].index(v)][:2]],
+        'cos2': src.redondear(cos2_plano2(F2[valores[c].index(v)]), 4),
+    } for c, v in raras]}
+
+    return {
+        'n': n,
+        'numericas': list(numericas),
+        'categoricas': list(categoricas),
+        'niveles': niveles,
+        'activo': activo,
+        'sinRaras': sin,
+    }
+
+
+def bloque_famd(famd):
+    """The lines that publish FAMD, shared by escribir() and by whoever regenerates
+    the block alone."""
+    j = lambda o: json.dumps(o, ensure_ascii=False)
+    return [
+        '/* The FAMD of the whole clean table — the closing of session 6. Every column',
+        '   with destiny `limpia` enters: the quantities the PCA saw and the names and',
+        '   ranks it could not. Two set-ups: `activo`, with everything active, and',
+        '   `sinRaras`, with the one-person categories (found by n_j = 1) taken out of the',
+        '   analysis and projected as supplementary. In `activo` the invented-cell markers',
+        '   are projected as supplementary too — they never shaped an axis.',
+        '',
+        '   All non-null axes are published, and every person on all of them, so that the',
+        '   identities — Σλ = inertia, Σr² + Ση² = λ_k, var(F_k) = λ_k, barycentre = mean of',
+        '   its people, Σctr = 100 — can be recomputed by scripts/check_salon.py from LIMPIA',
+        '   without repeating the analysis. Contributions are in percent; η² is the sum over',
+        '   the ACTIVE categories, which is the ANOVA η² when every category is active. */',
+        'export const FAMD = ' + j(famd) + ';',
+    ]
 
 
 def main():
@@ -695,10 +913,17 @@ def main():
                 conteo[va][vb] += 1
             matrices['barras'][a][bq] = conteo
 
+    # ── 10 · el FAMD de la tabla entera ─────────────────────────────────────
+    # Over exactly the columns with destiny `limpia`: the analysed quantities and the
+    # non-numeric columns that were grouped and imputed. `codigo` and `libro` are not
+    # categories and `pantalla` was discarded — the same three the entrada set aside.
+    famd = famd_salon(columna_limpia, analizadas,
+                      [c for c in no_num if destino[c] == 'limpia'], marcas, len(tabla))
+
     escribir(texto, cuant, ordi, cat, analizadas, meta, huecos, antes, cajas,
              marcados, descarte, raros, inventadas, despues, por_media, resultado,
              imputado, len(tabla), no_num, diag, no_analizables,
-             marcas, limpia, destino, orden, columna_limpia, matrices)
+             marcas, limpia, destino, orden, columna_limpia, matrices, famd)
 
     print(f'{len(tabla)} filas · {len(cuant)} cuantitativas '
           f'({len(analizadas)} al análisis, {len(DESCARTADAS)} descartada) · '
@@ -719,12 +944,30 @@ def main():
           + ', '.join(f'{c}(−{len(raros[c]["agrupados"])})' for c in movidas))
     print(f'  PCA: {resultado["porcentajes"][0]} % + {resultado["porcentajes"][1]} % '
           f'= {resultado["acumulado"][1]} % en dos componentes')
+    imprimir_famd(famd)
+
+
+def imprimir_famd(famd):
+    """What step 10 prints, so a run says what the closing will claim."""
+    a, s = famd['activo'], famd['sinRaras']
+    jq = {c: len(v) for c, v in famd['niveles'].items()}
+    print(f'  FAMD: {len(famd["numericas"])} cuantitativas + {len(famd["categoricas"])} '
+          f'cualitativas ({a["categoriasActivas"]} categorías) · '
+          f'Σλ = {a["inercia"]["total"]} = {a["inercia"]["numericas"]} + Σ(J_q − 1) = '
+          f'{sum(j - 1 for j in jq.values())} · {a["ejes"]} ejes')
+    print(f'      activo:   {a["porcentajes"][0]} % + {a["porcentajes"][1]} % '
+          f'= {a["acumulado"][1]} % en dos ejes')
+    print(f'      sinRaras: {s["porcentajes"][0]} % + {s["porcentajes"][1]} % '
+          f'= {s["acumulado"][1]} % · suplementarias: '
+          + ', '.join(f'{r["variable"]}={r["nivel"]}' for r in s['suplementarias']['categorias']))
+    print(f'      marcas proyectadas: {len(a["suplementarias"]["marcas"])} '
+          f'({", ".join(a["suplementarias"]["marcas"])})')
 
 
 def escribir(texto, cuant, ordi, cat, analizadas, meta, huecos, antes, cajas,
              marcados, descarte, raros, inventadas, despues, por_media, resultado,
              imputado, filas, no_num, diag, no_analizables,
-             marcas, limpia, destino, orden, columna_limpia, matrices):
+             marcas, limpia, destino, orden, columna_limpia, matrices, famd):
     """El módulo generado que la sesión 6 interpola."""
     j = lambda o: json.dumps(o, ensure_ascii=False)
     L = [
@@ -866,7 +1109,7 @@ def escribir(texto, cuant, ordi, cat, analizadas, meta, huecos, antes, cajas,
           '   the figure cannot drift apart. Everything is computed here: three matrices of',
           '   sixty-four panels is not work to do while a page opens in front of a class. */',
           'export const MATRICES = ' + j(matrices) + ';',
-          '']
+          ''] + bloque_famd(famd) + ['']
 
     with open(SALIDA, 'w', encoding='utf-8') as fh:
         fh.write('\n'.join(L))

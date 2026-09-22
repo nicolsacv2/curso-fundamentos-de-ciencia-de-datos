@@ -13,12 +13,19 @@
 
    Titles and goals are course content — they stay in Spanish. */
 
-export const SESIONES = 8;
+/* Nine, since session 6 was split in two: the cleaning chain stayed as session 6 and
+   the analysis of what is not a number became session 7. Everything that counts
+   sessions — the cover, the «Sesión NN de NN» eyebrow, the total hours — reads this. */
+export const SESIONES = 9;
+export const HORAS_POR_SESION = 3;
+
+/* The number in words, for the cover's subtitle. Only the total the course can have. */
+export const EN_LETRAS = { 8: 'Ocho', 9: 'Nueve', 10: 'Diez' };
 
 /* n → [title, goal], only for the ones still unbuilt. */
 export const PENDIENTES = {
-  7: ['Cómo aprende una máquina', 'Desmitificar el aprendizaje automático y la IA: qué tipos hay, cómo se entrenan, cómo se evalúan y por qué fallan.'],
-  8: ['Fundamentos de Inteligencia Artificial', 'Skills más populares, MCP, RAG, LangChain y SDD.']
+  8: ['Cómo aprende una máquina', 'Desmitificar el aprendizaje automático y la IA: qué tipos hay, cómo se entrenan, cómo se evalúan y por qué fallan.'],
+  9: ['Fundamentos de Inteligencia Artificial', 'Skills más populares, MCP, RAG, LangChain y SDD.']
 };
 
 export const pad2 = n => String(n).padStart(2, '0');

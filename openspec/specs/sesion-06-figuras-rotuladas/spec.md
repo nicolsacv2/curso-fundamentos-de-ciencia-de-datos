@@ -2,23 +2,27 @@
 
 ## Purpose
 
-Fija qué tiene que decir cada figura de la entrada de la sesión 6 sobre sus propios ejes:
-qué magnitud mide cada uno, en qué unidad, y con qué escala. Una figura que se proyecta en
-la pared sin decir qué mide obliga a la clase a adivinarlo, y una que dibuja dos escalas
+Fija qué tiene que decir cada figura de las sesiones 6 y 7 sobre sus propios ejes: qué
+magnitud mide cada uno, en qué unidad, y con qué escala. Una figura que se proyecta en la
+pared sin decir qué mide obliga a la clase a adivinarlo, y una que dibuja dos escalas
 distintas como si fueran una hace que lo adivinen mal.
 
 ## Requirements
 
 ### Requirement: Cada eje dice qué mide
-EL SISTEMA SHALL rotular, en cada figura de la entrada de la sesión 6 que tenga ejes, qué
-magnitud representa cada uno.
+EL SISTEMA SHALL rotular, en cada figura de las sesiones 6 y 7 que tenga ejes —en la
+entrada, en los bloques y en el cierre de cada una—, qué magnitud representa cada uno.
 
 #### Scenario: Ningún eje queda mudo
-- **WHEN** alguien mira una figura de la entrada que tiene ejes
+- **WHEN** alguien mira una figura de cualquier bloque de las sesiones 6 o 7 que tiene ejes
 - **THEN** cada eje lleva escrito qué magnitud representa
 
+#### Scenario: Un eje factorial dice su número y su porcentaje
+- **WHEN** una figura de las sesiones 6 o 7 dibuja un eje de un análisis factorial
+- **THEN** ese eje lleva escrito su número y el porcentaje de inercia que retiene
+
 #### Scenario: Una figura sin ejes declara su unidad de todos modos
-- **WHEN** una figura de la entrada no tiene ejes pero muestra recuentos o magnitudes
+- **WHEN** una figura de las sesiones 6 o 7 no tiene ejes pero muestra recuentos o magnitudes
 - **THEN** lleva escrito de qué son esos recuentos o esas magnitudes
 
 ### Requirement: Cada eje dice en qué unidad
@@ -62,14 +66,20 @@ variable, ENTONCES EL SISTEMA SHALL escribir la unidad de cada fila.
 - **AND** está escrito que las filas no comparten escala
 
 ### Requirement: Los rótulos no rompen la figura en una pantalla estrecha
-EL SISTEMA SHALL mantener las figuras de la entrada dentro del ancho de la ventana y sin
-recortar sus rótulos.
+EL SISTEMA SHALL mantener las figuras de todos los bloques de las sesiones 6 y 7 dentro del
+ancho de la ventana y sin recortar sus rótulos.
 
 #### Scenario: A 390 px se ve entera y rotulada
-- **WHEN** alguien abre la entrada de la sesión 6 en una ventana de 390 px de ancho
+- **WHEN** alguien abre cualquier bloque de las sesiones 6 o 7 en una ventana de 390 px de ancho
 - **THEN** las figuras se ajustan al ancho
 - **AND** la página no se desplaza horizontalmente
 - **AND** ningún rótulo de eje queda cortado
+
+#### Scenario: Ampliar funciona en cada bloque
+- **WHEN** alguien activa «Ampliar» en una figura de cualquier bloque de las sesiones 6 o 7
+- **THEN** se abre el diálogo de ampliación
+- **AND** Esc lo cierra
+- **AND** el foco vuelve al botón que lo abrió
 
 ### Requirement: Ningún texto de una figura queda cortado por su propio marco
 EL SISTEMA SHALL mostrar entero todo el texto que una figura dibuje, sin que el marco de la
@@ -88,3 +98,17 @@ colocarlo de modo que no se pueda confundir con otro punto.
 - **WHEN** alguien mira un rótulo que da la cifra de un punto
 - **THEN** el punto al que se refiere es el más cercano al rótulo
 - **AND** el texto del rótulo no se extiende sobre otros puntos de la misma serie
+
+### Requirement: Los índices de una fórmula no pisan su letra
+EL SISTEMA SHALL colocar cada subíndice y superíndice de las fórmulas dibujadas en las figuras
+de las sesiones 6 y 7 a la derecha del borde de la letra que acompaña, sea esa letra ancha o
+estrecha, y colocar la fracción o el símbolo que sigue después del índice, sin encimarse.
+
+#### Scenario: Un subíndice tras una letra ancha
+- **WHEN** una fórmula lleva un subíndice o superíndice tras una letra ancha como la m
+- **THEN** el índice empieza después del borde derecho de la letra
+- **AND** la fracción o el símbolo siguiente no se le encima
+
+#### Scenario: Las fracciones siguen alineadas
+- **WHEN** una fórmula coloca una fracción midiendo el texto que la precede
+- **THEN** la fracción cae después de ese texto, con el mismo avance por glifo con que se dibujó

@@ -44,14 +44,16 @@ export default function Block3({ id, tabId, block }) {
       </Diagram>
 
       <Prose>
-        {/* This used to say the paradox gets resolved in session 6, «cuando hablemos de
-            causalidad». Session 6 turned out to be MCA and FAMD, so the promise is gone
-            and the paradox stays planted: it is the discomfort that matters here, not the
-            appointment. See the change sesion-06-mca-y-famd. */}
-        <p>Esto se llama la <b>paradoja de Simpson</b> y hoy no la vamos a resolver. Hoy basta
-          con llevarse la incomodidad: una asociación puede ser correcta en cada grupo y decir
-          lo contrario en el total, así que <b>«¿asociado con qué, dentro de qué?»</b> es parte
-          de la pregunta, no un detalle.</p>
+        {/* This said «session 6, cuando hablemos de causalidad», then said nothing when
+            session 6 became MCA and FAMD, and now names session 7: its entrada resolves the
+            paradox with a contingency table of three variables. The appointment is only
+            worth making when a later panel keeps it. See the change
+            partir-la-sesion-06-en-dos. */}
+        <p>Esto se llama la <b>paradoja de Simpson</b> y hoy no la vamos a resolver: se resuelve
+          en la <b>sesión 7</b>, con una tabla de tres entradas. Hoy basta con llevarse la
+          incomodidad: una asociación puede ser correcta en cada grupo y decir lo contrario en
+          el total, así que <b>«¿asociado con qué, dentro de qué?»</b> es parte de la pregunta,
+          no un detalle.</p>
       </Prose>
 
       <Idea>r no mide si hay relación.{' '}

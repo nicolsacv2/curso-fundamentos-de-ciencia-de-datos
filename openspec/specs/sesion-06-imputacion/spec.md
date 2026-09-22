@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Cubre el paso de la entrada de la sesión 6 en que los huecos y los valores marcados como
+Cubre el paso de la sesión 6 —su bloque 2— en que los huecos y los valores marcados como
 atípicos se rellenan por muestreo aleatorio de la propia columna: qué hace el método, qué
-conserva, qué cuesta, y por qué el resultado que se proyecta en clase es siempre el mismo.
+conserva, qué rompe, y cómo la tabla recuerda qué celdas inventó.
 
 ## Requirements
 
@@ -13,7 +13,7 @@ EL SISTEMA SHALL rellenar los valores que faltan tomando al azar valores observa
 misma columna.
 
 #### Scenario: El método se enuncia
-- **WHEN** alguien llega al paso de imputación de la entrada
+- **WHEN** alguien llega al paso de imputación de la sesión 6
 - **THEN** se enuncia que los valores que faltan se rellenan tomando al azar valores observados de la misma columna
 
 ### Requirement: La regla de la caja no se aplica a una escala ordinal
@@ -21,7 +21,7 @@ EL SISTEMA SHALL no usar el rango intercuartílico para marcar atípicos en una 
 sea un orden y no una cantidad.
 
 #### Scenario: Un rango no tiene atípicos por dispersión
-- **WHEN** alguien recorre el paso de atípicos de la entrada
+- **WHEN** alguien recorre el paso de atípicos de la sesión 6
 - **THEN** ninguna variable ordinal tiene valores marcados como atípicos por la regla de la caja
 
 ### Requirement: Se dice por qué una escala ordinal queda fuera de esa regla
@@ -157,7 +157,7 @@ EL SISTEMA SHALL dejar fuera de la imputación toda columna en la que el número
 a inventar sea tan alto que el resultado dejaría de sostenerse.
 
 #### Scenario: La columna no se imputa
-- **WHEN** alguien recorre el paso de imputación de la entrada
+- **WHEN** alguien recorre el paso de imputación de la sesión 6
 - **THEN** la columna de horas de pantalla al día no se imputa
 
 ### Requirement: Descartarla se cuenta, no se omite
@@ -212,7 +212,7 @@ EL SISTEMA SHALL mostrar en clase un resultado de imputación fijo, que no cambi
 proyección y la siguiente.
 
 #### Scenario: La clase ve lo mismo dos veces
-- **WHEN** alguien abre la entrada de la sesión 6 dos veces
+- **WHEN** alguien abre la sesión 6 dos veces
 - **THEN** los valores imputados son los mismos en las dos
 
 ### Requirement: Se dice que la repetibilidad es una decisión
@@ -229,7 +229,7 @@ EL SISTEMA SHALL mostrar en clase valores imputados ya calculados de antemano, s
 generarlos en el momento de abrir la sesión.
 
 #### Scenario: Nada se sortea durante la clase
-- **WHEN** alguien abre la entrada de la sesión 6
+- **WHEN** alguien abre la sesión 6
 - **THEN** los valores imputados ya están calculados
 - **AND** no se sortea ninguno al abrirla
 

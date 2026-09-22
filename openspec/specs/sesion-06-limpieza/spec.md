@@ -2,33 +2,35 @@
 
 ## Purpose
 
-Cubre la primera parte de la entrada de la sesión 6: dejar utilizable la tabla del salón
-—estandarizar el texto, describirla con las medidas de la sesión 4, y encontrar los
-atípicos con diagramas de caja— mostrando en cada paso qué se ganó y qué se movió.
+Cubre la primera parte de la sesión 6 —su entrada y sus bloques 1 y 2—: dejar utilizable la
+tabla del salón —estandarizar el texto, describirla con las medidas de la sesión 4, encontrar
+sus atípicos con diagramas de caja, y decidir qué hacer con lo que no es un número— antes de
+cualquier análisis. Lo que antes era una sola entrada de 78 minutos es hoy la sesión entera,
+repartida en cinco bloques.
 
 ## Requirements
 
 ### Requirement: La entrada parte de la tabla del salón
-EL SISTEMA SHALL abrir la entrada de la sesión 6 con la tabla del salón tal como llegó del
+EL SISTEMA SHALL abrir la sesión 6 con la tabla del salón tal como llegó del
 formulario.
 
 #### Scenario: La tabla cruda está a la vista
-- **WHEN** alguien abre la entrada de la sesión 6
+- **WHEN** alguien abre la sesión 6
 - **THEN** ve la tabla del salón con sus valores tal como llegaron
 
 ### Requirement: Se dice por qué se vuelve a esa tabla
-EL SISTEMA SHALL enunciar en la entrada que se vuelve a la tabla del salón porque es
+EL SISTEMA SHALL enunciar en la sesión 6 que se vuelve a la tabla del salón porque es
 mayoritariamente no numérica, a diferencia del conjunto de la sesión 5.
 
 #### Scenario: El cambio de material se justifica
-- **WHEN** alguien lee la entrada de la sesión 6
+- **WHEN** alguien lee la sesión 6
 - **THEN** se enuncia que se vuelve a la tabla del salón porque casi todo lo que contiene no son números
 
 ### Requirement: El texto se estandariza
 EL SISTEMA SHALL mostrar una estandarización del texto de la tabla antes de describirla.
 
 #### Scenario: El texto pasa por un paso propio
-- **WHEN** alguien recorre la entrada de la sesión 6
+- **WHEN** alguien recorre la sesión 6
 - **THEN** la estandarización del texto aparece como un paso propio, antes de la descripción
 
 ### Requirement: Los cuatro tratamientos del texto se nombran
@@ -82,11 +84,11 @@ EL SISTEMA SHALL enunciar qué se pierde al estandarizar el texto.
 - **THEN** se enuncia qué se pierde al aplicarlo
 
 ### Requirement: La tabla que se muestra es la de las variables no numéricas
-EL SISTEMA SHALL mostrar en la entrada la tabla con las variables que no son numéricas, y
+EL SISTEMA SHALL mostrar en la sesión 6 la tabla con las variables que no son numéricas, y
 no solo con las que una sesión anterior auditó.
 
 #### Scenario: La tabla enseña de lo que va la sesión
-- **WHEN** alguien mira la tabla con la que arranca la entrada de la sesión 6
+- **WHEN** alguien mira la tabla con la que arranca la sesión 6
 - **THEN** ve en ella las variables que no son numéricas
 
 ### Requirement: Las variables no numéricas también se limpian
@@ -94,7 +96,7 @@ EL SISTEMA SHALL aplicar la limpieza a todas las variables que no son numéricas
 a las que entran en el análisis de componentes principales.
 
 #### Scenario: Ninguna queda sin tratar
-- **WHEN** alguien recorre la limpieza de la entrada
+- **WHEN** alguien recorre la limpieza de la sesión 6
 - **THEN** las variables que no son numéricas han pasado por ella
 
 ### Requirement: Cada variable no numérica se diagnostica
@@ -201,7 +203,7 @@ EL SISTEMA SHALL describir las variables cuantitativas de la tabla con medidas d
 localización y de dispersión, las mismas que la sesión 4 introdujo.
 
 #### Scenario: La descripción usa lo ya visto
-- **WHEN** alguien mira la descripción de la entrada de la sesión 6
+- **WHEN** alguien mira la descripción de la sesión 6
 - **THEN** se usan medidas de localización y de dispersión
 - **AND** son las mismas que la sesión 4 introdujo
 
@@ -218,7 +220,7 @@ EL SISTEMA SHALL mostrar esas medidas dos veces: sobre la tabla sin limpiar y so
 tabla ya limpia.
 
 #### Scenario: Hay un antes y un después
-- **WHEN** alguien recorre la entrada de la sesión 6
+- **WHEN** alguien recorre la sesión 6
 - **THEN** ve las medidas sobre la tabla sin limpiar y sobre la tabla ya limpia
 
 ### Requirement: Las dos descripciones se comparan lado a lado
@@ -249,7 +251,7 @@ EL SISTEMA SHALL dibujar un diagrama de caja por cada variable cuantitativa para
 sus valores atípicos.
 
 #### Scenario: Cada variable cuantitativa tiene su caja
-- **WHEN** alguien mira el paso de atípicos de la entrada
+- **WHEN** alguien mira el paso de atípicos de la sesión 6
 - **THEN** hay un diagrama de caja por cada variable cuantitativa
 
 ### Requirement: El diagrama de caja se explica antes de usarse
@@ -279,7 +281,7 @@ EL SISTEMA SHALL mostrar la regla exacta con la que un punto queda fuera de los 
 EL SISTEMA SHALL señalar en cada diagrama de caja los puntos que la regla deja fuera.
 
 #### Scenario: Los atípicos se ven
-- **WHEN** alguien mira un diagrama de caja de la entrada
+- **WHEN** alguien mira un diagrama de caja de la sesión 6
 - **THEN** los puntos que la regla deja fuera están señalados
 
 ### Requirement: Cada atípico se identifica en la tabla
@@ -320,15 +322,15 @@ como atípicos.
 EL SISTEMA SHALL mostrar cuántos valores faltan en cada columna antes de imputarlos.
 
 #### Scenario: El recuento de huecos está a la vista
-- **WHEN** alguien recorre la entrada de la sesión 6
+- **WHEN** alguien recorre la sesión 6
 - **THEN** se muestra cuántos valores faltan en cada columna
 
 ### Requirement: La limpieza se enuncia como una cadena de decisiones
-EL SISTEMA SHALL presentar la limpieza de la entrada como una secuencia de pasos, cada uno
+EL SISTEMA SHALL presentar la limpieza de la sesión 6 como una secuencia de pasos, cada uno
 con lo que decide.
 
 #### Scenario: La cadena se ve entera
-- **WHEN** alguien recorre la entrada de la sesión 6
+- **WHEN** alguien recorre la sesión 6
 - **THEN** la limpieza aparece como una secuencia de pasos
 - **AND** cada paso dice qué decide
 
@@ -363,7 +365,7 @@ EL SISTEMA SHALL mostrar la tabla completa ya limpia después del último paso d
 antes de cualquier análisis sobre ella.
 
 #### Scenario: El resultado de la cadena se ve
-- **WHEN** alguien termina de recorrer los pasos de limpieza de la entrada
+- **WHEN** alguien termina de recorrer los pasos de limpieza de la sesión 6
 - **THEN** ve la tabla completa con el resultado de haberlos aplicado
 - **AND** la ve antes de que empiece el análisis de componentes principales
 
@@ -400,11 +402,11 @@ cuántas son.
 - **THEN** coinciden
 
 ### Requirement: Ninguna variable se analiza sin haberse visto antes
-EL SISTEMA SHALL mostrar cada columna publicada en la tabla con la que abre la entrada,
+EL SISTEMA SHALL mostrar cada columna publicada en la tabla con la que abre la sesión 6,
 antes de que ningún paso de la cadena opere sobre ella.
 
 #### Scenario: La primera tabla las trae todas
-- **WHEN** alguien mira la tabla con la que arranca la entrada
+- **WHEN** alguien mira la tabla con la que arranca la sesión 6
 - **THEN** están todas las columnas publicadas
 - **AND** están las que no son numéricas
 

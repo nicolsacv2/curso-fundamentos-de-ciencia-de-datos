@@ -1,4 +1,4 @@
-import { C, MONO, txt } from '../../../svg/kit.js';
+import { C, MONO, SERIF, txt, wrap } from '../../../svg/kit.js';
 
 /* Session-local helpers, repeated instead of imported from s05 because each session
    is its own chunk and must not drag in another's to draw a rectangle. */
@@ -156,4 +156,146 @@ export function panelMosaico(x, y, w, h, conteo, filas, cols) {
   return out;
 }
 
-export { MONO };
+/* ═══════════ formulas, drawn rather than typeset ═══════════
+   Copied from s05/figures/intro.js, not imported: each session is its own chunk and
+   must not drag in another's to draw a fraction bar.
+
+   KaTeX and MathJax are the obvious tools and both are the fifth dependency the
+   project refuses. MathML needs none, but its typography changes with the browser,
+   and this has to read the same on the classroom projector as on the laptop it was
+   prepared on. So a row is a list of pieces and the cursor advances, so a bar sits
+   over the letter it belongs to by construction. */
+
+/* Rough advance width of a glyph. Serif digits and letters at this size sit near half
+   the font size, but not all of them: an m is almost twice that and an i a third, and a
+   subscript placed after «half an em» lands on top of the m. So the serif advance is per
+   glyph — wide, narrow, or the half-em default — and the mono one stays fixed, because a
+   mono face is. It does not have to be exact, it has to be consistent, because every
+   position downstream (fractions, indices) is measured from it. */
+const ADV = { serif: 0.5, mono: 0.6 };
+const ANCHO = { ancho: 0.85, estrecho: 0.33 };
+const ANCHAS = 'mwMW√';
+const ESTRECHAS = 'ijlItfr′\'·.,()|1';
+
+/* The advance of a piece of text, in px, at font size fs in family ff. */
+export function avance(texto, fs, ff) {
+  if (ff === MONO) return texto.length * ADV.mono * fs;
+  let w = 0;
+  for (const ch of texto) {
+    w += (ANCHAS.includes(ch) ? ANCHO.ancho : ESTRECHAS.includes(ch) ? ANCHO.estrecho : ADV.serif) * fs;
+  }
+  return w;
+}
+
+export function measure(parts, fs) {
+  return parts.reduce((w, p) => {
+    const size = p.fs || fs;
+    return w + avance(p.t, size, p.ff) + (p.sup || p.sub ? 0.32 * size : 0) + (p.gap || 0);
+  }, 0);
+}
+
+/* Draws the pieces left to right from x. A piece can carry a bar (the mean), a
+   superscript (the square) or a subscript (which variable a deviation belongs to). */
+export function row(x, y, parts, fs) {
+  let cur = x, s = '';
+  parts.forEach(p => {
+    const size = p.fs || fs;
+    const w = avance(p.t, size, p.ff);
+    cur += p.gap || 0;
+    s += txt(cur, y, p.t, { fs: size, ff: p.ff || SERIF, fill: p.fill || C.ink });
+    if (p.bar) {
+      s += `<line x1="${(cur + w * 0.08).toFixed(1)}" y1="${(y - size * 0.72).toFixed(1)}"
+        x2="${(cur + w * 0.92).toFixed(1)}" y2="${(y - size * 0.72).toFixed(1)}"
+        stroke="${p.fill || C.ink}" stroke-width="1.3"/>`;
+    }
+    if (p.sup) s += txt(cur + w + 1, y - size * 0.52, p.sup, { fs: size * 0.62, ff: SERIF, fill: p.fill || C.ink });
+    if (p.sub) s += txt(cur + w + 1, y + size * 0.24, p.sub, { fs: size * 0.62, ff: SERIF, fill: p.fill || C.ink });
+    cur += w + (p.sup || p.sub ? size * 0.32 : 0);
+  });
+  return s;
+}
+
+/* A fraction: both lines centred on x, the rule as wide as the wider of the two. */
+export function frac(x, y, top, bottom, fs) {
+  const wt = measure(top, fs), wb = measure(bottom, fs);
+  const width = Math.max(wt, wb) + 26;
+  return row(x - wt / 2, y - 14, top, fs)
+    + `<line x1="${(x - width / 2).toFixed(1)}" y1="${y}" x2="${(x + width / 2).toFixed(1)}" y2="${y}"
+        stroke="${C.ink2}" stroke-width="1.2"/>`
+    + row(x - wb / 2, y + 30, bottom, fs)
+    + `<!-- w:${width.toFixed(0)} -->`;
+}
+
+/* The label and the one-line gloss on the left of each formula. */
+export function label(y, tag, note) {
+  let s = txt(56, y, tag, { fs: 11.5, fill: C.ask, ls: 1.6 });
+  wrap(note, 30).forEach((line, i) => {
+    s += txt(56, y + 22 + i * 16, line, { fs: 12, fill: C.ink3 });
+  });
+  return s;
+}
+
+/* ═══════════ the factorial plane, shared by the three blocks ═══════════
+   The composition of the entrada's plano(): a square, the two axes through the origin,
+   and the labels OUTSIDE the cloud — at the end of an axis they land on the points near
+   the origin, which is where most of a factorial plane's points always are. An axis
+   label says the axis' number and its percentage of inertia, and nothing else: naming
+   it would be interpreting, and that happens in the prose with its contributions. */
+export function plano(xa, ya, L, lim, ejes) {
+  const sx = scale([-lim[0], lim[0]], [xa, xa + L]);
+  const sy = scale([-lim[1], lim[1]], [ya + L, ya]);
+  let b = pline([[sx(0), ya], [sx(0), ya + L]], C.lineSoft, { sw: 1 })
+    + pline([[xa, sy(0)], [xa + L, sy(0)]], C.lineSoft, { sw: 1 })
+    + txt(xa + L, ya + L + 20, `Eje 1 · ${num(ejes[0])} %`, { fs: 11, fill: C.ink3, ta: 'end' })
+    + txt(xa, ya + L + 20, `Eje 2 · ${num(ejes[1])} % (vertical)`, { fs: 11, fill: C.ink3 });
+  return { sx, sy, b };
+}
+
+/* A category on the plane: a square, because the individuals are circles and the two
+   have to be told apart before any colour is read. */
+export function cuadrado(cx, cy, lado, fill, o) {
+  o = o || {};
+  return `<rect x="${(cx - lado / 2).toFixed(1)}" y="${(cy - lado / 2).toFixed(1)}" width="${lado}"
+    height="${lado}" rx="2" fill="${fill}" opacity="${o.op || 1}"${o.stroke ? ` stroke="${o.stroke}" stroke-width="1.2"` : ''}/>`;
+}
+
+/* A supplementary point: hollow and dashed, because it received coordinates on a
+   geometry it did not shape, and the mark has to say so before the caption does. */
+export function suplementaria(cx, cy, r, color) {
+  return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r}" fill="none" stroke="${color}"
+    stroke-width="1.5" stroke-dasharray="4 3"/>`;
+}
+
+/* Stacks labels that would land on top of each other: sorted by y, any two closer than
+   `minimo` in the same column of x are pushed apart. Simple on purpose — the check is
+   check_figuras.mjs for the frame and the eye at 390 px for the rest. */
+export function apilar(rotulos, minimo) {
+  const orden = rotulos.slice().sort((a, b) => a.y - b.y);
+  for (let i = 1; i < orden.length; i++) {
+    for (let k = 0; k < i; k++) {
+      if (Math.abs(orden[k].x - orden[i].x) < (orden[k].ancho || 60)
+          && orden[i].y - orden[k].y < minimo) {
+        orden[i].y = orden[k].y + minimo;
+      }
+    }
+  }
+  return orden;
+}
+
+/* The reading protocol's quality threshold: a point with less than this share of its
+   distance captured by the plane is drawn but not interpreted. 0.2 is the rule of
+   thumb the guide states, and it is a decision, not a fact — which is why it lives
+   here once, is written out on screen wherever it is applied, and is read by block 1,
+   by the closing and by the closing's figures from the same place. */
+export const UMBRAL_COS2 = 0.2;
+
+/* The reading filter of the closing, in one place for the figure and the prose: a
+   category is interpreted when its contribution to axis 1 OR to axis 2 reaches the
+   average share, AND its cos² in the plane reaches the threshold. Contributions say
+   who built the axes; cos² says whether the plane shows the point where it is. */
+export function pasaFiltro(cat, aportePromedio) {
+  return (cat.ctr[0] >= aportePromedio || cat.ctr[1] >= aportePromedio)
+    && cat.cos2 >= UMBRAL_COS2;
+}
+
+export { MONO, SERIF };

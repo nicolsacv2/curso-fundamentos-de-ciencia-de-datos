@@ -286,6 +286,52 @@ export function DataTable({ cols, rows, pick, only, mark, wrap, focus, caption, 
   );
 }
 
+/* ── NumTable: a small numeric table in the `dtable` markup ──
+   The session-7 blocks print counts, profiles, coordinates and contributions: a handful
+   of rows with a name each, a header, sometimes a totals row. `cols` are the headers —
+   the first one names the row header column —; `rows` are arrays whose first cell is
+   the row's name; `pie` is an optional totals row in the same shape; `marca(i, j)`
+   says whether data cell (i, j) is highlighted.
+
+   The corner cell carries the same `n` class as the row headers, so it is sticky in
+   both directions like DataTable's «#»: without it the header row scrolls away with the
+   data while the row headers stay put, and the first data column ends up hidden under
+   them. It lived as five copies in the session-7 blocks before, and none had the corner. */
+export function NumTable({ cols, rows, caption, marca, pie }) {
+  const fila = (r, i, negrita) => (
+    <tr key={i}>
+      <th className="n" scope="row" style={{ textAlign: 'left' }}>{r[0]}</th>
+      {r.slice(1).map((v, j) => (
+        <td key={j} className={!negrita && marca && marca(i, j) ? 'mk' : undefined}>
+          {negrita ? <b>{v}</b> : v}
+        </td>
+      ))}
+    </tr>
+  );
+  return (
+    <div className="dtable">
+      <div className="frame">
+        <table>
+          <thead>
+            <tr>
+              {cols.map((c, i) => (
+                <th key={i} scope="col" className={i ? undefined : 'n'}>
+                  <span className={i ? 'h' : 'l'}>{c}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, i) => fila(r, i, false))}
+            {pie && fila(pie, 'pie', true)}
+          </tbody>
+        </table>
+      </div>
+      {caption && <figcaption>{caption}</figcaption>}
+    </div>
+  );
+}
+
 /* ── Two columns from 900px up ── */
 export function Pair({ children, style }) {
   return <div className="pair" style={style}>{children}</div>;
@@ -321,21 +367,6 @@ export function StoryHead({ num, place, children }) {
       {num && <span className="num">{num}</span>}
       {children}
       {place && <span className="place">{place}</span>}
-    </div>
-  );
-}
-
-/* ── Pendiente: a block that exists but has no content yet ──
-   Mounted so the session can be walked end to end and so filling it later is
-   editing a component that already exists, rather than adding one. It deliberately
-   announces nothing about its own subject: a block that taught half of MCA would be
-   worse than one that teaches none of it. No date is promised either. */
-export function Pendiente({ tema, children }) {
-  return (
-    <div className="pendiente">
-      <span className="rotulo">Bloque en preparación</span>
-      <p>El contenido de <b>{tema}</b> todavía no está escrito.</p>
-      {children}
     </div>
   );
 }

@@ -2,30 +2,25 @@
    for Gapminder, and the reason it goes back is that the table is mostly not
    numbers: session 5's PCA cannot read a department or a blood type.
 
-   The entrada is well over a third of the session — 78 minutes against the usual 22
-   to 35 — because the whole cleaning chain has to run over ALL thirty-one variables
-   before the first factorial plane: standardise the text, describe, draw the boxes,
-   diagnose the eighteen that are not numbers, mark and impute, show the clean table,
-   look at what goes with what, and only then reduce. That is not a preamble, it is
-   the work. It ends on «¿qué falta?», and the three blocks after it answer that.
-
-   It grew from 60 when the entrada gained the clean table and the three pair
-   matrices. The eighteen minutes came out of blocks 1 to 3, which have no content
-   yet — cheap to take now, and better decided here than inherited by whoever writes
-   them.
-
-   Blocks 1 to 3 and the closing are mounted and labelled but have no content yet;
-   they are written in later changes. */
+   It used to be one 78-minute entrada carrying the whole cleaning chain, followed by
+   the MCA, the FAMD and the analysis of the whole table. The change
+   partir-la-sesion-06-en-dos split it: the chain IS this session now, cut along its own
+   steps into the course's five blocks — the table as it arrived and the text; the
+   measures, the boxes, the two ordinal scales and the column that gets dropped; the
+   filling, the invented-cell markers, the second description and the clean table; what
+   goes with what and the PCA; and a closing that asks «¿qué falta?» and hands the
+   question to session 7, which took the factorial blocks with it. Nothing of the
+   chain was cut; it is said at a normal pace instead of a sprint. */
 export default {
   n: 6,
-  title: 'Todas las variables a la vez',
-  goal: 'Dejar utilizable una tabla real —texto estandarizado, atípicos a la vista, huecos imputados— y extender el análisis factorial a las variables que no son números.',
+  title: 'De la tabla sucia al primer plano',
+  goal: 'Dejar utilizable una tabla real —texto estandarizado, atípicos a la vista, huecos imputados— y ver hasta dónde llega con ella el análisis de la sesión 5.',
   hook: 'La tabla del salón lleva tres sesiones con nosotros y todavía no la hemos analizado entera: casi todo lo que dice no son números.',
   blocks: [
-    { id: 'entrada',  lab: 'Entrada',  rname: 'De la tabla sucia al primer plano', clock: '0–78' },
-    { id: 'bloque-1', lab: 'Bloque 1', rname: 'MCA',                               clock: '86–112' },
-    { id: 'bloque-2', lab: 'Bloque 2', rname: 'FAMD',                              clock: '120–146' },
-    { id: 'bloque-3', lab: 'Bloque 3', rname: 'Segmentación',                      clock: '154–172' },
-    { id: 'cierre',   lab: 'Cierre',   rname: 'Cierre',                            clock: '172–180' }
+    { id: 'entrada',  lab: 'Entrada',  rname: 'La tabla, y el texto',        clock: '0–32' },
+    { id: 'bloque-1', lab: 'Bloque 1', rname: 'Los valores raros',           clock: '32–70' },
+    { id: 'bloque-2', lab: 'Bloque 2', rname: 'Rellenar, y acordarse',       clock: '78–116' },
+    { id: 'bloque-3', lab: 'Bloque 3', rname: 'Qué va con qué, y el PCA',    clock: '124–164' },
+    { id: 'cierre',   lab: 'Cierre',   rname: '¿Qué falta?',                 clock: '164–180' }
   ]
 };

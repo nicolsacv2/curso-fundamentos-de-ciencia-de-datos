@@ -25,11 +25,15 @@ export function dataset() {
 
      This is the one place where the ported text of session 2 no longer matches the
      original course, and the difference is deliberate.
-     See specs/001-sesion-05-graficos-y-pca. */
+     See specs/001-sesion-05-graficos-y-pca.
+
+     «Se modela» moved from session 7 to session 8 when session 6 was split in two: the
+     cleaning stayed as 6, the analysis of what is not a number became 7, and the
+     machine-learning session slid to 8. See the change partir-la-sesion-06-en-dos. */
   const D = [
     ['SESIÓN 3','se limpia'],
     ['SESIÓN 4','se describe'],
-    ['SESIÓN 7','se modela']
+    ['SESIÓN 8','se modela']
   ];
   D.forEach(([s,q],i)=>{
     /* Three boxes centred where four used to sit, so the fan of arrows stays balanced
@@ -44,5 +48,5 @@ export function dataset() {
 
   b += txt(20,H-14,'ESTA TABLA ES EL HILO QUE COSE EL CURSO. SIN ELLA SON OCHO TEMAS SUELTOS.',
     {fs:11,fill:C.ask,ls:1.6});
-  return svg(W,H,'El formulario alimenta la tabla del salón, y de esa tabla salen flechas hacia las sesiones 3, 4 y 7, donde se limpia, se describe y se modela',b);
+  return svg(W,H,'El formulario alimenta la tabla del salón, y de esa tabla salen flechas hacia las sesiones 3, 4 y 8, donde se limpia, se describe y se modela',b);
 }
