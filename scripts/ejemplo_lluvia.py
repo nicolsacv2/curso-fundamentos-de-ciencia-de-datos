@@ -229,10 +229,18 @@ def ca_de(N):
         return sorted(out, key=lambda t: t[2])
     dist_filas = pares(perfil_fila, c, f)
     dist_cols = pares(perfil_col, r, g)
+    # Where the eigenvalues come from, published so the block can show it: the residuals,
+    # their cross matrix, its trace, and EVERY eigenvalue including the trivial zero of the
+    # centring that `ejes` drops — the block explains that zero, so it has to be there.
+    traza = sum(StS[a][a] for a in range(J))
+    assert cerca(traza, sum(S[i][j] ** 2 for i in range(I) for j in range(J))), 'la traza no es Σ s²'
+    assert cerca(sum(vals), traza), f'los valores propios suman {sum(vals)} y la traza es {traza}'
     return {
         'lam': lam, 'f': f, 'g': g, 'r': r, 'c': c, 'ctr_f': ctr_f, 'ctr_g': ctr_g,
         'cos2_f': cos2_f, 'cos2_g': cos2_g, 'perfil_fila': perfil_fila, 'K': K, 'd2_12': d2_12,
         'dist_filas': dist_filas, 'dist_cols': dist_cols,
+        'S': S, 'StS': StS, 'traza': traza,
+        'vals_todos': [v if v > NULO else 0.0 for v in vals],
     }
 
 
@@ -293,6 +301,7 @@ def main():
     # ── the CA ──
     ca = ca_de(N)
     assert cerca(sum(ca['lam']), phi2), f'Σλ = {sum(ca["lam"])} ≠ χ²/n = {phi2}'
+    assert cerca(ca['traza'], phi2), f'la traza de SᵀS = {ca["traza"]} ≠ χ²/n = {phi2}'
     K = ca['K']
     assert K == 2, f'una tabla 3 × 3 tiene dos ejes, no {K}'
 
@@ -373,9 +382,20 @@ def main():
         '   `distancias`: every pair of rows and of columns, closest first, with the',
         '   chi-square distance between profiles (`d`) and the distance between principal',
         '   coordinates (`dCoord`), asserted equal. `salto`: the farthest pair of rows, for the',
-        '   step from distances to the map. Signs by the largest coordinate. */',
+        '   step from distances to the map. `transicion` and `transicionInversa`: the formula',
+        '   verified in both directions, a row from the columns and a column from the rows.',
+        '   `residuos`, `matriz`, `traza`, `autovaloresConTrivial`: where the eigenvalues come from',
+        '   (the residuals, SᵀS, its trace, and every eigenvalue including the zero of the',
+        '   centring). Signs by the largest coordinate. */',
         'export const CA = ' + j({
             'ejes': K,
+            # where the eigenvalues come from: the standardised residuals of every cell, their
+            # cross matrix SᵀS (columns × columns), its trace = Σ s² = χ²/n, and every
+            # eigenvalue of that matrix including the trivial zero of the centring
+            'residuos': [[r3(x) for x in fila] for fila in ca['S']],
+            'matriz': [[r4(x) for x in fila] for fila in ca['StS']],
+            'traza': r4(ca['traza']),
+            'autovaloresConTrivial': [r4(v) for v in ca['vals_todos']],
             'inerciaTotal': r4(sum(ca['lam'])),
             'autovalores': [r4(l) for l in ca['lam']],
             'porcentajes': [r2(100 * l / sum(ca['lam'])) for l in ca['lam']],
@@ -400,6 +420,18 @@ def main():
                 'raizLambda': r4(math.sqrt(ca['lam'][0])),
                 'dilatado': r4(sum(ca['perfil_fila'][0][jx] * ca['g'][jx][0] for jx in range(len(fb))) / math.sqrt(ca['lam'][0])),
                 'coordPublicada': r3(ca['f'][0][0]),
+            },
+            # and the way back — a column as the barycentre of the rows, weighted by its
+            # column profile, dilated the same — for the first column on axis 1; the block
+            # shows both directions, which is what lets the two clouds share the axes
+            'transicionInversa': {
+                'columna': fb[0], 'eje': 1,
+                'sumandos': [{'nivel': fa[i], 'perfil': r3(perfil_col[0][i]), 'coord': r3(ca['f'][i][0])}
+                             for i in range(len(fa))],
+                'promedioPonderado': r4(sum(perfil_col[0][i] * ca['f'][i][0] for i in range(len(fa)))),
+                'raizLambda': r4(math.sqrt(ca['lam'][0])),
+                'dilatado': r4(sum(perfil_col[0][i] * ca['f'][i][0] for i in range(len(fa))) / math.sqrt(ca['lam'][0])),
+                'coordPublicada': r3(ca['g'][0][0]),
             },
             'distancia': {'filas': [fa[0], fa[1]], 'd2': r4(ca['d2_12']), 'd': r3(math.sqrt(ca['d2_12']))},
             # every pair, closest first; `d` from the profiles, `dCoord` from the coordinates

@@ -329,8 +329,8 @@ export function fCondicional() {
   s += parte;
   [parte, y] = seccion(y, 'UNA MEDIDA EN [0, 1]',
     'la V de Cramér: el chi-cuadrado sobre lo máximo que podría valer con estas filas y columnas',
-    yb => linea(X, yb, [{ t: 'V' }, eq, { t: '√', gap: 4, fs: 26 }],
-      [{ t: 'χ', sup: '2' }], [{ t: 'n · min(filas − 1, columnas − 1)' }], null),
+    yb => row(X, yb, [{ t: 'V' }, eq, { raiz: { top: [{ t: 'χ', sup: '2' }],
+      bottom: [{ t: 'n · min(filas − 1, columnas − 1)' }] } }], FS),
     `en el ejemplo: √(${num(CHI2.total)} / (${TABLA.n} · ${Math.min(F.length, K.length) - 1})) = ${num(CHI2.v)}. Es una medida de cuánto se asocian el cielo de un día y el del siguiente, no una prueba: los días son inventados.`);
   s += parte;
   return svg(W, y,

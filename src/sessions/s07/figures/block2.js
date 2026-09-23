@@ -84,7 +84,7 @@ export function fIndicadora() {
     'el chi-cuadrado repartido celda por celda: lo que hay menos lo que habría si personas y categorías fueran independientes',
     yb => linea(X, yb, [{ t: 's', sub: 'ij' }, eq],
       [{ t: 'p', sub: 'ij' }, { t: '−', gap: 7 }, { t: 'r', gap: 7, sub: 'i' }, { t: 'c', gap: 4, sub: 'j' }],
-      [{ t: '√(' }, { t: 'r', sub: 'i' }, { t: 'c', gap: 4, sub: 'j' }, { t: ')' }],
+      [{ raiz: [{ t: 'r', sub: 'i' }, { t: 'c', gap: 4, sub: 'j' }] }],
       [{ t: 'con', gap: 30, fill: C.ink2, fs: 15 }, { t: 'p', gap: 10, sub: 'ij' }, eq])
       + frac(X + 470, yb - 7, [{ t: 'z', sub: 'ij' }], [{ t: 'n · Q' }], FS),
     `en el ejemplo: la celda (1, Café) vale ${n3(MCA.residuos[0][0])} y la celda (5, Café), ${n3(MCA.residuos[4][0])}. Los ${n * MCA.J} residuos al cuadrado suman la inercia total, ${num(MCA.inerciaTotal)}.`);
@@ -170,7 +170,7 @@ export function fTransicion() {
   let s = '', y = 40, parte;
   const transicion = (yb, izq, den, suma, sub) => {
     let cur = X + measure([izq, eq], FS) + 10 + 62 + 10 + 20;
-    let m = linea(X, yb, [izq, eq], [{ t: '1' }], [{ t: '√λ', sub: 'k' }], [{ t: '·', gap: 4 }])
+    let m = linea(X, yb, [izq, eq], [{ t: '1' }], [{ raiz: [{ t: 'λ', sub: 'k' }] }], [{ t: '·', gap: 4 }])
       + frac(cur + 22, yb - 7, [{ t: '1' }], [den], FS);
     cur += 44 + 10;
     m += row(cur, yb, [{ t: 'Σ', fs: 26, fill: C.ink2 }, { t: 'z', gap: 6, sub: 'ij' }, suma], FS)
@@ -212,12 +212,25 @@ export function fInercia() {
 
   [parte, y] = seccion(y, 'CORRECCIÓN DE BENZÉCRI',
     'se re-escalan solo los valores propios que superan el promedio; los demás se dan por ruido',
-    yb => row(X, yb, [{ t: 'λ', sup: 'adj', sub: 'k' }, { t: '=', gap: 22, fill: C.ink2 }, { t: '(', gap: 10 }], FS)
-      + frac(X + 96, yb - 7, [{ t: 'Q' }], [{ t: 'Q − 1' }], FS)
-      + row(X + 132, yb, [{ t: ')', sup: '2' }, { t: '(', gap: 12 }, { t: 'λ', gap: 2, sub: 'k' }, { t: '−', gap: 10 }], FS)
-      + frac(X + 232, yb - 7, [{ t: '1' }], [{ t: 'Q' }], FS)
-      + row(X + 256, yb, [{ t: ')', sup: '2' }, { t: 'solo si', gap: 24, fill: C.ink2, fs: 15 }, { t: 'λ', gap: 10, sub: 'k' }, { t: '>', gap: 10 }], FS)
-      + frac(X + 400, yb - 7, [{ t: '1' }], [{ t: 'Q' }], FS),
+    yb => {
+      /* Pieces and fractions laid end to end from a cursor, each placed after what was
+         measured before it. The offsets used to be literals (X + 96, X + 132, …), and the
+         day «adj» got its true width the «=» landed on the parenthesis. */
+      let cur = X, out = '';
+      const piezas = ps => { out += row(cur, yb, ps, FS); cur += measure(ps, FS); };
+      const fraccion = (top, bottom) => {
+        const w = Math.max(measure(top, FS), measure(bottom, FS)) + 26;
+        out += frac(cur + w / 2, yb - 7, top, bottom, FS);
+        cur += w;
+      };
+      piezas([{ t: 'λ', sup: 'adj', sub: 'k' }, { t: '=', gap: 12, fill: C.ink2 }, { t: '(', gap: 12 }]);
+      fraccion([{ t: 'Q' }], [{ t: 'Q − 1' }]);
+      piezas([{ t: ')', sup: '2' }, { t: '(', gap: 12 }, { t: 'λ', gap: 2, sub: 'k' }, { t: '−', gap: 8 }]);
+      fraccion([{ t: '1' }], [{ t: 'Q' }]);
+      piezas([{ t: ')', sup: '2' }, { t: 'solo si', gap: 24, fill: C.ink2, fs: 15 }, { t: 'λ', gap: 10, sub: 'k' }, { t: '>', gap: 10 }]);
+      fraccion([{ t: '1' }], [{ t: 'Q' }]);
+      return out;
+    },
     `en el ejemplo solo λ₁ = ${num(MCA.autovalores[0])} supera ${num(b.umbral)}: (${Q}/${Q - 1})² · (${num(MCA.autovalores[0])} − ${num(b.umbral)})² = ${num(b.ajustados[0])}. El eje 1 pasa de ${num(MCA.porcentajes[0])} % crudo a ${num(b.porcentajesAjustados[0])} % ajustado: con ${MCA.n} personas la corrección exagera, que es la crítica de Greenacre.`);
   s += parte;
 
@@ -264,7 +277,7 @@ export function fSuplementaria() {
     'la fórmula de transición aplicada hacia afuera: la categoría recibe coordenadas sobre unos ejes ya cerrados, sin haber participado en los residuos, en la SVD ni en los λ',
     yb => {
       let cur = X + measure([{ t: 'g', sup: 'sup', sub: 'jk' }, eq], FS) + 10 + 62 + 10 + 20;
-      let m = linea(X, yb, [{ t: 'g', sup: 'sup', sub: 'jk' }, eq], [{ t: '1' }], [{ t: '√λ', sub: 'k' }], [{ t: '·', gap: 4 }])
+      let m = linea(X, yb, [{ t: 'g', sup: 'sup', sub: 'jk' }, eq], [{ t: '1' }], [{ raiz: [{ t: 'λ', sub: 'k' }] }], [{ t: '·', gap: 4 }])
         + frac(cur + 22, yb - 7, [{ t: '1' }], [{ t: 'n', sub: 'j' }], FS);
       cur += 44 + 10;
       return m + row(cur, yb, [{ t: 'Σ', fs: 26, fill: C.ink2 }, { t: 'f', gap: 6, sub: 'ik' }], FS)

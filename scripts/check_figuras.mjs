@@ -20,6 +20,14 @@
  * ar-s7-: the two sessions are one route apart, and a marker id repeated across them
  * would make url(#…) resolve to the other session's figure.
  *
+ * Formula text is also checked for OVERLAPS: two serif <text> elements of the same figure
+ * whose estimated boxes intersect by more than HOLGURA_SOLAPE in both directions. A
+ * subscript is its own <text>, so an index that lands on the next symbol — which is what
+ * a fixed advance after «ij» did — fails here instead of on the wall. Only the serif
+ * family is checked: the monospace labels of the maps are stacked by design. The box is
+ * estimated with the same per-glyph advance the typesetter uses, from cap height to
+ * descender, so that what the check sees is what row() laid out.
+ *
  * No dependencies: it imports the figures and reads the SVG strings they return.
  *
  *     node scripts/check_figuras.mjs
@@ -27,9 +35,20 @@
 import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { avance, SERIF } from '../src/sessions/s07/figures/shared.js';
 
 const ANCHO_CAR = { mono: 0.6, serif: 0.5 };   // em per character, by family
 const HOLGURA = 6;                              // px of slack before an overrun counts
+const HOLGURA_SOLAPE = 3;                       // px two formula texts may share before it is a collision
+const ES_SERIF = f => /serif/i.test(f) && !/mono/i.test(f);
+
+/* The estimated box of a <text>: x by anchor, width by the typesetter's own advance for
+   the serif family, height from cap height to descender. */
+function caja(x, y, familia, fs, anclaje, texto) {
+  const ancho = ES_SERIF(familia) ? avance(texto, fs, SERIF) : texto.length * ANCHO_CAR.mono * fs;
+  const izquierda = anclaje === 'end' ? x - ancho : anclaje === 'middle' ? x - ancho / 2 : x;
+  return { izquierda, derecha: izquierda + ancho, arriba: y - 0.72 * fs, abajo: y + 0.2 * fs, texto };
+}
 
 const aqui = dirname(fileURLToPath(import.meta.url));
 const SESIONES = ['s06', 's07'];
@@ -67,15 +86,19 @@ for (const sesion of SESIONES) {
       if (maxY > H - 2) problemas.push(`algo dibujado en y=${maxY.toFixed(0)}, fuera de H=${H}`);
 
       /* 2 · text whose composed width leaves the right edge */
+      const formulas = [];
       for (const m of svg.matchAll(
-        /<text x="([\d.-]+)"[^>]*?font-family="([^"]*)"\s*font-size="([\d.]+)"[^>]*?text-anchor="(\w+)"[^>]*>([^<]*)<\/text>/g)) {
-        const [, x, familia, fs, anclaje, texto] = m;
+        /<text x="([\d.-]+)" y="([\d.-]+)"[^>]*?font-family="([^"]*)"\s*font-size="([\d.]+)"[^>]*?text-anchor="(\w+)"[^>]*>([^<]*)<\/text>/g)) {
+        const [, x, y, familia, fs, anclaje, texto] = m;
         const em = /serif/i.test(familia) && !/mono/i.test(familia) ? ANCHO_CAR.serif : ANCHO_CAR.mono;
         const ancho = texto.length * em * Number(fs);
         const izquierda = anclaje === 'end' ? Number(x) - ancho
           : anclaje === 'middle' ? Number(x) - ancho / 2
           : Number(x);
         const derecha = izquierda + ancho;
+        if (ES_SERIF(familia) && texto.trim()) {
+          formulas.push(caja(Number(x), Number(y), familia, Number(fs), anclaje, texto));
+        }
         if (derecha > W + HOLGURA) {
           problemas.push(`texto llega a x≈${derecha.toFixed(0)} (W=${W}): «${texto.slice(0, 44)}…»`);
         }
@@ -87,7 +110,19 @@ for (const sesion of SESIONES) {
         }
       }
 
-      /* 3 · an id repeated across figures would make url(#…) resolve to another figure's
+      /* 3 · two formula texts on top of each other */
+      for (let a = 0; a < formulas.length; a++) {
+        for (let b2 = a + 1; b2 < formulas.length; b2++) {
+          const p = formulas[a], q = formulas[b2];
+          const dx = Math.min(p.derecha, q.derecha) - Math.max(p.izquierda, q.izquierda);
+          const dy = Math.min(p.abajo, q.abajo) - Math.max(p.arriba, q.arriba);
+          if (dx > HOLGURA_SOLAPE && dy > HOLGURA_SOLAPE) {
+            problemas.push(`se solapan «${p.texto}» y «${q.texto}» (${dx.toFixed(0)}×${dy.toFixed(0)} px)`);
+          }
+        }
+      }
+
+      /* 4 · an id repeated across figures would make url(#…) resolve to another figure's
          marker; every id must carry ITS session's prefix. */
       for (const m of svg.matchAll(/\sid="([^"]+)"/g)) {
         if (!m[1].startsWith(prefijo)) problemas.push(`id «${m[1]}» sin el prefijo ${prefijo}`);
@@ -101,6 +136,6 @@ for (const sesion of SESIONES) {
 }
 
 console.log(fallos
-  ? `\n${fallos} recorte(s) en ${figuras} figuras.`
-  : `\nNinguna de las ${figuras} figuras recorta su contenido.`);
+  ? `\n${fallos} recorte(s) o solape(s) en ${figuras} figuras.`
+  : `\nNinguna de las ${figuras} figuras recorta ni solapa su contenido.`);
 process.exit(fallos ? 1 : 0);

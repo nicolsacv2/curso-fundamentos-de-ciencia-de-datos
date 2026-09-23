@@ -29,6 +29,7 @@ const lista = xs => xs.map((x, i, a) =>
 
 const R = ESTADOS, K = ESTADOS;
 const t = CA.transicion;
+const ti = CA.transicionInversa;
 const ultima = R.length - 1;
 /* Who names axis 1: the rows and the columns above their average share. */
 const filasNombran = CA.filas.filter(r => r.ctr[0] > CA.aportePromedioFilas);
@@ -153,10 +154,27 @@ export default function Block1({ id, tabId, block }) {
           que la nube <b>más se estira</b> —la que más inercia conserva— y después la siguiente,
           perpendicular a la primera. Lo que cambia es la nube (perfiles en vez de personas), el
           peso (cada punto por su masa) y la regla (chi-cuadrado en vez de la distancia de
-          siempre). Lo que no cambia es el gesto. Hay <b>{CA.ejes} ejes</b>, el menor de filas y
-          columnas menos uno, y cada uno conserva su valor propio.</p>
+          siempre). Lo que no cambia es el gesto. Y el número de cada eje, su <b>valor
+          propio</b>, sale en tres pasos. Primero, los <b>residuos estandarizados</b>: en cada
+          celda, lo observado menos lo esperado, en proporciones, sobre la raíz de lo esperado.
+          Es el χ² de la entrada con signo y sobre n: sus cuadrados suman <b>{f(CA.traza)}</b>,
+          que es χ²/n. Están en la tabla de abajo. Segundo, la <b>matriz de residuos
+          cruzados</b>, columnas contra columnas: en su diagonal, cuánto residuo acumula cada
+          columna ({lista(CA.matriz.map((fila, k) => f(fila[k])))}), y su traza —la suma de esa
+          diagonal— es otra vez {f(CA.traza)}. Tercero, <b>diagonalizarla</b>, exactamente lo que
+          el PCA hizo con la matriz de correlaciones: el mayor valor propio,{' '}
+          <b>{f(CA.autovaloresConTrivial[0])}</b>, es la inercia de la dirección que más
+          conserva; el siguiente, <b>{f(CA.autovaloresConTrivial[1])}</b>, la de la perpendicular;
+          y el tercero vale <b>{f(CA.autovaloresConTrivial[CA.autovaloresConTrivial.length - 1])}</b>,
+          porque los residuos suman cero en cada fila y en cada columna —el centrado— y esa
+          dirección no tiene nada que repartir. Los tres suman {f(CA.traza)}, y por eso hay{' '}
+          <b>{CA.ejes} ejes</b> y no {K.length}: el menor de filas y columnas menos uno. De los
+          vectores propios salen las coordenadas de las columnas y, por la transición de más
+          abajo, las de las filas.</p>
         <p><b>Las coordenadas.</b> La coordenada de una fila en un eje es su <b>proyección</b>{' '}
-          sobre él. Por eso la distancia entre dos filas <b>en el mapa</b> aproxima su distancia
+          sobre él: esa es su <b>f_ik</b>, la f de la fila i en el eje k, el número que el mapa
+          dibuja; la de una columna se llama g_jk. Por eso la distancia entre dos filas{' '}
+          <b>en el mapa</b> aproxima su distancia
           chi-cuadrado, y es exacta cuando se suman todos los ejes. Se comprueba sobre las dos
           filas más lejanas, «observado {salto.par[0]}» y «observado {salto.par[1]}»: por los
           perfiles, d = <b>{f(salto.dPerfiles)}</b>; por las coordenadas, <b>{f(salto.dCoord)}</b>.{' '}
@@ -165,12 +183,55 @@ export default function Block1({ id, tabId, block }) {
             : <>Cerca, porque los ejes del mapa retienen el {f(salto.retenido)} %.</>}</p>
       </Prose>
 
+      <NumTable
+        cols={['residuo · observado \\ siguiente', ...K]}
+        rows={R.map((r, i) => [r, ...CA.residuos[i].map(f)])}
+        marca={(i, j) => CA.residuos[i][j] > 0}
+        caption={<>Los residuos estandarizados del ejemplo, con signo: positivo donde hubo más pares
+          de los esperados, negativo donde menos. Cada fila y cada columna suman cero, y los
+          nueve cuadrados suman {f(CA.traza)} = χ²/n.</>}
+      />
+
       <Diagram fig={fSalto}>
-        Tres peldaños: la nube, los ejes, las coordenadas. El bloque siguiente da el mismo salto
-        sobre otra tabla.
+        Cinco peldaños: la nube, los residuos, la matriz y sus valores propios, los ejes, las
+        coordenadas. El bloque siguiente da el mismo salto sobre otra tabla.
       </Diagram>
 
       <h3>Filas y columnas en el mismo plano</h3>
+      <Prose>
+        <p><b>Dos nubes.</b> Hasta aquí dibujamos una sola nube: los {R.length} perfiles de fila,
+          cada uno con {K.length} coordenadas —una por columna—, su masa y la distancia
+          chi-cuadrado. Pero la tabla tiene otra nube igual de legítima: los {K.length} perfiles
+          de <b>columna</b>, cada uno con {R.length} coordenadas —una por fila—, con la masa de su
+          columna y la misma regla. Son dos nubes en dos espacios distintos, y de entrada no hay
+          ninguna razón para dibujarlas en el mismo papel.</p>
+        <p><b>Los mismos ejes.</b> Si se le da el salto de arriba a cada nube por separado, salen
+          los mismos valores propios: {lista(CA.autovalores.map(f))}. No es casualidad: las dos
+          nubes son la misma tabla leída por filas o por columnas, y la inercia que una reparte en
+          sus ejes es la que la otra reparte en los suyos. Cada eje de la nube de filas tiene su
+          pareja en la nube de columnas con la misma inercia, así que hay <b>un solo juego de
+          ejes</b> que dibujar.</p>
+        <p><b>La transición.</b> Y las coordenadas se corresponden una a una: las filas y las
+          columnas comparten el plano por las <b>fórmulas de transición</b>. Cada fila está en el
+          promedio de las columnas, pesado por su perfil y dilatado por 1/√λ; cada columna, en el
+          promedio de las filas, pesado por su perfil de columna y dilatado igual. Ida: «observado{' '}
+          {t.fila}» en el eje {t.eje} es{' '}
+          {t.sumandos.map(x => `${f(x.perfil)} · (${f(x.coord)})`).join(' + ')} ={' '}
+          <b>{f(t.promedioPonderado)}</b>, y {f(t.promedioPonderado)}/{f(t.raizLambda)} ={' '}
+          <b>{f(t.dilatado)}</b>, su coordenada publicada ({f(t.coordPublicada)}). Vuelta:
+          «siguiente {ti.columna}» en el eje {ti.eje} es{' '}
+          {ti.sumandos.map(x => `${f(x.perfil)} · (${f(x.coord)})`).join(' + ')} ={' '}
+          <b>{f(ti.promedioPonderado)}</b>, y {f(ti.promedioPonderado)}/{f(ti.raizLambda)} ={' '}
+          <b>{f(ti.dilatado)}</b>, su coordenada publicada ({f(ti.coordPublicada)}). Con la ida y
+          la vuelta comprobadas, superponer las dos nubes sobre los mismos ejes no es un truco de
+          dibujo: es lo que las fórmulas dicen.</p>
+        <p><b>El precio.</b> Entre dos filas, la distancia del mapa es la chi-cuadrado
+          {CA.acumulado[1] === 100 ? ' —aquí exacta—' : ' —aproximada por el plano—'}; entre dos
+          columnas, también. Entre una fila y una columna <b>no hay distancia</b>: viven en
+          espacios distintos y lo único que las une es el promedio ponderado. Por eso una de las
+          reglas de lectura de abajo habla de dirección y no de distancia.</p>
+      </Prose>
+
       <Diagram fig={mapaCA}>
         Los cielos del día observado como círculos y los del día siguiente como cuadrados, con su
         número de días. Bajo cada pareja, la celda de la diagonal que dibuja.
@@ -187,13 +248,6 @@ export default function Block1({ id, tabId, block }) {
             : <>Aquí el eje 1 lleva {pct(CA.porcentajes[0])} y el eje 2 el resto: la tabla no es
               una sola línea, y hacen falta los dos ejes para leerla. Lo que opone el eje 1 es{' '}
               {opone}.</>}</p>
-        <p>Las filas y las columnas comparten el plano por las <b>fórmulas de transición</b>:
-          cada fila está en el promedio de las columnas, pesado por su perfil y dilatado por
-          1/√λ; cada columna, en el promedio de las filas, pesado por su perfil de columna y
-          dilatado igual. Se comprueba sobre «observado {t.fila}» en el eje {t.eje}:{' '}
-          {t.sumandos.map(x => `${f(x.perfil)} · (${f(x.coord)})`).join(' + ')} ={' '}
-          <b>{f(t.promedioPonderado)}</b>, y {f(t.promedioPonderado)}/{f(t.raizLambda)} ={' '}
-          <b>{f(t.dilatado)}</b>, que es su coordenada publicada, {f(t.coordPublicada)}.</p>
       </Prose>
 
       <Diagram fig={fTransicionCA}>

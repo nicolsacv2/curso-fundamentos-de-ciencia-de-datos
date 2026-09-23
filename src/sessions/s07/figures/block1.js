@@ -1,5 +1,5 @@
 import { C, svg, txt, wrap } from '../../../svg/kit.js';
-import { TABLA, ESPERADAS, CHI2, CA } from '../data/lluvia.js';
+import { ESTADOS, TABLA, ESPERADAS, CHI2, CA } from '../data/lluvia.js';
 import { dot, num, plano, cuadrado, apilar, row, frac, measure, label } from './shared.js';
 
 /* Block 1 of session 7 · the simple correspondence analysis of the rain table. Every id
@@ -96,20 +96,41 @@ export function fSalto() {
       { t: 'masa', gap: 26, fill: C.ink2, fs: 15 }, { t: 'm', gap: 10, sub: 'i' }, eq], [{ t: 'n', sub: 'i·' }], [{ t: 'n' }], null),
     `en el ejemplo: ${CA.filas.length} puntos con ${CA.columnas.length} coordenadas cada uno, con masas (${CA.filas.map(r => num(r.masa)).join(', ')}), y la regla chi-cuadrado de arriba`);
   s += parte;
+  const ll = ESTADOS.indexOf('lluvia');
+  [parte, y] = seccion(y, 'LOS RESIDUOS', 'en cada celda, lo observado menos lo esperado en proporciones, sobre la raíz de lo esperado: el chi-cuadrado de la entrada, con signo y sobre n',
+    yb => linea(X, yb, [{ t: 's', sub: 'ij' }, eq],
+      [{ t: 'p', sub: 'ij' }, { t: '−', gap: 7 }, { t: 'r', gap: 7, sub: 'i' }, { t: 'c', gap: 4, sub: 'j' }],
+      [{ raiz: [{ t: 'r', sub: 'i' }, { t: 'c', gap: 4, sub: 'j' }] }],
+      [{ t: 'con', gap: 30, fill: C.ink2, fs: 15 }, { t: 'p', gap: 10, sub: 'ij' }, eq, { t: 'n', sub: 'ij' }, { t: '/ n', gap: 4 }]),
+    `en el ejemplo, la celda «${ESTADOS[ll]} → ${ESTADOS[ll]}»: s = ${n3(CA.residuos[ll][ll])}; los ${CA.residuos.length * CA.residuos[0].length} residuos al cuadrado suman ${num(CA.traza)} = χ²/n`);
+  s += parte;
+  [parte, y] = seccion(y, 'LA MATRIZ Y SUS VALORES PROPIOS', 'los residuos cruzados, columna contra columna; su traza es χ²/n. Se diagonaliza como el PCA de la sesión 6 diagonalizó la matriz de correlaciones: los valores propios son la inercia de cada eje',
+    yb => linea(X, yb, [{ t: 'M' }, eq, { t: 'S', sup: 'T' }, { t: 'S', gap: 2 }, { t: 'traza(M)', gap: 30 }, eq, { t: 'Σ', gap: 4, fs: 26, fill: C.ink2 },
+      { t: 's', gap: 4, sub: 'ij', sup: '2' }, { t: '=', gap: 14, fill: C.ink2 }], [{ t: 'χ', sup: '2' }], [{ t: 'n' }],
+      [{ t: '=', gap: 4, fill: C.ink2 }, { t: 'Σ', gap: 8, fs: 26, fill: C.ink2 }, { t: 'λ', gap: 4, sub: 'k' }]),
+    `en el ejemplo: diagonal (${CA.matriz.map((fila, k) => num(fila[k])).join(', ')}), traza ${num(CA.traza)}; los valores propios son (${CA.autovaloresConTrivial.map(num).join(', ')}) y suman ${num(CA.traza)}. El cero es el del centrado: los residuos suman cero por fila y por columna, y esa dirección no reparte nada`);
+  s += parte;
   [parte, y] = seccion(y, 'LOS EJES', 'la dirección en la que la nube más se estira —la que más inercia conserva, pesando cada punto por su masa—; después la siguiente, perpendicular. El gesto del PCA de la sesión 6, sobre esta nube y con esta regla',
     yb => linea(X, yb, [{ t: 'λ', sub: '1' }, { t: '≥', gap: 8 }, { t: 'λ', gap: 8, sub: '2' }, { t: '≥ … ≥', gap: 8 }, { t: 'λ', gap: 8, sub: 'K' },
       { t: 'K', gap: 40 }, eq, { t: 'min(filas, columnas) − 1' }], null, null, null),
     `en el ejemplo: K = ${CA.ejes}, λ = (${CA.autovalores.map(num).join(', ')}); el eje 1 conserva ${num(CA.porcentajes[0])} % de la inercia y el eje 2 el resto`);
   s += parte;
   [parte, y] = seccion(y, 'LAS COORDENADAS', 'la coordenada de una fila en un eje es su proyección sobre él; la distancia entre dos filas en el mapa aproxima la chi-cuadrado, y es exacta si se suman todos los ejes',
-    yb => linea(X, yb, [{ t: 'd', sup: '2' }, { t: '(i, i′)' }, { t: '≈', gap: 8, fill: C.ink2 }, { t: 'Σ', gap: 6, fs: 26, fill: C.ink2 }, { t: '(f', gap: 4, sub: 'ik' }, { t: '−', gap: 7 }, { t: 'f', gap: 7, sub: 'i′k' }, { t: ')', sup: '2' },
-      { t: 'con igualdad si k recorre los K ejes', gap: 30, fill: C.ink2, fs: 15 }], null, null, null)
-      + idx(X + measure([{ t: 'd', sup: '2' }, { t: '(i, i′)' }, { t: '≈', gap: 8 }], FS) + 10, yb + 20, 'k'),
+    /* The letters are defined on their own line BEFORE the formula that uses them: a
+       formula that opens with f_ik unexplained reads as a symbol, not as «the
+       coordinate», and the wall asked what it was. */
+    yb => row(X, yb, [{ t: 'f', sub: 'ik' }, eq, { t: 'coordenada de la fila i en el eje k', fill: C.ink2, fs: 15 },
+      { t: 'g', gap: 26, sub: 'jk' }, eq, { t: 'la de la columna j en el eje k', fill: C.ink2, fs: 15 }], FS)
+      + linea(X, yb + 40, [{ t: 'd', sup: '2' }, { t: '(i, i′)' }, { t: '≈', gap: 8, fill: C.ink2 }, { t: 'Σ', gap: 6, fs: 26, fill: C.ink2 }, { t: '(f', gap: 4, sub: 'ik' }, { t: '−', gap: 7 }, { t: 'f', gap: 7, sub: 'i′k' }, { t: ')', sup: '2' },
+        { t: 'con igualdad si k recorre los K ejes', gap: 30, fill: C.ink2, fs: 15 }], null, null, null)
+      + idx(X + measure([{ t: 'd', sup: '2' }, { t: '(i, i′)' }, { t: '≈', gap: 8 }], FS) + 10, yb + 60, 'k'),
     `en el ejemplo, entre «observado ${sl.par[0]}» y «observado ${sl.par[1]}»: por los perfiles d = ${num(sl.dPerfiles)}; por las coordenadas, ${num(sl.dCoord)}. ${sl.retenido === 100 ? `Iguales: los ${sl.ejes} ejes retienen el 100 %, así que el mapa no aproxima, dibuja.` : `Cerca: el mapa retiene ${num(sl.retenido)} %.`}`);
   s += parte;
   return svg(W, y,
-    'Los tres pasos de las distancias al mapa: la nube de perfiles con sus masas y la '
-    + 'distancia chi-cuadrado; los ejes, ordenados por la inercia que conservan, tantos como el '
+    'Los cinco pasos de las distancias al mapa: la nube de perfiles con sus masas y la '
+    + 'distancia chi-cuadrado; los residuos estandarizados de cada celda; su matriz cruzada, '
+    + 'cuya traza es el chi-cuadrado sobre n y cuyos valores propios, incluido el cero del '
+    + 'centrado, son la inercia de cada eje; los ejes, ordenados por la inercia que conservan, tantos como el '
     + 'menor de filas y columnas menos uno; y las coordenadas como proyecciones, con la distancia '
     + 'entre dos filas en el mapa aproximando la chi-cuadrado y coincidiendo con ella cuando se '
     + `suman todos los ejes. Verificado sobre «observado ${sl.par[0]}» y «observado ${sl.par[1]}»`, s);
@@ -117,21 +138,22 @@ export function fSalto() {
 
 /* ═══════════ 2 · transition, contribution, cos² ═══════════ */
 export function fTransicionCA() {
-  const t = CA.transicion;
+  const t = CA.transicion, ti = CA.transicionInversa;
   const f0 = CA.filas[0];
   let s = '', y = 40, parte;
   [parte, y] = seccion(y, 'DE LAS COLUMNAS A LA FILA', 'una fila está en el promedio de las columnas, pesado por su perfil r_ij, dilatado por 1/√λ — y viceversa, con el perfil de columna c_ji = n_ij / n_·j: la columna repartida entre las filas. No es el c_j de la distancia, que es una sola cifra por columna',
     yb => {
-      let cur = X + measure([{ t: 'f', sub: 'ik' }, eq], FS) + 10 + 62 + 10 + 20;
-      return linea(X, yb, [{ t: 'f', sub: 'ik' }, eq], [{ t: '1' }], [{ t: '√λ', sub: 'k' }], [{ t: '·', gap: 4 }])
+      let cur = X + measure([{ t: 'f', sub: 'ik' }, eq], FS) + 10
+        + Math.max(measure([{ t: '1' }], FS), measure([{ raiz: [{ t: 'λ', sub: 'k' }] }], FS)) + 26 + 10 + 20;
+      return linea(X, yb, [{ t: 'f', sub: 'ik' }, eq], [{ t: '1' }], [{ raiz: [{ t: 'λ', sub: 'k' }] }], [{ t: '·', gap: 4 }])
         + row(cur, yb, [{ t: 'Σ', fs: 26, fill: C.ink2 }, { t: 'r', gap: 6, sub: 'ij' }, { t: 'g', gap: 6, sub: 'jk' }], FS)
         + idx(cur + 4, yb + 20, 'j')
         + row(cur + 120, yb, [{ t: 'g', sub: 'jk' }, eq], FS)
-        + frac(cur + 120 + measure([{ t: 'g', sub: 'jk' }, eq], FS) + 40, yb - 7, [{ t: '1' }], [{ t: '√λ', sub: 'k' }], FS)
+        + frac(cur + 120 + measure([{ t: 'g', sub: 'jk' }, eq], FS) + 40, yb - 7, [{ t: '1' }], [{ raiz: [{ t: 'λ', sub: 'k' }] }], FS)
         + row(cur + 120 + measure([{ t: 'g', sub: 'jk' }, eq], FS) + 80, yb, [{ t: '·', gap: 4 }, { t: 'Σ', gap: 8, fs: 26, fill: C.ink2 }, { t: 'c', gap: 6, sub: 'ji' }, { t: 'f', gap: 6, sub: 'ik' }], FS)
         + idx(cur + 120 + measure([{ t: 'g', sub: 'jk' }, eq], FS) + 108, yb + 20, 'i');
     },
-    `en el ejemplo, «observado ${t.fila}» en el eje ${t.eje}: ${t.sumandos.map(x => `${num(x.perfil)}·(${n3(x.coord)})`).join(' + ')} = ${n3(t.promedioPonderado)}, y ${n3(t.promedioPonderado)}/${num(t.raizLambda)} = ${n3(t.dilatado)}: su coordenada publicada es ${n3(t.coordPublicada)}`);
+    `en el ejemplo, ida: «observado ${t.fila}» en el eje ${t.eje}: ${t.sumandos.map(x => `${num(x.perfil)}·(${n3(x.coord)})`).join(' + ')} = ${n3(t.promedioPonderado)}, y ${n3(t.promedioPonderado)}/${num(t.raizLambda)} = ${n3(t.dilatado)}: su coordenada publicada es ${n3(t.coordPublicada)}. Vuelta: «siguiente ${ti.columna}» en el eje ${ti.eje}: ${ti.sumandos.map(x => `${num(x.perfil)}·(${n3(x.coord)})`).join(' + ')} = ${n3(ti.promedioPonderado)}, y ${n3(ti.promedioPonderado)}/${num(ti.raizLambda)} = ${n3(ti.dilatado)}: su coordenada publicada es ${n3(ti.coordPublicada)}`);
   s += parte;
   [parte, y] = seccion(y, 'CONTRIBUCIÓN Y COSENO CUADRADO', 'quién construyó el eje, y qué tan fiel es la posición de cada punto en él; las mismas dos herramientas para filas y para columnas',
     yb => linea(X, yb, [{ t: 'ctr', sub: 'ik' }, eq], [{ t: 'm', sub: 'i' }, { t: 'f', gap: 6, sub: 'ik', sup: '2' }], [{ t: 'λ', sub: 'k' }],

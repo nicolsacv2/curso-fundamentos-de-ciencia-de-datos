@@ -59,8 +59,8 @@ export function fReescalado() {
   [parte, y] = seccion(y, 'UNA INDICADORA',
     'la ponderación chi-cuadrado del MCA disfrazada de estandarización: varianza 1 − p_j, y cada variable aporta J_q − 1',
     yb => linea(X, yb, [{ t: 'z', sub: 'j' }, { t: '↦', gap: 10, fill: C.ink2 }],
-      [{ t: 'z', sub: 'j' }], [{ t: '√p', sub: 'j' }],
-      [{ t: '−', gap: 2 }, { t: '√p', gap: 8, sub: 'j' }, { t: 'con', gap: 30, fill: C.ink2, fs: 15 },
+      [{ t: 'z', sub: 'j' }], [{ raiz: [{ t: 'p', sub: 'j' }] }],
+      [{ t: '−', gap: 2 }, { raiz: [{ t: 'p', sub: 'j' }], gap: 8 }, { t: 'con', gap: 30, fill: C.ink2, fs: 15 },
        { t: 'p', gap: 10, sub: 'j' }, eq, { t: 'n', sub: 'j' }, { t: '/ n', gap: 4 }]),
     `en el ejemplo: las ${catCols.length} indicadoras tienen p_j = ${num(0.5)} y varianza 1 − p_j = ${num(catCols[0].varianza)} cada una; Bebida aporta ${catCols.length / 2 - 1} y Horario ${catCols.length / 2 - 1}`);
   s += parte;
