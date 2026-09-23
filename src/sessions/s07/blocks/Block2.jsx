@@ -1,7 +1,7 @@
 import { Panel, Task, Options, Cards, Card, Diagram, Pair, Prose, List, NumTable }
   from '../../../components/content/index.jsx';
 import { PERSONAS, TABLA, TABLA_RARA, MCA, MCA_RARA, SUPL } from '../data/ejemplo.js';
-import { fIndicadora, fDistancia, fSalto, fTransicion, fInercia, fContribucion, fSuplementaria,
+import { fIndicadora, fDistancia, fSalto, fMatricial, fTransicion, fInercia, fContribucion, fSuplementaria,
   mapaBase, mapaRara, mapaSuplementarias } from '../figures/block2.js';
 import { UMBRAL_COS2 } from '../figures/shared.js';
 
@@ -160,6 +160,24 @@ export default function Block1({ id, tabId, block }) {
         ))}
       </Cards>
 
+      <Prose>
+        <p><b>En una sola línea.</b> Las mismas matrices del bloque 1, sobre la tabla disyuntiva:
+          S = U Σ Vᵀ, con σ_k = √λ_k, aquí {lista(MCA.svd.sigma.map(f))}. Lo que cambia es de
+          dónde salen S y las masas: P = Z/(nQ), toda masa de fila vale 1/{MCA.n} —así que
+          D_r^−½ es √{MCA.n} por la identidad— y D_c = diag(n_j/nQ). Las personas son F = √n U Σ:
+          la persona {MCA.matricial.persona.i} en el eje 1 es {f(MCA.matricial.persona.raizN)} ·{' '}
+          {f(MCA.matricial.persona.u)} · {f(MCA.matricial.persona.sigma)} ={' '}
+          <b>{f(MCA.matricial.persona.producto)}</b>, su coordenada. Las categorías son
+          G = D_c^−½ V Σ: {MCA.matricial.categoria.nivel} es {f(MCA.matricial.categoria.v)} ·{' '}
+          {f(MCA.matricial.categoria.sigma)} / {f(MCA.matricial.categoria.raizMasa)} ={' '}
+          <b>{f(MCA.matricial.categoria.producto)}</b>, la suya. La transición en matrices es la
+          del bloque 1, letra por letra.</p>
+      </Prose>
+
+      <Diagram fig={fMatricial}>
+        Las tres líneas sobre la tabla disyuntiva, con lo que cambia respecto a la lluvia.
+      </Diagram>
+
       <h3>Parte 1 · La métrica chi-cuadrado</h3>
       <Prose>
         <p>Lo que distingue al MCA del PCA no es el algoritmo: es <b>cómo mide la distancia
@@ -276,6 +294,9 @@ export default function Block1({ id, tabId, block }) {
           Solo lo superan {lista(nombran.map(rotulo))}, con {pct(nombran[0].ctr[0])} cada
           una. Por eso <b>el eje 1 se llama «{nombreEje1}»</b>, y no se llama nada más: las
           otras cuatro categorías están por debajo del promedio y no lo nombran.</p>
+        <p>De dónde salen las dos —por qué las contribuciones suman uno por eje y los cos² uno por
+          punto— lo dedujo el bloque 1, y la deducción es la misma sobre la tabla disyuntiva:
+          cambian D_r y D_c, no el argumento.</p>
       </Prose>
 
       <Diagram fig={fContribucion}>

@@ -1,7 +1,7 @@
 import { Panel, Task, Cards, Card, Diagram, Pair, Prose, List, NumTable }
   from '../../../components/content/index.jsx';
 import { ESTADOS, TABLA, PERFILES, ESPERADAS, CHI2, CA } from '../data/lluvia.js';
-import { fPerfiles, fSalto, fTransicionCA, mapaCA } from '../figures/block1.js';
+import { fPerfiles, fSalto, fMatricial, fDeduccion, fTransicionCA, mapaCA } from '../figures/block1.js';
 import { UMBRAL_COS2 } from '../figures/shared.js';
 
 /* Block 1 of session 7 · simple correspondence analysis. The same rain table the entrada
@@ -197,6 +197,36 @@ export default function Block1({ id, tabId, block }) {
         coordenadas. El bloque siguiente da el mismo salto sobre otra tabla.
       </Diagram>
 
+      <h3>En una sola línea: las matrices</h3>
+      <Prose>
+        <p>Todo lo anterior cabe en cuatro líneas, para quien quiera reproducir el mapa con un
+          programa o reconocer aquí lo que ya sabe. <b>La descomposición.</b> Los residuos se
+          parten en tres matrices, S = U Σ Vᵀ: U tiene una fila por fila de la tabla y una
+          columna por eje —las direcciones de la nube de filas—; V tiene una fila por columna
+          —las de la nube de columnas—; y Σ es diagonal con los <b>valores singulares</b>{' '}
+          σ_k = √λ_k, aquí {lista(CA.svd.sigma.map(f))}. Es la misma diagonalización de arriba
+          vista de una vez: SᵀS = V Λ Vᵀ es la matriz que se diagonalizó, SSᵀ = U Λ Uᵀ la de la
+          otra nube, y Λ = Σ² son los valores propios. Que las dos compartan Σ es exactamente
+          «los mismos ejes» de la sección siguiente.</p>
+        <p><b>Las coordenadas.</b> Las filas son F = D_r^−½ U Σ, con D_r la diagonal de las masas
+          de fila: entrada por entrada, f_ik = u_ik σ_k / √r_i. Las columnas, G = D_c^−½ V Σ, con
+          las masas de columna: g_jk = v_jk σ_k / √c_j. Con los números publicados: «observado{' '}
+          {CA.matricial.fila.nivel}» en el eje 1 es {f(CA.matricial.fila.u)} · {f(CA.matricial.fila.sigma)} /{' '}
+          {f(CA.matricial.fila.raizMasa)} = <b>{f(CA.matricial.fila.producto)}</b>, su coordenada; y
+          «siguiente {CA.matricial.columna.nivel}» es {f(CA.matricial.columna.v)} ·{' '}
+          {f(CA.matricial.columna.sigma)} / {f(CA.matricial.columna.raizMasa)} ={' '}
+          <b>{f(CA.matricial.columna.producto)}</b>, la suya.</p>
+        <p><b>La transición.</b> En la misma notación, F = D_r^−1 P G Σ^−1 y G = D_c^−1 Pᵀ F Σ^−1:
+          D_r^−1 P son los perfiles de fila, así que cada fila es el promedio de las columnas
+          pesado por su perfil y dilatado por Σ^−1, y al revés. Son las dos líneas que la sección
+          siguiente verifica con números.</p>
+      </Prose>
+
+      <Diagram fig={fMatricial}>
+        Las cuatro líneas, cada una con una entrada del ejemplo recalculada desde U, V, σ y las
+        masas.
+      </Diagram>
+
       <h3>Filas y columnas en el mismo plano</h3>
       <Prose>
         <p><b>Dos nubes.</b> Hasta aquí dibujamos una sola nube: los {R.length} perfiles de fila,
@@ -268,6 +298,29 @@ export default function Block1({ id, tabId, block }) {
           día siguiente</b> a la vez, y lo que opone es lo que esas filas y columnas oponen:{' '}
           {opone}.</p>
       </Prose>
+
+      <Prose>
+        <p><b>De dónde sale la contribución.</b> La inercia de un eje es la suma, pesada por las
+          masas, de las coordenadas al cuadrado: λ_k = Σ_i m_i f_ik². Se ve en una línea desde las
+          matrices de arriba: con f_ik = u_ik σ_k / √r_i, la suma queda σ_k² Σ_i u_ik², y las
+          columnas de U tienen norma uno, así que es σ_k² = λ_k. En el eje 1:{' '}
+          {CA.deduccion.sumandosInercia.map(f).join(' + ')} = <b>{f(CA.deduccion.suma)}</b>, que es
+          λ₁ = {f(CA.deduccion.lambda)}. La <b>contribución</b> de una fila es su sumando sobre ese
+          total, y por eso las contribuciones <b>suman uno por eje</b>: son partes de λ_k.</p>
+        <p><b>De dónde sale el cos².</b> La distancia chi-cuadrado de una fila al centroide es
+          Σ_j (r_ij − c_j)²/c_j, y cada término es (s_ij/√r_i)²: la distancia es la norma de la
+          fila i de D_r^−½ S. Las coordenadas f_ik son esa misma fila escrita sobre los ejes, que
+          son perpendiculares, y una longitud al cuadrado es la suma de los cuadrados de sus
+          coordenadas —Pitágoras—: d²(i, centroide) = Σ_k f_ik². Para «observado{' '}
+          {CA.deduccion.fila}»: {CA.deduccion.sumandosDistancia.map(f).join(' + ')} ={' '}
+          <b>{f(CA.deduccion.sumaF2)}</b>, y desde el perfil, {f(CA.deduccion.d2Perfil)}. El{' '}
+          <b>cos²</b> de un eje es la parte de ese cuadrado que ese eje muestra, y por eso los
+          cosenos cuadrados <b>suman uno por punto</b>: son partes de su distancia.</p>
+      </Prose>
+
+      <Diagram fig={fDeduccion}>
+        Las dos identidades detrás de las dos herramientas, con los sumandos del ejemplo.
+      </Diagram>
 
       <NumTable
         cols={['punto', 'tipo', 'días', 'coord. eje 1', 'ctr eje 1', 'cos² eje 1']}

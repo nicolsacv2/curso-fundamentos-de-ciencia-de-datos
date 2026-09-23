@@ -136,6 +136,80 @@ export function fSalto() {
     + `suman todos los ejes. Verificado sobre «observado ${sl.par[0]}» y «observado ${sl.par[1]}»`, s);
 }
 
+/* ═══════════ 1c · the matrix form: S = U Σ Vᵀ, F, G, and the transition ═══════════
+   The four lines the guide writes and the block had only said in words. Every symbol is
+   defined in its gloss, Σ (the matrix) is set at body size to tell it from the summation
+   sign, and each line is followed by one entry of the example recomputed from the
+   published U, V, σ and masses. */
+const SIG = { t: 'Σ' };
+export function fMatricial() {
+  const sv = CA.svd, mf = CA.matricial.fila, mc = CA.matricial.columna;
+  let s = '', y = 40, parte;
+  [parte, y] = seccion(y, 'LA DESCOMPOSICIÓN', 'los residuos se parten en tres: U, una fila por fila de la tabla y una columna por eje —las direcciones de la nube de filas—; V, una fila por columna —las de la nube de columnas—; y Σ, diagonal, con los valores singulares σ_k = √λ_k. SᵀS = V Λ Vᵀ es la matriz que se diagonalizó; SSᵀ = U Λ Uᵀ, la de la otra nube, con los mismos λ',
+    yb => linea(X, yb, [{ t: 'S' }, eq, { t: 'U' }, { ...SIG, gap: 4 }, { t: 'V', gap: 4, sup: 'T' },
+      { t: 'Λ', gap: 40 }, eq, { ...SIG }, { t: '', sup: '2' }, { t: 'σ', gap: 40, sub: 'k' }, eq, { raiz: [{ t: 'λ', sub: 'k' }] }], null, null, null)
+      + linea(X, yb + 40, [{ t: 'S', sup: 'T' }, { t: 'S', gap: 2 }, eq, { t: 'V' }, { t: 'Λ', gap: 4 }, { t: 'V', gap: 4, sup: 'T' },
+        { t: 'S', gap: 40 }, { t: 'S', gap: 2, sup: 'T' }, eq, { t: 'U' }, { t: 'Λ', gap: 4 }, { t: 'U', gap: 4, sup: 'T' }], null, null, null),
+    `en el ejemplo: σ = (${sv.sigma.map(num).join(', ')}), y σ² = (${sv.sigma.map(x => num(Math.round(x * x * 10000) / 10000)).join(', ')}) = λ. U es ${sv.U.length} × ${CA.ejes}, V es ${sv.V.length} × ${CA.ejes}`);
+  s += parte;
+  [parte, y] = seccion(y, 'LAS FILAS', 'las coordenadas de las filas: U estirada por Σ y dividida por la raíz de cada masa; D_r es la diagonal de las masas de fila',
+    yb => linea(X, yb, [{ t: 'F' }, eq, { t: 'D', sub: 'r', sup: '−1/2' }, { t: 'U', gap: 4 }, { ...SIG, gap: 4 },
+      { t: 'f', gap: 40, sub: 'ik' }, eq], [{ t: 'u', sub: 'ik' }, { t: 'σ', gap: 4, sub: 'k' }], [{ raiz: [{ t: 'r', sub: 'i' }] }], null),
+    `en el ejemplo, «observado ${mf.nivel}» en el eje ${mf.eje}: u = ${n3(mf.u)}, σ = ${num(mf.sigma)}, √r = ${num(mf.raizMasa)}; ${n3(mf.u)} · ${num(mf.sigma)} / ${num(mf.raizMasa)} = ${n3(mf.producto)}, su coordenada publicada es ${n3(mf.coordPublicada)}`);
+  s += parte;
+  [parte, y] = seccion(y, 'LAS COLUMNAS', 'lo mismo con V y las masas de columna, D_c: la misma Σ, porque las dos nubes comparten los ejes',
+    yb => linea(X, yb, [{ t: 'G' }, eq, { t: 'D', sub: 'c', sup: '−1/2' }, { t: 'V', gap: 4 }, { ...SIG, gap: 4 },
+      { t: 'g', gap: 40, sub: 'jk' }, eq], [{ t: 'v', sub: 'jk' }, { t: 'σ', gap: 4, sub: 'k' }], [{ raiz: [{ t: 'c', sub: 'j' }] }], null),
+    `en el ejemplo, «siguiente ${mc.nivel}» en el eje ${mc.eje}: v = ${n3(mc.v)}, σ = ${num(mc.sigma)}, √c = ${num(mc.raizMasa)}; ${n3(mc.v)} · ${num(mc.sigma)} / ${num(mc.raizMasa)} = ${n3(mc.producto)}, su coordenada publicada es ${n3(mc.coordPublicada)}`);
+  s += parte;
+  [parte, y] = seccion(y, 'LA TRANSICIÓN, EN MATRICES', 'D_r⁻¹ P son los perfiles de fila y D_c⁻¹ Pᵀ los de columna: cada nube en el promedio ponderado de la otra, dilatado por Σ⁻¹. Es la fórmula de la sección siguiente, línea por línea',
+    yb => linea(X, yb, [{ t: 'F' }, eq, { t: 'D', sub: 'r', sup: '−1' }, { t: 'P', gap: 4 }, { t: 'G', gap: 4 }, { ...SIG, gap: 4, sup: '−1' },
+      { t: 'G', gap: 40 }, eq, { t: 'D', sub: 'c', sup: '−1' }, { t: 'P', gap: 4, sup: 'T' }, { t: 'F', gap: 4 }, { ...SIG, gap: 4, sup: '−1' }], null, null, null),
+    `en el ejemplo, la sección siguiente lo verifica con números: «observado ${CA.transicion.fila}» desde las columnas y «siguiente ${CA.transicionInversa.columna}» desde las filas`);
+  s += parte;
+  return svg(W, y,
+    'Las fórmulas matriciales del análisis de correspondencias: la descomposición de los '
+    + 'residuos en U, Σ y V transpuesta, con Λ igual a Σ al cuadrado y SᵀS igual a V Λ Vᵀ; las '
+    + 'coordenadas de las filas como D_r a la menos un medio por U por Σ; las de las columnas '
+    + 'como D_c a la menos un medio por V por Σ; y las fórmulas de transición en matrices. '
+    + `Verificadas sobre «observado ${mf.nivel}» y «siguiente ${mc.nivel}» en el eje 1`, s);
+}
+
+/* ═══════════ 1d · where contribution and cos² come from ═══════════
+   Two identities, each derived in a gloss and checked with the example's own terms: the
+   inertia of an axis is the mass-weighted sum of squared coordinates (so a contribution
+   is a share of it, and shares add to one), and the chi-square distance of a row to the
+   centroid is the sum of its squared coordinates over every axis (so a cos² is a share
+   of it, and shares add to one). */
+export function fDeduccion() {
+  const d = CA.deduccion;
+  let s = '', y = 40, parte;
+  [parte, y] = seccion(y, 'LA INERCIA DE UN EJE', 'sustituyendo f_ik = u_ik σ_k / √r_i, la suma pesada por las masas queda σ_k² Σ_i u_ik², y las columnas de U tienen norma uno: es λ_k. La contribución es la parte de esa suma que pone cada fila, y por eso suman uno',
+    yb => linea(X, yb, [{ t: 'λ', sub: 'k' }, eq, { t: 'Σ', gap: 4, fs: 26, fill: C.ink2 }, { t: 'm', gap: 4, sub: 'i' }, { t: 'f', gap: 4, sub: 'ik', sup: '2' },
+      { t: '=', gap: 14, fill: C.ink2 }, { t: 'σ', gap: 6, sub: 'k', sup: '2' }, { t: 'Σ', gap: 6, fs: 26, fill: C.ink2 }, { t: 'u', gap: 4, sub: 'ik', sup: '2' },
+      { t: '=', gap: 14, fill: C.ink2 }, { t: 'σ', gap: 6, sub: 'k', sup: '2' }, { t: 'ctr', gap: 40, sub: 'ik' }, eq],
+      [{ t: 'm', sub: 'i' }, { t: 'f', gap: 4, sub: 'ik', sup: '2' }], [{ t: 'λ', sub: 'k' }], null)
+      + idx(X + measure([{ t: 'λ', sub: 'k' }, eq], FS) + 8, yb + 20, 'i'),
+    `en el ejemplo, eje ${d.eje}: ${d.sumandosInercia.map(num).join(' + ')} = ${num(d.suma)} = λ₁ = ${num(d.lambda)}. Cada sumando sobre ${num(d.suma)} es la contribución de su fila`);
+  s += parte;
+  [parte, y] = seccion(y, 'LA DISTANCIA AL CENTROIDE', '(s_ij / √r_i)² es (r_ij − c_j)² / c_j, así que la distancia chi-cuadrado de la fila i al centroide es la norma de su fila en D_r⁻¹ᐟ² S. Sus coordenadas f_ik son esa misma fila escrita sobre los ejes, que son perpendiculares: Pitágoras. El cos² es la parte de ese cuadrado que muestra un eje, y por eso suman uno',
+    yb => linea(X, yb, [{ t: 'd', sup: '2' }, { t: '(i, centroide)' }, eq, { t: 'Σ', gap: 4, fs: 26, fill: C.ink2 }],
+      [{ t: '(r', sub: 'ij' }, { t: '−', gap: 7 }, { t: 'c', gap: 7, sub: 'j' }, { t: ')', sup: '2' }], [{ t: 'c', sub: 'j' }],
+      [{ t: '=', gap: 4, fill: C.ink2 }, { t: 'Σ', gap: 8, fs: 26, fill: C.ink2 }, { t: 'f', gap: 4, sub: 'ik', sup: '2' }])
+      + idx(X + measure([{ t: 'd', sup: '2' }, { t: '(i, centroide)' }, eq], FS) + 8, yb + 20, 'j')
+      /* the cos² on its own line: with the fraction after the sum it ran out of frame */
+      + linea(X, yb + 74, [{ t: 'cos', sup: '2', sub: 'ik' }, eq], [{ t: 'f', sub: 'ik', sup: '2' }], [{ t: 'd', sup: '2' }, { t: '(i, centroide)' }], null),
+    `en el ejemplo, «observado ${d.fila}»: ${d.sumandosDistancia.map(num).join(' + ')} = ${num(d.sumaF2)}, y desde el perfil, Σ (r_ij − c_j)²/c_j = ${num(d.d2Perfil)}. Cada sumando sobre ${num(d.sumaF2)} es el cos² de ese eje`);
+  s += parte;
+  return svg(W, y,
+    'Dos deducciones: la inercia de un eje es la suma, pesada por las masas, de las '
+    + 'coordenadas al cuadrado, igual a sigma al cuadrado porque las columnas de U son '
+    + 'unitarias, y la contribución es la parte de esa suma que pone cada fila; y la distancia '
+    + 'chi-cuadrado de una fila al centroide es la suma de sus coordenadas al cuadrado sobre '
+    + 'todos los ejes, y el coseno cuadrado es la parte que muestra cada eje. Con las cifras '
+    + `del eje 1 y de «observado ${d.fila}»`, s);
+}
+
 /* ═══════════ 2 · transition, contribution, cos² ═══════════ */
 export function fTransicionCA() {
   const t = CA.transicion, ti = CA.transicionInversa;

@@ -131,6 +131,40 @@ export function fDistancia() {
     + 'sobre su frecuencia menos uno', s);
 }
 
+/* ═══════════ 1e · the matrix form on the indicator matrix ═══════════
+   The same three lines block 1 writes for the rain table, with what changes here:
+   P = Z/(nQ), every row mass 1/n (so D_r^{-1/2} is √n times the identity) and
+   D_c = diag(n_j/(nQ)). One person and one category recomputed from U, V and σ. */
+const SIG = { t: 'Σ' };
+export function fMatricial() {
+  const sv = MCA.svd, mp = MCA.matricial.persona, mc = MCA.matricial.categoria;
+  let s = '', y = 40, parte;
+  [parte, y] = seccion(y, 'LA DESCOMPOSICIÓN', 'los residuos de la tabla disyuntiva se parten igual que en la lluvia: U con una fila por persona, V con una fila por categoría, Σ diagonal con σ_k = √λ_k. Lo que cambia es de dónde salen S y las masas',
+    yb => linea(X, yb, [{ t: 'S' }, eq, { t: 'U' }, { ...SIG, gap: 4 }, { t: 'V', gap: 4, sup: 'T' },
+      { t: 'σ', gap: 40, sub: 'k' }, eq, { raiz: [{ t: 'λ', sub: 'k' }] }], null, null, null)
+      /* what changes, on its own line: with everything on one it ran out of frame */
+      + linea(X, yb + 48, [{ t: 'con', fill: C.ink2, fs: 15 }, { t: 'P', gap: 10 }, eq], [{ t: 'Z' }], [{ t: 'n · Q' }],
+        [{ t: 'D', gap: 26, sub: 'r' }, eq, { t: 'I / n' }, { t: 'D', gap: 26, sub: 'c' }, eq, { t: 'diag(n', sub: 'j' }, { t: '/ nQ)', gap: 4 }]),
+    `en el ejemplo: σ = (${sv.sigma.map(num).join(', ')}), σ² = λ. U es ${sv.U.length} × ${MCA.ejes}, V es ${sv.V.length} × ${MCA.ejes}, y toda masa de fila es 1/${MCA.n}`);
+  s += parte;
+  [parte, y] = seccion(y, 'LAS PERSONAS', 'F = D_r⁻¹ᐟ² U Σ, y como toda masa de fila es 1/n, D_r⁻¹ᐟ² es √n por la identidad',
+    yb => linea(X, yb, [{ t: 'F' }, eq, { t: 'D', sub: 'r', sup: '−1/2' }, { t: 'U', gap: 4 }, { ...SIG, gap: 4 }, { t: '=', gap: 14, fill: C.ink2 },
+      { raiz: [{ t: 'n' }], gap: 4 }, { t: 'U', gap: 4 }, { ...SIG, gap: 4 }, { t: 'f', gap: 40, sub: 'ik' }, eq, { raiz: [{ t: 'n' }] }, { t: 'u', gap: 4, sub: 'ik' }, { t: 'σ', gap: 4, sub: 'k' }], null, null, null),
+    `en el ejemplo, la persona ${mp.i} en el eje ${mp.eje}: √${MCA.n} · ${n3(mp.u)} · ${num(mp.sigma)} = ${num(mp.raizN)} · ${n3(mp.u)} · ${num(mp.sigma)} = ${n3(mp.producto)}, su coordenada publicada es ${n3(mp.coordPublicada)}`);
+  s += parte;
+  [parte, y] = seccion(y, 'LAS CATEGORÍAS', 'G = D_c⁻¹ᐟ² V Σ, con la masa de cada categoría c_j = n_j / nQ: la misma Σ que las personas',
+    yb => linea(X, yb, [{ t: 'G' }, eq, { t: 'D', sub: 'c', sup: '−1/2' }, { t: 'V', gap: 4 }, { ...SIG, gap: 4 },
+      { t: 'g', gap: 40, sub: 'jk' }, eq], [{ t: 'v', sub: 'jk' }, { t: 'σ', gap: 4, sub: 'k' }], [{ raiz: [{ t: 'c', sub: 'j' }] }], null),
+    `en el ejemplo, ${mc.nivel} en el eje ${mc.eje}: ${n3(mc.v)} · ${num(mc.sigma)} / ${num(mc.raizMasa)} = ${n3(mc.producto)}, su coordenada publicada es ${n3(mc.coordPublicada)}. La transición en matrices es la del bloque 1`);
+  s += parte;
+  return svg(W, y,
+    'Las fórmulas matriciales del MCA: la descomposición de los residuos de la tabla '
+    + 'disyuntiva en U, Σ y V transpuesta, con P igual a Z sobre n por Q, D_r igual a la '
+    + 'identidad sobre n y D_c la diagonal de n_j sobre n por Q; las coordenadas de las personas '
+    + 'como raíz de n por U por Σ, y las de las categorías como D_c a la menos un medio por V '
+    + `por Σ. Verificadas sobre la persona ${mp.i} y ${mc.nivel} en el eje 1`, s);
+}
+
 /* ═══════════ 2b · from the distances to the map ═══════════
    The same three steps block 1 draws for the rain table, on the indicator matrix: the
    cloud (a person per row of Z, mass 1/n, the chi-square rule), the axes (the direction

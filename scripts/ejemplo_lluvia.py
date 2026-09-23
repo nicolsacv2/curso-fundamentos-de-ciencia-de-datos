@@ -235,12 +235,30 @@ def ca_de(N):
     traza = sum(StS[a][a] for a in range(J))
     assert cerca(traza, sum(S[i][j] ** 2 for i in range(I) for j in range(J))), 'la traza no es Σ s²'
     assert cerca(sum(vals), traza), f'los valores propios suman {sum(vals)} y la traza es {traza}'
+    # The matrix form the block writes: S = U Σ Vᵀ with σ_k = √λ_k, F = D_r^{-1/2} U Σ and
+    # G = D_c^{-1/2} V Σ. U is recovered from F (u_ik = f_ik √r_i / σ_k) and the three
+    # identities are asserted, plus the two the derivation of ctr and cos² rests on:
+    # λ_k = Σ_i m_i f_ik² (columns of U of norm one) and d²(i, centroide) = Σ_k f_ik².
+    sigma = [math.sqrt(l) for l in lam]
+    U = [[f[i][k] * math.sqrt(r[i]) / sigma[k] for k in range(K)] for i in range(I)]
+    for i in range(I):
+        for j in range(J):
+            assert cerca(S[i][j], sum(U[i][k] * sigma[k] * V[k][j] for k in range(K)), 1e-8), \
+                'U Σ Vᵀ no reconstruye S'
+    for k in range(K):
+        assert cerca(sum(U[i][k] ** 2 for i in range(I)), 1, 1e-8), f'la columna {k + 1} de U no es unitaria'
+        assert cerca(sigma[k] ** 2, lam[k]), 'σ² ≠ λ'
+        assert cerca(sum(r[i] * f[i][k] ** 2 for i in range(I)), lam[k]), \
+            f'Σ m_i f_ik² ≠ λ_k en el eje {k + 1}: la deducción de la contribución no cuadra'
+        for j in range(J):
+            assert cerca(g[j][k], V[k][j] * sigma[k] / math.sqrt(c[j])), 'G ≠ D_c^{-1/2} V Σ'
     return {
         'lam': lam, 'f': f, 'g': g, 'r': r, 'c': c, 'ctr_f': ctr_f, 'ctr_g': ctr_g,
         'cos2_f': cos2_f, 'cos2_g': cos2_g, 'perfil_fila': perfil_fila, 'K': K, 'd2_12': d2_12,
         'dist_filas': dist_filas, 'dist_cols': dist_cols,
         'S': S, 'StS': StS, 'traza': traza,
         'vals_todos': [v if v > NULO else 0.0 for v in vals],
+        'U': U, 'V': V, 'sigma': sigma, 'd2_f': d2_f,
     }
 
 
@@ -386,7 +404,10 @@ def main():
         '   verified in both directions, a row from the columns and a column from the rows.',
         '   `residuos`, `matriz`, `traza`, `autovaloresConTrivial`: where the eigenvalues come from',
         '   (the residuals, SᵀS, its trace, and every eigenvalue including the zero of the',
-        '   centring). Signs by the largest coordinate. */',
+        '   centring). `svd`, `matricial`, `deduccion`: the matrix form S = U Σ Vᵀ with the',
+        '   coordinates as D_r^{-1/2} U Σ and D_c^{-1/2} V Σ, one row and one column recomputed',
+        '   from it, and the two sums behind contribution and cos². Signs by the largest',
+        '   coordinate. */',
         'export const CA = ' + j({
             'ejes': K,
             # where the eigenvalues come from: the standardised residuals of every cell, their
@@ -432,6 +453,36 @@ def main():
                 'raizLambda': r4(math.sqrt(ca['lam'][0])),
                 'dilatado': r4(sum(perfil_col[0][i] * ca['f'][i][0] for i in range(len(fa))) / math.sqrt(ca['lam'][0])),
                 'coordPublicada': r3(ca['g'][0][0]),
+            },
+            # the matrix form: S = U Σ Vᵀ, F = D_r^{-1/2} U Σ, G = D_c^{-1/2} V Σ. `svd.V[j][k]`
+            # is column j on axis k, like `columnas[j].coord`; `matricial` is one row and one
+            # column recomputed from these pieces, for the block to show next to the formula
+            'svd': {
+                'U': [[r4(ca['U'][i][k]) for k in range(K)] for i in range(len(fa))],
+                'V': [[r4(ca['V'][k][j]) for k in range(K)] for j in range(len(fb))],
+                'sigma': [r4(x) for x in ca['sigma']],
+                'r': [r4(x) for x in ca['r']], 'c': [r4(x) for x in ca['c']],
+            },
+            'matricial': {
+                'fila': {'nivel': fa[0], 'eje': 1, 'u': r4(ca['U'][0][0]), 'sigma': r4(ca['sigma'][0]),
+                         'raizMasa': r4(math.sqrt(ca['r'][0])),
+                         'producto': r3(ca['U'][0][0] * ca['sigma'][0] / math.sqrt(ca['r'][0])),
+                         'coordPublicada': r3(ca['f'][0][0])},
+                'columna': {'nivel': fb[0], 'eje': 1, 'v': r4(ca['V'][0][0]), 'sigma': r4(ca['sigma'][0]),
+                            'raizMasa': r4(math.sqrt(ca['c'][0])),
+                            'producto': r3(ca['V'][0][0] * ca['sigma'][0] / math.sqrt(ca['c'][0])),
+                            'coordPublicada': r3(ca['g'][0][0])},
+            },
+            # the two sums the derivation of ctr and cos² rests on, with their terms
+            'deduccion': {
+                'eje': 1,
+                'sumandosInercia': [r4(ca['r'][i] * ca['f'][i][0] ** 2) for i in range(len(fa))],
+                'suma': r4(sum(ca['r'][i] * ca['f'][i][0] ** 2 for i in range(len(fa)))),
+                'lambda': r4(ca['lam'][0]),
+                'fila': fa[0],
+                'sumandosDistancia': [r4(ca['f'][0][k] ** 2) for k in range(K)],
+                'sumaF2': r4(ca['d2_f'][0]),
+                'd2Perfil': r4(sum((ca['perfil_fila'][0][j] - ca['c'][j]) ** 2 / ca['c'][j] for j in range(len(fb)))),
             },
             'distancia': {'filas': [fa[0], fa[1]], 'd2': r4(ca['d2_12']), 'd': r3(math.sqrt(ca['d2_12']))},
             # every pair, closest first; `d` from the profiles, `dCoord` from the coordinates

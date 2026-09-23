@@ -216,6 +216,36 @@ def mca(variables, reglas):
 
     total = sum(lam)
 
+    # The matrix form the block writes: S = U Σ Vᵀ, F = D_r^{-1/2} U Σ = √n U Σ (every mass
+    # is 1/n), G = D_c^{-1/2} V Σ. U is recovered from F and the identities asserted.
+    sigma = [math.sqrt(l) for l in lam]
+    U = [[f[i][k] * math.sqrt(r) / sigma[k] for k in range(K)] for i in range(n)]
+    for i in range(n):
+        for j in range(J):
+            assert cerca(S[i][j], sum(U[i][k] * sigma[k] * V[k][j] for k in range(K)), 1e-8), \
+                'U Σ Vᵀ no reconstruye S'
+    for k in range(K):
+        assert cerca(sum(U[i][k] ** 2 for i in range(n)), 1, 1e-8), f'la columna {k + 1} de U no es unitaria'
+        for j in range(J):
+            assert cerca(g[j][k], V[k][j] * sigma[k] / math.sqrt(c[j])), 'G ≠ D_c^{-1/2} V Σ'
+    svd = {
+        'U': [[redondear(U[i][k], 4) for k in range(K)] for i in range(n)],
+        'V': [[redondear(V[k][j], 4) for k in range(K)] for j in range(J)],
+        'sigma': [redondear(x, 4) for x in sigma],
+        'r': redondear(r, 4), 'c': [redondear(x, 4) for x in c],
+    }
+    matricial = {
+        'persona': {'i': 1, 'eje': 1, 'u': redondear(U[0][0], 4), 'sigma': redondear(sigma[0], 4),
+                    'raizN': redondear(math.sqrt(n), 4),
+                    'producto': redondear(U[0][0] * sigma[0] * math.sqrt(n), 3),
+                    'coordPublicada': redondear(f[0][0], 3)},
+        'categoria': {'variable': cats[0][0], 'nivel': cats[0][1], 'eje': 1,
+                      'v': redondear(V[0][0], 4), 'sigma': redondear(sigma[0], 4),
+                      'raizMasa': redondear(math.sqrt(c[0]), 4),
+                      'producto': redondear(V[0][0] * sigma[0] / math.sqrt(c[0]), 3),
+                      'coordPublicada': redondear(g[0][0], 3)},
+    }
+
     # The jump from distances to the map, on the farthest pair of people: the chi-square
     # distance straight from Z (the formula the block shows), the distance between their
     # coordinates over all K axes — equal by construction, and asserted — and over the two
@@ -278,6 +308,9 @@ def mca(variables, reglas):
         },
         # the farthest pair of people, three ways: by Z, by every axis, by the map's two
         'salto': salto,
+        # the matrix form, and one person and one category recomputed from it
+        'svd': svd,
+        'matricial': matricial,
         # unrounded, for the other set-ups; stripped before writing
         '_raw': {'lam': lam, 'V': V, 'g': g, 'f': f, 'S': S, 'Z': Z, 'nj': nj, 'c': c,
                  'cats': cats, 'd2': d2, 'ctr': ctr, 'cos2': cos2},
