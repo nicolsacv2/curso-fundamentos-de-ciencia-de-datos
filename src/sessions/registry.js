@@ -3,11 +3,13 @@ import meta02 from './s02/meta.js';
 import meta03 from './s03/meta.js';
 import meta04 from './s04/meta.js';
 import meta05 from './s05/meta.js';
+import meta06 from './s06/meta.js';
+import meta07 from './s07/meta.js';
 
 /* Metadata for the built sessions. It is a few bytes and the index needs it to draw
    the block chips, so it ships in the main bundle. The content — the heavy part —
    does not: every block is fetched on its own. */
-export const METAS = [meta01, meta02, meta03, meta04, meta05];
+export const METAS = [meta01, meta02, meta03, meta04, meta05, meta06, meta07];
 
 /* One import() per block. Vite emits an independent chunk for each, so opening
    session 1 never downloads session 2, and opening block 1 never downloads block 3. */
@@ -46,6 +48,20 @@ export const BLOCKS = {
     'bloque-2': () => import('./s05/blocks/Block2.jsx'),
     'bloque-3': () => import('./s05/blocks/Block3.jsx'),
     'cierre':   () => import('./s05/blocks/Closing.jsx')
+  },
+  6: {
+    'entrada':  () => import('./s06/blocks/Intro.jsx'),
+    'bloque-1': () => import('./s06/blocks/Block1.jsx'),
+    'bloque-2': () => import('./s06/blocks/Block2.jsx'),
+    'bloque-3': () => import('./s06/blocks/Block3.jsx'),
+    'cierre':   () => import('./s06/blocks/Closing.jsx')
+  },
+  7: {
+    'entrada':  () => import('./s07/blocks/Intro.jsx'),
+    'bloque-1': () => import('./s07/blocks/Block1.jsx'),
+    'bloque-2': () => import('./s07/blocks/Block2.jsx'),
+    'bloque-3': () => import('./s07/blocks/Block3.jsx'),
+    'cierre':   () => import('./s07/blocks/Closing.jsx')
   }
 };
 

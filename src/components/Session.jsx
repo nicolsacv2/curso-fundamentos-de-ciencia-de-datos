@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo } from 'react';
 import Rail from './Rail.jsx';
-import { pad2 } from '../data/syllabus.js';
+import { SESIONES, pad2 } from '../data/syllabus.js';
 import { BLOCKS } from '../sessions/registry.js';
 
 /* An open session. The rail and masthead render immediately; the active block
@@ -22,7 +22,7 @@ export default function Session({ meta, active, onSelect, onIndex }) {
       <div className="wrap">
         <header className="masthead">
           <p className="eyebrow">
-            Fundamentos de ciencia de datos · Sesión {pad2(meta.n)} de 08
+            Fundamentos de ciencia de datos · Sesión {pad2(meta.n)} de {pad2(SESIONES)}
           </p>
           <h1>{meta.title}</h1>
           <p className="subtitle">{meta.goal}</p>

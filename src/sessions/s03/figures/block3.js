@@ -1,4 +1,5 @@
 import { C, SERIF, svg, txt, arrow, wrap } from '../../../svg/kit.js';
+import { RECUENTOS } from '../../../data/salon.js';
 import { box } from './shared.js';
 
 /* ═══════════ B3 · the original is never touched ═══════════
@@ -10,7 +11,7 @@ export function versiones() {
   let b = arrow('ar-s3-ver');
 
   const cajas = [
-    [30, 'salon_v1_crudo', 'Las 23 respuestas tal como llegaron. No se corrige, no se ordena, no se borra una fila. Es la única prueba de qué se preguntó y qué contestaron.', C.reveal, 'INTOCABLE'],
+    [30, 'salon_v1_crudo', `Las ${RECUENTOS.filas} respuestas tal como llegaron. No se corrige, no se ordena, no se borra una fila. Es la única prueba de qué se preguntó y qué contestaron.`, C.reveal, 'INTOCABLE'],
     [660, 'salon_v2_limpio', 'La copia sobre la que se trabaja. Cada columna nueva se añade al lado de la vieja, nunca encima.', C.ask, 'AQUÍ SE TRABAJA']
   ];
 

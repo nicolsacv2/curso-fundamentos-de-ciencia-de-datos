@@ -13,7 +13,7 @@ export function bitacora() {
 
   const cabeceras = ['QUÉ ENCONTRÉ', 'QUÉ HICE', 'POR QUÉ', 'QUÉ CAMBIARÍA AL REVÉS'];
   const contenido = [
-    'La columna C escribe Bogotá de seis maneras.',
+    'La variable municipio escribe Bogotá de seis maneras.',
     'Copié la columna a una nueva y unifiqué todo a «Bogotá D.C.».',
     'Las seis se refieren al mismo lugar, y así se pueden contar juntas.',
     'Contando las escrituras tal cual, Bogotá dejaría de ser la ciudad de la mitad del salón y pasarían a ser seis grupos de una o cinco personas.'

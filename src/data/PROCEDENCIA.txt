@@ -1,0 +1,58 @@
+Dataset del salón — respuestas del formulario de la sesión 2 del curso.
+
+Archivo:  Dataset del salón · Sesión 2 (respuestas).xlsx
+Captura:  2026-09-15
+Origen:   formulario de Google respondido en clase durante la sesión 2.
+
+Contenido: 27 respuestas × 34 columnas (A–AH). Una fila por persona.
+
+NO SE VERSIONA. Trae las 34 columnas del formulario, incluidas la marca temporal y el
+nombre exacto del programa de pregrado, que no se publican.
+
+Lo que sí se versiona es lo que generan los scripts a partir de este archivo:
+
+  scripts/extract_salon.py  ->  src/data/salon.js          (crudo, columnas publicables)
+  scripts/clean_salon.py    ->  src/data/salon_limpio.js   (la cadena de la sesión 6)
+  scripts/export_xlsx.py    ->  src/data/salon_limpio.xlsx (crudo + limpio + bitácora)
+
+QUÉ SE PUBLICA Y QUÉ NO
+
+De las 34 columnas se publican 31. Quedan fuera tres:
+
+  A   marca temporal            el orden exacto de envío reidentifica
+  D   grupo de edad             dice lo mismo que la edad, con menos detalle
+  H   nombre exacto del programa  casi un identificador en una clase de este tamaño
+
+UNA DECISIÓN QUE SE TOMÓ A SABIENDAS
+
+Hasta este cambio quedaban fuera siete columnas, no tres. El peso, la estatura, la talla
+de camiseta y el año de nacimiento estaban excluidos por reidentificación, con ese motivo
+escrito. El titular del curso decidió publicarlos.
+
+Lo que se gana: el peso y la estatura son el único par de variables de la tabla que se dan
+la mano —se correlacionan—, y sin al menos un par así la sesión 6 no puede enseñar cuándo
+un análisis factorial resume y cuándo no. La talla de camiseta es la única variable ordinal
+del formulario cuyos niveles son etiquetas (S · M · L · XL) y no números, que es lo que
+permite enseñar que lo que ordena una variable no es que se escriba con cifras.
+
+Lo que se acepta a cambio: son datos corporales, este repositorio es público y el sitio
+también, y la clase son veintisiete personas. Con la tabla delante, la combinación de
+departamento, área, edad, peso y estatura deja a muy poca gente dentro de cada perfil.
+Quien responda el formulario en ediciones siguientes debe saber que esas columnas se
+publican.
+
+El año de nacimiento no se publica tal cual: se publica la EDAD derivada de él
+(2026 − año, con 2026 fijado como el año de captura). El grupo de edad, que es ese mismo
+dato más grueso, se deja fuera para no publicarlo dos veces.
+
+El criterio columna por columna, con su motivo, está en scripts/extract_salon.py:
+COLUMNAS, DERIVADAS y EXCLUIDAS.
+
+EL ARCHIVO QUE SE ENTREGA A LA CLASE
+
+src/data/salon_limpio.xlsx SÍ se versiona: lleva las mismas 31 columnas publicables, la
+tabla ya limpia, las marcas de qué celdas se inventaron, y la bitácora de cada decisión de
+limpieza. Es este archivo el que se le entrega a la clase, no el de arriba.
+
+Mismo trato que los CSV de Gapminder de la sesión 5: el archivo de origen vive fuera del
+control de versiones y su procedencia queda anotada al lado.

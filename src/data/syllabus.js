@@ -1,17 +1,31 @@
-/* The eight sessions of the course. Ones without a module under sessions/ render
-   dimmed. When a session is built its own meta wins, so titles live in one place:
-   the entries here only cover the sessions that do not exist yet.
+/* The course's shape: how many sessions there are, and what to announce for the ones
+   that do not exist yet.
+
+   It used to carry a title and a goal for all eight. But Cover.jsx reads
+   `m ? m.title : title`, so the moment a session got its meta.js those two strings
+   stopped being read — five sessions' worth of dead text that nothing kept in step
+   with the sessions themselves. Session 4 promised on screen that session 6 was about
+   causality, and so did the entry here, for exactly that reason.
+
+   Now a title lives in one place, always: in the session's own meta.js if it exists,
+   and here if it does not. Building a session means writing its meta.js and deleting
+   its entry below.
+
    Titles and goals are course content — they stay in Spanish. */
 
-export const SYLLABUS = [
-  [1, 'El mundo corre sobre datos', 'Entender qué es y qué no es la ciencia de datos, descubrir que ya tomamos decisiones con datos todos los días, y ver de dónde salió todo esto.'],
-  [2, 'La materia prima: ¿qué es un dato?', 'Distinguir tipos de datos, entender la anatomía de una tabla y comprender que los datos se fabrican, no se encuentran.'],
-  [3, 'Datos sucios: el trabajo invisible', 'Entender que la limpieza es la mayor parte del trabajo, y que cada decisión de limpieza tiene consecuencias sobre la conclusión.'],
-  [4, 'Estadística sin miedo: describir la realidad', 'Leer con criterio promedios, dispersión y distribuciones, y detectar cuándo un resumen esconde más de lo que muestra.'],
-  [5, 'Ver para entender: visualización y narrativa', 'Elegir el gráfico correcto, detectar gráficos mentirosos y contar una historia con datos.'],
-  [6, 'Correlación, causalidad y el arte de concluir', 'Desarrollar el músculo del pensamiento crítico: correlación frente a causalidad, azar, muestreo y experimentos.'],
-  [7, 'Cómo aprende una máquina', 'Desmitificar el aprendizaje automático y la IA: qué tipos hay, cómo se entrenan, cómo se evalúan y por qué fallan.'],
-  [8, 'Fundamentos de Inteligencia Artificial', 'Skills más populares, MCP, RAG, LangChain y SDD.']
-];
+/* Nine, since session 6 was split in two: the cleaning chain stayed as session 6 and
+   the analysis of what is not a number became session 7. Everything that counts
+   sessions — the cover, the «Sesión NN de NN» eyebrow, the total hours — reads this. */
+export const SESIONES = 9;
+export const HORAS_POR_SESION = 3;
+
+/* The number in words, for the cover's subtitle. Only the total the course can have. */
+export const EN_LETRAS = { 8: 'Ocho', 9: 'Nueve', 10: 'Diez' };
+
+/* n → [title, goal], only for the ones still unbuilt. */
+export const PENDIENTES = {
+  8: ['Cómo aprende una máquina', 'Desmitificar el aprendizaje automático y la IA: qué tipos hay, cómo se entrenan, cómo se evalúan y por qué fallan.'],
+  9: ['Fundamentos de Inteligencia Artificial', 'Skills más populares, MCP, RAG, LangChain y SDD.']
+};
 
 export const pad2 = n => String(n).padStart(2, '0');

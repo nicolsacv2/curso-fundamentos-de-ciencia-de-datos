@@ -1,7 +1,7 @@
 import {
   Panel, Task, DataTable, Diagram, Prose, Idea
 } from '../../../components/content/index.jsx';
-import { COLS, ROWS } from '../data/salon.js';
+import { COLS, COLS_S03, ROWS, RECUENTOS } from '../../../data/salon.js';
 import { bogota } from '../figures/intro.js';
 
 export default function Intro({ id, tabId, block }) {
@@ -20,28 +20,48 @@ export default function Intro({ id, tabId, block }) {
       <DataTable
         cols={COLS}
         rows={ROWS}
-        wrap={['D', 'J']}
+        /* The dataset is shared with sessions 4 and 6 and carries 27 columns; this
+           session audits ten of them, so it asks for those ten by name. */
+        pick={COLS_S03}
+        wrap={['area', 'libro']}
         caption={<>Cada fila es una persona; el <b>código</b> es el que cada quien se inventó.
-          Las columnas van con letra y las filas con número: de ahora en adelante, cuando
-          señalemos algo lo vamos a hacer con su coordenada — <b>C4</b>, <b>F16</b>.</>}
+          Cada columna lleva el <b>nombre de su variable</b> y cada fila su número: de ahora
+          en adelante, cuando señalemos algo lo vamos a hacer con esos dos —
+          <b>municipio, fila 4</b>; <b>minutos, fila 16</b>—. La letra que tenían en la hoja de
+          cálculo no dice nada de lo que hay dentro.</>}
       />
 
       <h3>El conteo que no cuadra</h3>
 
       <Task label="Chat · un número · 10–22" big="¿Cuánta gente de esta clase vive en Bogotá?">
-        <p>Mira la columna <b>C</b> y cuenta. Un número al chat, sin discutir con el vecino.</p>
+        <p>Mira la variable <b>municipio</b> y cuenta. Un número al chat, sin discutir con el vecino.</p>
       </Task>
 
       <Diagram fig={bogota}>
-        Si cuentas valores distintos, la columna dice que hay <b>seis municipios</b> con una,
-        dos, tres y cinco personas cada uno. Si cuentas ciudades, hay <b>una</b>, con trece.
+        {/* The spelling count and the sizes used to be written out here — «seis municipios»,
+            «una, dos, tres y cinco» — and they were true of the 23 answers the form had when
+            this was written. They come out of the data now. */}
+        Si cuentas valores distintos, la columna dice que hay{' '}
+        <b>{RECUENTOS.bogotaFormas.length + RECUENTOS.bogotaCorregidos.length} municipios</b>{' '}
+        con {[...new Set(RECUENTOS.bogotaFormas.map(([, n]) => n))].sort((a, b) => a - b)
+          .join(', ').replace(/, (\d+)$/, ' y $1')} personas cada uno. Si cuentas ciudades, hay{' '}
+        <b>una</b>, con {RECUENTOS.bogota}.
       </Diagram>
 
       <Prose>
         <p>Las dos respuestas salen de la misma columna y ninguna de las dos es un error de
-          cuentas. Tampoco hay una celda mal escrita: nadie puso el municipio equivocado, y
-          «Bogotá» y «Bogotá D.C.» son las dos maneras correctas de decirlo.</p>
-        <p>Y sin embargo, de las trece personas que viven en Bogotá, <b>siete</b> escribieron
+          cuentas. Y en {RECUENTOS.bogotaFormas.length} de los{' '}
+          {RECUENTOS.bogotaFormas.length + RECUENTOS.bogotaCorregidos.length} valores tampoco
+          hay una celda mal escrita: «Bogotá» y «Bogotá D.C.» son las dos maneras correctas
+          de decirlo.</p>
+        <p>El que falta es de otra clase. Alguien escribió{' '}
+          <b>«{RECUENTOS.bogotaCorregidos[0][0]}»</b>, que <b>no es una manera de escribir
+          «Bogotá»</b>: es una localidad de Bogotá puesta donde iba el municipio. Esa no la
+          arregla ninguna regla — ni recortar espacios, ni quitar tildes, ni bajar a
+          minúsculas—, porque lo que hay que saber para arreglarla no está en la tabla: está
+          en la cabeza de alguien que conozca la ciudad. La corregimos <b>a mano</b>, y por
+          eso queda escrita, con su motivo, junto al código que genera la tabla.</p>
+        <p>Y sin embargo, de las {RECUENTOS.bogota} personas que viven en Bogotá, <b>{RECUENTOS.bogotaEnCundinamarca}</b> escribieron
           «Cundinamarca» en la columna del departamento. Tampoco están equivocadas: es lo que
           uno dice. Lo que estaba mal era la pregunta, que ofrecía una casilla imposible.</p>
         <p>Hoy la sesión entera va de esto: <b>alguien va a tener que decidir</b> cuál de las

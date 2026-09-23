@@ -1,6 +1,6 @@
 import { C, svg, txt } from '../../../svg/kit.js';
 import { box, axes, dot, pline } from './shared.js';
-import { MINUTOS } from '../data/salon.js';
+import { MINUTOS } from '../../../data/salon.js';
 
 /* ═══════════ Block 1 · three legitimate centers of one triangle ═══════════
    The same triangle three times. Each panel constructs a different «center» and all
@@ -105,7 +105,7 @@ export function centrosTriangulo() {
 }
 
 /* ═══════════ Block 1 · what each summary minimizes ═══════════
-   Both curves are computed over the class's own 20 minutes-of-phone values. Move the
+   Both curves are computed over the class's own minutes-of-phone values. Move the
    candidate summary along the x axis and add up how wrong it is: penalizing the error
    squared, the best possible number is the promedio; penalizing the absolute error,
    the best possible number is the mediana. Neither minimum is a coincidence. */
@@ -132,7 +132,7 @@ export function perdidas() {
   const n1 = norm(l1), n2 = norm(l2);
 
   b += axes(x0, y0, pw, ph);
-  b += txt(x0 + pw, y0 + 26, 'si resumieras la columna F con este número →', { fs: 11.5, fill: C.ink3, ta: 'end' });
+  b += txt(x0 + pw, y0 + 26, 'si resumieras minutos con este número →', { fs: 11.5, fill: C.ink3, ta: 'end' });
   b += txt(x0 - 14, y0 - ph, 'cuánto te equivocas en total', { fs: 11.5, fill: C.ink3, ta: 'start' });
 
   b += pline(cs.map((cnd, i) => [sx(cnd), sy(n2[i])]), C.ask, { sw: 1.8 });
@@ -155,7 +155,7 @@ export function perdidas() {
     { fs: 11, fill: C.reveal, ls: 1.4 });
 
   return svg(W, H,
-    'Dos curvas de error total sobre los veinte valores de la columna F: penalizando ' +
+    `Dos curvas de error total sobre los ${MINUTOS.n} valores de minutos: penalizando ` +
     'el error al cuadrado el mínimo cae exactamente en el promedio, 152.6; penalizando ' +
     'el error absoluto el mínimo cae exactamente en la mediana, 120',
     b);
@@ -176,8 +176,8 @@ export function cuantiles() {
   const vmax = 960;
   const vx = v => x0 + (v / vmax) * pw;
 
-  b += txt(x0, 40, 'LAS 20 RESPUESTAS, EN ORDEN', { fs: 10.5, fill: C.ask, ls: 1.8 });
-  b += txt(x0, yVal - 58, 'LAS MISMAS 20, EN MINUTOS', { fs: 10.5, fill: C.ask, ls: 1.8 });
+  b += txt(x0, 40, `LAS ${MINUTOS.n} RESPUESTAS, EN ORDEN`, { fs: 10.5, fill: C.ask, ls: 1.8 });
+  b += txt(x0, yVal - 58, `LAS MISMAS ${MINUTOS.n}, EN MINUTOS`, { fs: 10.5, fill: C.ask, ls: 1.8 });
 
   /* Threads from rank to value. */
   vals.forEach((v, i) => {
@@ -212,7 +212,7 @@ export function cuantiles() {
     { fs: 11, fill: C.reveal, ls: 1.4 });
 
   return svg(W, H,
-    'Las veinte respuestas de minutos de celular dos veces: espaciadas por su puesto en ' +
+    `Las ${MINUTOS.n} respuestas de minutos de celular dos veces: espaciadas por su puesto en ` +
     'la fila, los cuartiles hacen cuatro grupos de cinco personas; puestas en su valor ' +
     'real, los mismos cortes caen en 7.3, 120 y 187.5 minutos',
     b);

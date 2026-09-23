@@ -1,7 +1,7 @@
 import {
   Panel, Task, Cards, Card, Diagram, Pair, Prose, List, Idea
 } from '../../../components/content/index.jsx';
-import { MINUTOS, MINUTOS_SIN } from '../data/salon.js';
+import { MINUTOS, MINUTOS_SIN } from '../../../data/salon.js';
 import { enjambres, ahorros } from '../figures/block2.js';
 
 export default function Block2({ id, tabId, block }) {
@@ -23,7 +23,7 @@ export default function Block2({ id, tabId, block }) {
 
       <Cards cols="c3">
         <Card k="Rango" t={`${MINUTOS.rango} min`}>
-          Máximo menos mínimo de la columna F: 960 − 1. Lo definen exactamente dos personas;
+          Máximo menos mínimo de <b>minutos</b>: 960 − 1. Lo definen exactamente dos personas;
           las otras dieciocho podrían cambiar sin que se entere.
         </Card>
         <Card k="Varianza" t="promedio de desviaciones²">
@@ -32,7 +32,7 @@ export default function Block2({ id, tabId, block }) {
         </Card>
         <Card k="Desviación estándar" t={`${MINUTOS.desviacion} min`}>
           La raíz de la varianza: vuelve a las unidades originales. Es «cuánto se aleja del
-          promedio una respuesta típica» de la columna F.
+          promedio una respuesta típica» de <b>minutos</b>.
         </Card>
       </Cards>
 
@@ -47,10 +47,13 @@ export default function Block2({ id, tabId, block }) {
         <Prose>
           <h4>Sensibles al atípico</h4>
           <List>
-            <li>Promedio: <b>{MINUTOS.media} → {MINUTOS_SIN.media}</b> — una sola fila lo mueve
-              42 minutos.</li>
-            <li>Desviación estándar: <b>{MINUTOS.desviacion} → {MINUTOS_SIN.desviacion}</b> — casi
-              a la mitad, porque el cuadrado agranda lo lejano.</li>
+            {/* The gap used to be written out as «42 minutos» and the drop as «casi a la
+                mitad». Both were true of the 20 answers the form had then; it has 23 now,
+                so both come out of the data. */}
+            <li>Promedio: <b>{MINUTOS.media} → {MINUTOS_SIN.media}</b> — una sola fila lo mueve{' '}
+              {(MINUTOS.media - MINUTOS_SIN.media).toFixed(1)} minutos.</li>
+            <li>Desviación estándar: <b>{MINUTOS.desviacion} → {MINUTOS_SIN.desviacion}</b> — cae
+              más que el promedio, porque el cuadrado agranda lo lejano.</li>
             <li>Rango: <b>{MINUTOS.rango} → {MINUTOS_SIN.rango}</b> — era, literalmente, esa
               fila.</li>
           </List>

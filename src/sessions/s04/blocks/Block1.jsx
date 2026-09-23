@@ -1,7 +1,7 @@
 import {
   Panel, Task, Options, Cards, Card, Diagram, Prose, Idea
 } from '../../../components/content/index.jsx';
-import { MINUTOS, BALANCEADA } from '../data/salon.js';
+import { MINUTOS, BALANCEADA } from '../../../data/salon.js';
 import { centrosTriangulo, perdidas, cuantiles } from '../figures/block1.js';
 import TriangleActivity from '../activities/TriangleActivity.jsx';
 
@@ -46,29 +46,35 @@ export default function Block1({ id, tabId, block }) {
 
       <Cards cols="c3">
         <Card k="Promedio" t={`${MINUTOS.media} min`}>
-          Suma los {MINUTOS.n} valores de la columna F y reparte por igual. Usa toda la
+          Suma los {MINUTOS.n} valores de <b>minutos</b> y reparte por igual. Usa toda la
           información — y por eso mismo cualquier valor extremo lo arrastra.
         </Card>
         <Card k="Mediana" t={`${MINUTOS.mediana} min`}>
           Ordena la fila y toma el del medio: la mitad del salón está por debajo, la mitad por
           encima. Solo le importa el orden, no los tamaños.
         </Card>
-        <Card k="Moda" t={`${MINUTOS.moda} min`}>
-          El valor más repetido: {MINUTOS.modaVeces} personas contestaron {MINUTOS.moda}. Es el
-          único de los tres que también funciona cuando la columna no es numérica.
+        {/* `modas` is a list: a column can have two most-repeated values, and this one
+            stopped being unimodal once the form took four more answers. */}
+        <Card k="Moda" t={`${MINUTOS.modas.join(' y ')} min`}>
+          El valor más repetido: {MINUTOS.modaVeces} personas contestaron{' '}
+          {MINUTOS.modas.join(' y ')}. Es el único de los tres que también funciona cuando la
+          columna no es numérica.
         </Card>
       </Cards>
 
       <h3>La discusión pendiente de la sesión 3</h3>
       <Prose>
-        <p>Quedamos debiendo una respuesta: ¿se puede promediar la columna H, la de «alimentación
+        <p>Quedamos debiendo una respuesta: ¿se puede promediar <b>balanceada</b>, la de «alimentación
           balanceada del 1 al 5»? El promedio da <b>{BALANCEADA.media}</b>, y ese número suma
           etiquetas: el 5 de la fila 16 — la que comió cero porciones de fruta — no es «cinco
           veces» el 1 de la fila 1, así que la suma no significa nada. Lo que sí se puede: la{' '}
-          <b>mediana es {BALANCEADA.mediana}</b> — la respuesta del medio — y la moda es doble,
-          {' '}<b>{BALANCEADA.modas[0]} y {BALANCEADA.modas[1]}</b>, con {BALANCEADA.modaVeces}{' '}
-          personas cada una. Para una escala ordinal, el centro se busca con orden y con conteo,
-          no con suma.</p>
+          {/* «la moda es doble, 3 y 4, con 9 personas cada una» is what the class was shown:
+              column H was bimodal over the 23 answers the form had then. With 27 it is not,
+              so the sentence counts the modes instead of assuming two. */}
+          <b>mediana es {BALANCEADA.mediana}</b> — la respuesta del medio — y la moda es{' '}
+          <b>{BALANCEADA.modas.join(' y ')}</b>, con {BALANCEADA.modaVeces} personas
+          {BALANCEADA.modas.length > 1 ? ' cada una' : ''}. Para una escala ordinal, el centro se
+          busca con orden y con conteo, no con suma.</p>
       </Prose>
 
       <h3>Por qué el promedio y la mediana son esos y no otros</h3>

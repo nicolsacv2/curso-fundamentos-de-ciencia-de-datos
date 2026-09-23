@@ -2,7 +2,7 @@ import {
   Panel, Task, Options, Cards, Card, Diagram, DataTable,
   Story, StoryHead, Prose, Source, Idea
 } from '../../../components/content/index.jsx';
-import { COLS, ROWS, MEDIAS } from '../data/salon.js';
+import { COLS, COLS_S03, ROWS, MEDIAS, RECUENTOS } from '../../../data/salon.js';
 import { bitacora } from '../figures/block2.js';
 
 export default function Block2({ id, tabId, block }) {
@@ -18,28 +18,28 @@ export default function Block2({ id, tabId, block }) {
       </Diagram>
 
       <h3>¿Cuánto es el promedio?</h3>
-      <p className="lead">La columna F preguntaba cuántos <b>minutos</b> pasaste ayer en cosas
+      <p className="lead">La variable <b>minutos</b> preguntaba cuántos <b>minutos</b> pasaste ayer en cosas
         ajenas al trabajo o al estudio. Aquí está entera.</p>
 
       <DataTable
         cols={COLS}
         rows={ROWS}
-        pick={['A', 'F']}
+        pick={['codigo', 'minutos']}
         caption={<>Veinte respuestas y tres celdas vacías.</>}
       />
 
-      <Task label="Chat · un número · 78–96" big="Calcula el promedio de la columna F.">
+      <Task label="Chat · un número · 78–96" big="Calcula el promedio de minutos.">
         <p>Sin ponerte de acuerdo con nadie y sin explicar cómo lo hiciste. Un número al chat.</p>
       </Task>
 
       <h4>Lo que va a pasar</h4>
       <Cards cols="c4">
         <Card k="Si ignoras las vacías" t={`${MEDIAS.ignorarVacias} min`}>
-          Sumas las veinte que hay y divides por veinte. Es lo que hace una hoja de cálculo si
+          Sumas las {RECUENTOS.minutosRespondidas} que hay y divides por {RECUENTOS.minutosRespondidas}. Es lo que hace una hoja de cálculo si
           no le dices nada.
         </Card>
         <Card k="Si las cuentas como cero" t={`${MEDIAS.vaciasComoCero} min`}>
-          Divides por 23 en vez de por 20. Estás afirmando que quien no respondió pasó cero
+          Divides por {RECUENTOS.filas} en vez de por {RECUENTOS.minutosRespondidas}. Estás afirmando que quien no respondió pasó cero
           minutos, y eso nadie lo dijo.
         </Card>
         <Card k="Si botas el 960" t={`${MEDIAS.sinAtipico} min`}>
@@ -65,9 +65,10 @@ export default function Block2({ id, tabId, block }) {
       <DataTable
         cols={COLS}
         rows={ROWS}
+        pick={COLS_S03}
         only={[16]}
-        wrap={['D', 'J']}
-        mark={['F16', 'G16', 'H16']}
+        wrap={['area', 'libro']}
+        mark={['minutos:16', 'porciones:16', 'balanceada:16']}
         caption={<>Novecientos sesenta minutos son dieciséis horas. Cero porciones de fruta o
           verdura, y un 5 sobre 5 en «qué tan balanceada fue tu alimentación». En la tabla
           completa —la de 34 columnas— esta misma persona dejó otras cuatro preguntas sin
@@ -106,7 +107,7 @@ export default function Block2({ id, tabId, block }) {
             <b>depuración y unificación</b>. Decidir si «el mismo nombre con un apellido de más»,
             «la misma fecha corrida un día» y «el municipio escrito como vereda» son una persona
             o son dos. Es la misma operación que acabamos de hacer con García Márquez en la
-            columna J, sobre 23 filas.</p>
+            variable <b>libro</b>, sobre {RECUENTOS.filas} filas.</p>
           <p>El resultado fue <b>6.402 víctimas</b>. De ellas, <b>4.154 no estaban documentadas
             ni por la Fiscalía ni por el Centro de Memoria</b>: aparecían solo al cruzar las tres
             fuentes. Quien hubiera mirado una sola lista habría concluido una cifra mucho más

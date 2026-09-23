@@ -1,5 +1,5 @@
 import { Panel, Task, Pair, Prose, Idea } from '../../../components/content/index.jsx';
-import { MINUTOS, MINUTOS_SIN } from '../data/salon.js';
+import { MINUTOS, MINUTOS_SIN, RECUENTOS } from '../../../data/salon.js';
 
 export default function Closing({ id, tabId, block }) {
   return (
@@ -42,14 +42,21 @@ export default function Closing({ id, tabId, block }) {
 
       <h3>Lo que queda</h3>
       <Prose>
+        {/* This used to announce that the Simpson paradox waits for session 6, «cuando
+            hablemos de causalidad». Session 6 turned out to be MCA and FAMD. The other
+            debt in this paragraph — that every number here still hangs on how the table
+            was cleaned — is the one session 6 actually picks up, so the bridge is rebuilt
+            through it. See the change sesion-06-mca-y-famd. */}
         <p>Salimos con una caja de resúmenes y el precio de cada uno: centros que responden
           preguntas distintas, dispersiones que dicen cuánto creerle al centro, y coeficientes
-          de asociación que miden líneas y órdenes, no verdades. Y con dos deudas anotadas: la
-          paradoja de Simpson espera a la sesión 6, y todos los números de hoy — el {MINUTOS.media},
-          el {MINUTOS.mediana}, el {MINUTOS.desviacion} — siguen dependiendo de lo que votamos al
-          limpiar la tabla.</p>
+          de asociación que miden líneas y órdenes, no verdades. Y con una deuda anotada: todos
+          los números de hoy — el {MINUTOS.media}, el {MINUTOS.mediana}, el {MINUTOS.desviacion}{' '}
+          — siguen dependiendo de lo que votamos al limpiar la tabla. Esa deuda se cobra en la{' '}
+          <b>sesión 6</b>, cuando volvamos a esta misma tabla, la limpiemos en serio y veamos
+          cuánto se mueven estos tres números — y qué hacer con las columnas que no son
+          números, que son casi todas.</p>
         <p>La sesión que viene cambiamos de material: dejamos esta tabla y nos vamos a 183
-          países, porque para aprender a <b>elegir un gráfico</b> hacen falta más de veintitrés
+          países, porque para aprender a <b>elegir un gráfico</b> hacen falta más de {RECUENTOS.filas}
           filas. Veremos qué gráfico admite cada tipo de dato, cómo mirar cuatro variables a la
           vez cuando la hoja solo tiene dos ejes, y cómo un gráfico puede estorbar aunque todos
           sus números sean ciertos.</p>
