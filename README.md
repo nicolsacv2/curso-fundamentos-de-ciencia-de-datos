@@ -153,13 +153,19 @@ y compara contra las cifras de `mca_famd_guia.md`, que son su oráculo y no su f
 
 `ejemplo_lluvia.py` escribe `src/sessions/s07/data/lluvia.js`: el ejemplo con el que abre la
 sesión 7 y sobre el que el bloque 1 enseña el análisis de correspondencias simples. Es una
-tabla de contingencia **inventada y declarada como tal** —el cielo de hoy contra el cielo de
-mañana, tres estados, un año de días—, escrita como constante en el script: no lee ningún
-dato ni ningún archivo. Publica los perfiles, las esperadas, el chi-cuadrado celda por celda
-y el análisis de correspondencias, y antes de escribir comprueba sus identidades y la propia
-historia del ejemplo —que llover hoy hace más probable llover mañana—. Trae también, como
-constantes con la inversión comprobada, la tabla de la paradoja de Simpson que la sesión 4
-dejó plantada. Los datos del salón entran a la sesión 7 solo en el cierre.
+tabla de contingencia **inventada y declarada como tal**: el cielo del **día observado**
+contra el del **día siguiente**, tres estados, en un año de 365 días **simulado con la semilla
+fija** desde una regla de transición declarada en el script, y **contado en pares de días
+consecutivos** —365 días dan 364 pares—. La tabla no está escrita en ninguna parte: sale del
+recuento, y por eso sus márgenes cuadran por construcción —la suma de un estado como día
+observado y como día siguiente difieren como máximo en uno, exactamente lo que explican el
+primer y el último día del año—, cosa que la primera versión, declarada celda por celda, no
+cumplía. No lee ningún dato ni ningún archivo. Publica el año, los perfiles, las esperadas, el
+chi-cuadrado celda por celda y el análisis de correspondencias, y antes de escribir comprueba
+sus identidades, la consistencia de los márgenes y la propia historia del ejemplo —que llover
+un día hace más probable llover el siguiente—. Trae también, como constantes con la inversión
+comprobada, la tabla de la paradoja de Simpson que la sesión 4 dejó plantada. Los datos del
+salón entran a la sesión 7 solo en el cierre.
 
 La excepción es `clean_salon.py`, la cadena de limpieza de la sesión 6, que imputa con
 `RandomSampleImputer` de [feature-engine][fe] y, como paso 10, calcula el FAMD de la

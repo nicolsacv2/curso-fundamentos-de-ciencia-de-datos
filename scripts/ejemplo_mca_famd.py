@@ -101,8 +101,21 @@ def cerca(a, b, tol=EXACTO):
     return abs(a - b) <= tol
 
 
+def primero_no_nulo(coords):
+    """Index of the first coordinate that is not a rounding zero.
+
+    The sign of an eigenvector is arbitrary and has to be pinned by SOMETHING that does
+    not depend on the machine. «The largest coordinate in absolute value» does: in these
+    small examples two coordinates tie exactly (the two indicators of a binary variable
+    are mirror images), and which of the two Jacobi leaves a hair larger changed between
+    two computers, flipping an axis that no figure draws but the file records. The first
+    non-null coordinate, by index, cannot tie with itself."""
+    return next(j for j, x in enumerate(coords) if abs(x) > NULO)
+
+
 def fijar_signo(k, coords, cats, reglas):
-    """Whether axis k has to be flipped for the named category to have its sign."""
+    """Whether axis k has to be flipped: for the named category to have its sign when
+    there is a rule, and otherwise for the first non-null coordinate to be positive."""
     regla = reglas.get(k)
     if regla:
         var, nivel, signo = regla
@@ -110,8 +123,7 @@ def fijar_signo(k, coords, cats, reglas):
             sys.exit(f'la categoría {var}={nivel} que fija el signo del eje {k + 1} '
                      f'no existe: revisa SIGNOS')
         return sgn(coords[cats.index((var, nivel))]) != signo
-    mayor = max(range(len(coords)), key=lambda j: abs(coords[j]))
-    return coords[mayor] < 0
+    return coords[primero_no_nulo(coords)] < 0
 
 
 def ca_de(S, n_ejes):
@@ -203,6 +215,30 @@ def mca(variables, reglas):
     lam_burt = [v * v for v in sing_b]
 
     total = sum(lam)
+
+    # The jump from distances to the map, on the farthest pair of people: the chi-square
+    # distance straight from Z (the formula the block shows), the distance between their
+    # coordinates over all K axes — equal by construction, and asserted — and over the two
+    # axes of the map, which is smaller by exactly what the plane does not keep.
+    def d_z(a, b):
+        return math.sqrt(n / Q * sum((Z[a][j] - Z[b][j]) ** 2 / nj[j] for j in range(J)))
+
+    def d_f(a, b, ejes):
+        return math.sqrt(sum((f[a][k] - f[b][k]) ** 2 for k in range(ejes)))
+
+    par = max(((a, b) for a in range(n) for b in range(a + 1, n)),
+              key=lambda p_: (round(d_z(*p_), 9), -p_[0], -p_[1]))
+    assert cerca(d_z(*par), d_f(*par, K), 1e-8), \
+        'la distancia chi-cuadrado por Z no es la distancia entre coordenadas con todos los ejes'
+    assert d_f(*par, 2) <= d_f(*par, K) + EXACTO, 'el mapa no puede alargar una distancia'
+    salto = {
+        'personas': [par[0] + 1, par[1] + 1],
+        'dZ': redondear(d_z(*par), 3),
+        'dTodosLosEjes': redondear(d_f(*par, K), 3),
+        'dMapa': redondear(d_f(*par, 2), 3),
+        'ejes': K, 'ejesMapa': 2,
+        'retenido': redondear(100 * sum(lam[:2]) / total, 1),
+    }
     return {
         'n': n, 'Q': Q, 'J': J, 'ejes': K,
         'inerciaTotal': redondear(inercia, 4),
@@ -240,6 +276,8 @@ def mca(variables, reglas):
             'autovalores': [redondear(l, 4) for l in lam_burt],
             'cuadrados': [redondear(l * l, 4) for l in lam],
         },
+        # the farthest pair of people, three ways: by Z, by every axis, by the map's two
+        'salto': salto,
         # unrounded, for the other set-ups; stripped before writing
         '_raw': {'lam': lam, 'V': V, 'g': g, 'f': f, 'S': S, 'Z': Z, 'nj': nj, 'c': c,
                  'cats': cats, 'd2': d2, 'ctr': ctr, 'cos2': cos2},
@@ -406,7 +444,10 @@ def famd(numericas, categoricas):
     assert cerca(sum(lam), inercia), f'Σλ = {sum(lam)} ≠ {inercia}'
     F = [[sum(X[i][a] * V[k][a] for a in range(m)) for k in range(K)] for i in range(n)]
 
-    # signs: cups negative on axis 1, person 7 positive on axis 2, largest otherwise
+    # signs: cups negative on axis 1, person 7 positive on axis 2, and on every other
+    # axis the first person with a non-null score positive — not «the largest loading»,
+    # which ties between the two mirror-image indicators of a binary variable and made
+    # axis 3 come out flipped on another machine (see primero_no_nulo)
     i_tazas = next(a for a, col in enumerate(columnas) if col[1] == 'tazas')
     for k in range(K):
         if k == 0:
@@ -415,8 +456,7 @@ def famd(numericas, categoricas):
         elif k == 1:
             flip = F[6][1] < 0
         else:
-            mayor = max(range(m), key=lambda a: abs(V[k][a]))
-            flip = V[k][mayor] < 0
+            flip = F[primero_no_nulo([F[i][k] for i in range(n)])][k] < 0
         if flip:
             V[k] = [-x for x in V[k]]
             for i in range(n):

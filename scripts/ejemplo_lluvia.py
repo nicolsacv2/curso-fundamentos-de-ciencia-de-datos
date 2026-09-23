@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """Generate the rain example session 7 opens with, and the CA of its table.
 
-Declares — it does not measure — a year of invented days, crossed by the sky of one day
-against the sky of the next, and writes src/sessions/s07/data/lluvia.js with:
+Simulates — it does not measure — a year of invented days, one state of the sky per
+day, and COUNTS the pairs of consecutive days: the sky of the observed day against the
+sky of the day after. Writes src/sessions/s07/data/lluvia.js with:
 
   ESTADOS     the three states of the sky, in the order the wall reads them.
-  TABLA       the cross table «hoy × mañana»: counts, margins, total.
-  PERFILES    row and column profiles — the conditional probabilities, P(mañana | hoy)
-              and P(hoy | mañana).
+  ANIO        the 365 simulated days, in order, with the first and the last one named.
+  TABLA       the cross table «día observado × día siguiente»: counts of PAIRS (364 of
+              them), margins, total, and for every state its two sums side by side with
+              the difference and what explains it.
+  PERFILES    row and column profiles — the conditional probabilities,
+              P(siguiente | observado) and P(observado | siguiente).
   ESPERADAS   the table the two days would give if they were independent.
   CHI2        the chi-square cell by cell, its total, φ² = χ²/n and Cramér's V.
   CA          the simple correspondence analysis of that table: masses, eigenvalues,
@@ -17,19 +21,34 @@ against the sky of the next, and writes src/sessions/s07/data/lluvia.js with:
   SIMPSON     the paradox session 4 left planted, as a 2 × 2 × 2 table of declared
               constants: a drug, two age groups, a high or low dose, better or not.
 
-The table is invented and the entrada says so. It is built to tell one story — the
-sky tends to repeat itself, so a rainy day makes rain tomorrow more likely than the
-year's average — and the story is asserted here, so that editing a count cannot leave
-the prose saying something the table no longer shows.
+WHY THE TABLE IS COUNTED AND NOT DECLARED. The first version declared the nine cells by
+hand, and its margins were impossible: 170 days of sun as the observed day against 155
+as the day after. In a table of consecutive days every day is «observed» once and
+«next» once — except the first day of the year, which is never «next», and the last,
+which is never «observed» — so the two sums of a state can differ by one at most. A
+declared table has no year behind it that guarantees that; a counted one does, by
+construction, and the script asserts it: filas[k] − columnas[k] == [day 1 is k] −
+[day 365 is k], for every state.
 
-Everything the blocks state is asserted BEFORE anything is written: the margins add up
-to the total, the expected table keeps the margins, the cell contributions add up to
-χ², Σλ = φ², the transition formula holds for every row and every column, Σctr = 1 per
-axis, Σcos² = 1 per point, K = min(r, c) − 1 non-null axes, the story holds, and the
-Simpson reversal happens. If any of it fails, nothing is published.
+What IS declared, and nothing else about the table: the transition rule (from each
+state, the probability of each state the next day — the diagonal high, because the sky
+repeats itself), the seed, the first day and the number of days. The rule is the story
+and it is not published: the entrada teaches how to read a table, not how to simulate
+one, and printing the probabilities the year was drawn from would be giving the answer
+before the question. The story is asserted on the COUNTED table anyway — a rainy day
+makes rain the next day more likely than the year's average, the diagonal is the
+maximum of every row — so a seed that happens not to tell it cannot be published.
 
-No dependencies and no data file: a 3 × 3 table is diagonalised with the Jacobi rotation
-of scripts/extract_gapminder.py, like the eight-person example. Two runs give the same
+Everything the blocks state is asserted BEFORE anything is written: 365 days and 364
+pairs, the margins add up to the total, the two sums of every state agree with the
+first and last day, the expected table keeps the margins, the cell contributions add up
+to χ², Σλ = φ², the transition formula holds for every row and every column, Σctr = 1
+per axis, Σcos² = 1 per point, K = min(r, c) − 1 non-null axes, the story holds, and
+the Simpson reversal happens. If any of it fails, nothing is published.
+
+No dependencies and no data file: the year comes from random.Random with the seed
+pinned, and a 3 × 3 table is diagonalised with the Jacobi rotation of
+scripts/extract_gapminder.py, like the eight-person example. Two runs give the same
 file.
 
 Rounding: four decimals in λ, χ² and V; three in profiles and coordinates; two in
@@ -41,6 +60,7 @@ percentages and contributions (in percent).
 import json
 import math
 import os
+import random
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -55,18 +75,27 @@ OUT = os.path.join(ROOT, 'src', 'sessions', 's07', 'data', 'lluvia.js')
 NULO = 1e-9
 EXACTO = 1e-9
 
-# ── The year, declared ──────────────────────────────────────────────────────
-# Rows: the sky today. Columns: the sky tomorrow. 365 days. The diagonal is heavy on
-# purpose — the sky repeats itself — and rain follows rain more often than it follows
-# sun; that is the whole story, and it is asserted below.
+# ── The year: a rule, a seed, a first day, and how many days ────────────────
+# Rows: the state of the observed day. Columns: the probability of each state the day
+# after. The diagonal is high on purpose — the sky repeats itself — and rain follows
+# rain more often than the year's average has rain: that is the whole story, and it is
+# asserted on the counted table below, not assumed from these numbers.
 ESTADOS = ['sol', 'nublado', 'lluvia']
-DIAS = [
-    [110, 40, 20],   # hoy sol
-    [35, 60, 40],    # hoy nublado
-    [10, 25, 25],    # hoy lluvia
+TRANSICION = [
+    [0.65, 0.25, 0.10],   # observado sol
+    [0.25, 0.45, 0.30],   # observado nublado
+    [0.15, 0.35, 0.50],   # observado lluvia
 ]
+ESTADO_INICIAL = 'sol'
 DIAS_DEL_ANIO = 365
-RELATO = 'un año inventado de 365 días: el cielo de hoy contra el cielo de mañana'
+# Pinned, and the reason is the same the entrada of session 6 gives for its imputer:
+# without it every run would draw another year, and the class on Tuesday would not see
+# the class on Thursday's table. The value was chosen once: the first seed under which
+# the counted table tells the story the asserts below demand AND the year starts and
+# ends under different skies — so that the two sums of a state visibly differ by one,
+# which is the lesson the entrada draws from the margins.
+SEMILLA = 2
+RELATO = 'un año inventado de 365 días: el cielo de cada día contra el del día siguiente'
 
 # ── Simpson: the story session 4 told, as counts ─────────────────────────────
 # A drug, two age groups. Inside each group the high dose helps more; the young
@@ -89,6 +118,35 @@ def cerca(a, b, tol=EXACTO):
 def r4(x): return redondear(x, 4)
 def r3(x): return redondear(x, 3)
 def r2(x): return redondear(x, 2)
+
+
+def simular_anio(semilla, dias=DIAS_DEL_ANIO):
+    """One state per day, drawn from TRANSICION with the seed pinned.
+
+    The draw is spelled out — a uniform against the cumulative row — instead of
+    random.choices, so that what the seed produces depends on nothing but random()."""
+    rng = random.Random(semilla)
+    anio = [ESTADO_INICIAL]
+    for _ in range(dias - 1):
+        fila = TRANSICION[ESTADOS.index(anio[-1])]
+        u = rng.random()
+        acumulado = 0.0
+        for estado, p in zip(ESTADOS, fila):
+            acumulado += p
+            if u < acumulado:
+                anio.append(estado)
+                break
+        else:
+            anio.append(ESTADOS[-1])
+    return anio
+
+
+def contar_pares(anio):
+    """The cross table of consecutive days: the observed day in rows, the next in columns."""
+    N = [[0] * len(ESTADOS) for _ in ESTADOS]
+    for observado, siguiente in zip(anio, anio[1:]):
+        N[ESTADOS.index(observado)][ESTADOS.index(siguiente)] += 1
+    return N
 
 
 def chi2_de(N):
@@ -155,20 +213,63 @@ def ca_de(N):
         assert cerca(sum(cos2_g[j]), 1), 'Σcos² de una columna ≠ 1'
     # the chi-square distance between the first two rows, the formula the block shows
     d2_12 = sum((perfil_fila[0][j] - perfil_fila[1][j]) ** 2 / c[j] for j in range(J))
+    # Every pair of rows and every pair of columns: the chi-square distance between their
+    # profiles, and the Euclidean distance between their principal coordinates over ALL
+    # the axes. The two have to agree — that identity is what lets «close on the map» be
+    # read as «similar profiles» — and the block shows both, so both are published.
+    def pares(perfiles, pesos, coords):
+        out = []
+        for a in range(len(perfiles)):
+            for b in range(a + 1, len(perfiles)):
+                d2 = sum((perfiles[a][j] - perfiles[b][j]) ** 2 / pesos[j] for j in range(len(pesos)))
+                d_coord = math.sqrt(sum((coords[a][k] - coords[b][k]) ** 2 for k in range(K)))
+                assert cerca(math.sqrt(d2), d_coord, 1e-7), \
+                    f'la distancia chi-cuadrado ({math.sqrt(d2)}) no es la distancia en coordenadas ({d_coord})'
+                out.append((a, b, d2, d_coord))
+        return sorted(out, key=lambda t: t[2])
+    dist_filas = pares(perfil_fila, c, f)
+    dist_cols = pares(perfil_col, r, g)
     return {
         'lam': lam, 'f': f, 'g': g, 'r': r, 'c': c, 'ctr_f': ctr_f, 'ctr_g': ctr_g,
         'cos2_f': cos2_f, 'cos2_g': cos2_g, 'perfil_fila': perfil_fila, 'K': K, 'd2_12': d2_12,
+        'dist_filas': dist_filas, 'dist_cols': dist_cols,
     }
 
 
 def main():
     fa = fb = ESTADOS
-    N = DIAS
+
+    # ── the year, and the pairs counted from it ──
+    anio = simular_anio(SEMILLA)
+    assert len(anio) == DIAS_DEL_ANIO, f'el año tiene {len(anio)} días, no {DIAS_DEL_ANIO}'
+    assert all(e in ESTADOS for e in anio), 'un día tiene un estado que no existe'
+    N = contar_pares(anio)
 
     # ── the table, its margins, profiles, expected counts and chi-square ──
     n, filas, cols, Esp, celdas, chi2, v = chi2_de(N)
-    assert n == DIAS_DEL_ANIO, f'el año tiene {n} días, no {DIAS_DEL_ANIO}'
+    assert n == DIAS_DEL_ANIO - 1, f'{DIAS_DEL_ANIO} días dan {DIAS_DEL_ANIO - 1} pares, no {n}'
     assert sum(filas) == n and sum(cols) == n, 'los marginales no cuadran'
+    # Every day is «observed» once and «next» once, except the first and the last of
+    # the year. So the two sums of a state differ by exactly whether day 1 has it minus
+    # whether day 365 has it — and never by more than one. This is the check the first
+    # version did not have, and the one the entrada now puts on the wall.
+    margenes = []
+    for k, estado in enumerate(ESTADOS):
+        primero, ultimo = anio[0] == estado, anio[-1] == estado
+        diferencia = filas[k] - cols[k]
+        assert diferencia == int(primero) - int(ultimo), \
+            f'«{estado}»: {filas[k]} como observado y {cols[k]} como siguiente, y el año no lo explica'
+        assert abs(diferencia) <= 1
+        if primero and ultimo:
+            explicacion = f'el primer y el último día del año son «{estado}» los dos'
+        elif primero:
+            explicacion = f'el primer día del año es «{estado}» y el último no'
+        elif ultimo:
+            explicacion = f'el último día del año es «{estado}» y el primero no'
+        else:
+            explicacion = f'ni el primer ni el último día del año es «{estado}»'
+        margenes.append({'estado': estado, 'observado': filas[k], 'siguiente': cols[k],
+                         'diferencia': diferencia, 'explicacion': explicacion})
     for i in range(len(fa)):
         assert cerca(sum(Esp[i]), filas[i]), 'las esperadas no conservan el marginal de fila'
     for j in range(len(fb)):
@@ -183,9 +284,9 @@ def main():
     # ── the story: the sky repeats itself ──
     ll, so = ESTADOS.index('lluvia'), ESTADOS.index('sol')
     assert perfil_fila[ll][ll] > marginal_col[ll], \
-        'llover hoy no hace más probable llover mañana: el ejemplo no cuenta su historia'
+        'llover un día no hace más probable llover el siguiente: el ejemplo no cuenta su historia'
     assert perfil_fila[so][so] > marginal_col[so], \
-        'un día de sol no hace más probable el sol mañana: el ejemplo no cuenta su historia'
+        'un día de sol no hace más probable el sol al día siguiente: el ejemplo no cuenta su historia'
     for i in range(len(fa)):
         assert N[i][i] == max(N[i]), f'la fila «{fa[i]}» no tiene su máximo en la diagonal'
 
@@ -223,28 +324,40 @@ def main():
     j = lambda o: json.dumps(o, ensure_ascii=False)
     L = [
         '/* generated by scripts/ejemplo_lluvia.py — do not edit by hand.',
-        '   The rain example session 7 opens with: a year of INVENTED days, the sky of one day',
-        '   against the sky of the next. Declared as constants in the script, checked there',
-        '   — margins, expected table, Σλ = χ²/n, transition, Σctr, Σcos², the story the',
-        '   example tells, the Simpson reversal — and only then written here. */',
+        '   The rain example session 7 opens with: a year of INVENTED days, simulated with the',
+        '   seed pinned, and the pairs of consecutive days COUNTED from it — the sky of the',
+        '   observed day against the sky of the day after. Checked in the script — 364 pairs,',
+        '   margins that agree with the first and last day, expected table, Σλ = χ²/n,',
+        '   transition, Σctr, Σcos², the story the example tells, the Simpson reversal — and',
+        '   only then written here. */',
         '',
         '/* The three states of the sky, in the order the wall reads them. Rows and columns of',
         '   TABLA share this order; a block that needs one cell finds it by name here. */',
         'export const ESTADOS = ' + j(ESTADOS) + ';',
         '',
-        '/* Counts of days, with the margins and the total. `filas` is today, `columnas` is',
-        '   tomorrow. */',
-        'export const TABLA = ' + j({'relato': RELATO, 'n': n, 'unidad': 'días', 'celdas': N,
-                                     'filas': filas, 'columnas': cols,
+        '/* The year, day by day. 365 days give 364 pairs; the first day is never «siguiente»',
+        '   and the last is never «observado», which is why the two sums of a state can differ',
+        '   by one. */',
+        'export const ANIO = ' + j({'dias': len(anio), 'pares': n, 'estados': anio,
+                                    'primerDia': anio[0], 'ultimoDia': anio[-1],
+                                    'semilla': SEMILLA}) + ';',
+        '',
+        '/* Counts of PAIRS of consecutive days, with the margins and the total. `filas` is the',
+        '   observed day, `columnas` the day after. `margenes` puts the two sums of every state',
+        '   side by side, with the difference and what explains it. */',
+        'export const TABLA = ' + j({'relato': RELATO, 'n': n, 'unidad': 'pares de días consecutivos',
+                                     'dias': len(anio), 'celdas': N,
+                                     'filas': filas, 'columnas': cols, 'margenes': margenes,
                                      'marginalFila': [r3(x) for x in marginal_fila],
                                      'marginalColumna': [r3(x) for x in marginal_col]}) + ';',
         '',
-        '/* Row profiles (each row over its margin: P(mañana | hoy)) and column profiles',
-        '   (P(hoy | mañana)). Each one adds up to one. */',
+        '/* Row profiles (each row over its margin: P(siguiente | observado)) and column',
+        '   profiles (P(observado | siguiente)). Each one adds up to one. */',
         'export const PERFILES = ' + j({'fila': [[r3(x) for x in p_] for p_ in perfil_fila],
                                         'columna': [[r3(x) for x in p_] for p_ in perfil_col]}) + ';',
         '',
-        '/* What the table would be if today said nothing about tomorrow: fila · columna / n.',
+        '/* What the table would be if the observed day said nothing about the next: fila ·',
+        '   columna / n.',
         '   Same margins as the observed one. */',
         'export const ESPERADAS = ' + j([[r2(x) for x in fila] for fila in Esp]) + ';',
         '',
@@ -257,7 +370,10 @@ def main():
         '/* The simple correspondence analysis of TABLA. `filas[i].coord` and',
         '   `columnas[j].coord` on every axis; contributions in percent; cos² over all axes.',
         '   Σλ = phi2; K = min(filas, columnas) − 1 = 2 axes, so the plane keeps everything.',
-        '   Signs by the largest coordinate. */',
+        '   `distancias`: every pair of rows and of columns, closest first, with the',
+        '   chi-square distance between profiles (`d`) and the distance between principal',
+        '   coordinates (`dCoord`), asserted equal. `salto`: the farthest pair of rows, for the',
+        '   step from distances to the map. Signs by the largest coordinate. */',
         'export const CA = ' + j({
             'ejes': K,
             'inerciaTotal': r4(sum(ca['lam'])),
@@ -286,6 +402,22 @@ def main():
                 'coordPublicada': r3(ca['f'][0][0]),
             },
             'distancia': {'filas': [fa[0], fa[1]], 'd2': r4(ca['d2_12']), 'd': r3(math.sqrt(ca['d2_12']))},
+            # every pair, closest first; `d` from the profiles, `dCoord` from the coordinates
+            'distancias': {
+                'filas': [{'a': fa[a], 'b': fa[b], 'd2': r4(d2), 'd': r3(math.sqrt(d2)), 'dCoord': r3(dc)}
+                          for a, b, d2, dc in ca['dist_filas']],
+                'columnas': [{'a': fb[a], 'b': fb[b], 'd2': r4(d2), 'd': r3(math.sqrt(d2)), 'dCoord': r3(dc)}
+                             for a, b, d2, dc in ca['dist_cols']],
+            },
+            # the jump from distances to the map, verified on the farthest pair of rows:
+            # the same number by the profiles and by the coordinates, because the two axes
+            # keep all the inertia
+            'salto': {
+                'par': [fa[ca['dist_filas'][-1][0]], fa[ca['dist_filas'][-1][1]]],
+                'dPerfiles': r3(math.sqrt(ca['dist_filas'][-1][2])),
+                'dCoord': r3(ca['dist_filas'][-1][3]),
+                'ejes': K, 'retenido': r2(100.0),
+            },
         }) + ';',
         '',
         '/* The Simpson paradox of session 4, as counts. In each age group the high dose',
@@ -298,10 +430,14 @@ def main():
         fh.write('\n'.join(L))
 
     print(f'{RELATO} → {os.path.relpath(OUT, ROOT)}')
+    print(f'  semilla {SEMILLA} · {len(anio)} días, {n} pares · primer día {anio[0]}, último {anio[-1]}')
     for i, fila in enumerate(N):
-        print(f'  hoy {fa[i]:<8} ' + ' '.join(f'{x:>5}' for x in fila) + f'  | {filas[i]}')
-    print(f'  {"suma":<12} ' + ' '.join(f'{x:>5}' for x in cols) + f'  | {n}')
-    print(f'  P(lluvia | lluvia hoy) = {r3(perfil_fila[ll][ll])} > P(lluvia) = {r3(marginal_col[ll])}')
+        print(f'  observado {fa[i]:<8} ' + ' '.join(f'{x:>5}' for x in fila) + f'  | {filas[i]}')
+    print(f'  {"suma":<18} ' + ' '.join(f'{x:>5}' for x in cols) + f'  | {n}')
+    for m in margenes:
+        print(f'  {m["estado"]:<8} observado {m["observado"]:>3} · siguiente {m["siguiente"]:>3} · '
+              f'diferencia {m["diferencia"]:+d}: {m["explicacion"]}')
+    print(f'  P(lluvia | lluvia el día observado) = {r3(perfil_fila[ll][ll])} > P(lluvia) = {r3(marginal_col[ll])}')
     print(f'  χ² = {r4(chi2)} · φ² = {r4(phi2)} · V = {r4(v)} · CA: λ = {[r4(l) for l in ca["lam"]]} · '
           f'{[r2(100 * l / sum(ca["lam"])) for l in ca["lam"]]} %')
     t = simpson['total']

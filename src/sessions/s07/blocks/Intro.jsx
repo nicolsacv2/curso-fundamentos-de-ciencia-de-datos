@@ -1,26 +1,31 @@
 import { Panel, Task, Cards, Card, Diagram, Pair, Prose, NumTable }
   from '../../../components/content/index.jsx';
-import { ESTADOS, TABLA, PERFILES, ESPERADAS, CHI2, SIMPSON } from '../data/lluvia.js';
-import { tablaChi2, perfilesFila, simpsonTotal, simpsonGrupos, fCondicional, celdaLluvia, celdaMayor }
+import { ESTADOS, ANIO, TABLA, PERFILES, ESPERADAS, CHI2, SIMPSON } from '../data/lluvia.js';
+import { anio, tablaChi2, perfilesFila, simpsonTotal, simpsonGrupos, fCondicional, celdaLluvia, celdaMayor }
   from '../figures/intro.js';
 
 /* Entrada of session 7 · conditional probability and contingency tables. It answers the
    question session 6 closed with — «¿qué falta?» — by learning to read TWO variables that
    are not numbers together, on an example of its own before the class table comes back
-   in the closing: the sky today against the sky tomorrow, over a year of INVENTED days.
-   The cross table, its margins, each row as a conditional probability, what independence
-   would look like, the chi-square cell by cell and a measure in [0, 1]. It ends by paying
-   the debt session 4 left: the Simpson paradox, as a table of three variables.
+   in the closing: the sky of one day against the sky of the day after, over a year of
+   INVENTED days. The year itself first, then the unit — a pair of consecutive days —, the
+   cross table, its margins (and why the two sums of a state differ by one at most), each
+   row as a conditional probability, what independence would look like, the chi-square
+   cell by cell and a measure in [0, 1]. It ends by paying the debt session 4 left: the
+   Simpson paradox, as a table of three variables.
+
+   The two variables are called «día observado» and «día siguiente», never the words for
+   today and tomorrow: in a room on a given date those two name the date, not the table.
 
    Every number is interpolated from src/sessions/s07/data/lluvia.js, which
-   scripts/ejemplo_lluvia.py wrote from a declared table after asserting its identities
+   scripts/ejemplo_lluvia.py counted from a simulated year after asserting its identities
    and its story. Nothing is computed here, and no number is typed. */
 
 const f = v => String(v).replace('.', ',').replace('-', '−');
 const pct = v => `${f(Math.round(v * 1000) / 10)} %`;
 
 const R = ESTADOS, K = ESTADOS;
-/* The cell the example is named after: it rained today, it rains tomorrow. */
+/* The cell the example is named after: it rained one day, it rains the next. */
 const m = celdaLluvia();
 /* The cell that puts the most into the chi-square, read off the data. */
 const g = celdaMayor();
@@ -40,47 +45,84 @@ export default function Intro({ id, tabId, block }) {
           salón vuelve <b>al final de la sesión</b>, cuando ya se sepa leerla entera.</p>
       </Task>
 
-      <h3>Si llovió hoy, ¿llueve mañana?</h3>
+      <h3>Si un día llueve, ¿llueve el día siguiente?</h3>
       <Prose>
-        <p>Imaginen un año de <b>{TABLA.n} días</b> en un lugar cualquiera, y que cada día se anotó
-          el cielo con una de tres palabras: <b>sol</b>, <b>nublado</b> o <b>lluvia</b>. La
-          pregunta es si el cielo de hoy dice algo del de mañana. Para responderla se cruzan
-          los días: una fila por cada cielo de <b>hoy</b>, una columna por cada cielo de{' '}
-          <b>mañana</b>, y en cada celda <b>cuántos días</b> hubo con esa combinación. En los
-          bordes, las sumas: la de cada fila, la de cada columna, y el total, que son los{' '}
-          {TABLA.n} días. Se llama <b>tabla de contingencia</b>. Los días son inventados
-          —nadie los midió— y sirven para aprender a leerla; la tabla real llega en el
+        <p>Imaginen un año de <b>{ANIO.dias} días</b> en un lugar cualquiera, y que cada día se
+          anotó el cielo con una de tres palabras: <b>sol</b>, <b>nublado</b> o <b>lluvia</b>.
+          Aquí está el año entero. Los días son inventados —nadie los midió, los sorteó un
+          programa con el azar fijado— y sirven para aprender; la tabla real llega en el
           cierre.</p>
       </Prose>
 
+      <Diagram fig={anio}>
+        Los {ANIO.dias} días, en orden. El primero fue de {ANIO.primerDia}; el último, de{' '}
+        {ANIO.ultimoDia}. Debajo, la unidad con la que vamos a contar.
+      </Diagram>
+
+      <Prose>
+        <p>La pregunta es si el cielo de un día dice algo del cielo del día siguiente. Para
+          responderla no se cuentan días: se cuentan <b>pares de días consecutivos</b> —cada
+          día con el que le sigue—. Al primero de cada par lo llamamos <b>día observado</b>; al
+          segundo, <b>día siguiente</b>. Un año de {ANIO.dias} días da <b>{ANIO.pares} pares</b>:
+          el día 1 con el 2, el 2 con el 3, y así hasta el {ANIO.dias - 1} con el {ANIO.dias}.</p>
+        <p>Y los pares se cruzan: una fila por cada cielo del <b>día observado</b>, una columna
+          por cada cielo del <b>día siguiente</b>, y en cada celda <b>cuántos pares</b> hubo
+          con esa combinación. En los bordes, las sumas: la de cada fila, la de cada columna, y
+          el total, que son los {TABLA.n} pares. Se llama <b>tabla de contingencia</b>.</p>
+      </Prose>
+
       <NumTable
-        cols={['hoy \\ mañana', ...K, 'suma']}
+        cols={['observado \\ siguiente', ...K, 'suma']}
         rows={R.map((r, i) => [r, ...TABLA.celdas[i], TABLA.filas[i]])}
         pie={['suma', ...TABLA.columnas, TABLA.n]}
         marca={(i, j) => i === m.i && j === m.j}
-        caption={<>Recuentos de días de un año inventado. Las filas son el cielo de hoy; las columnas,
-          el de mañana. Señalada, la celda que da nombre al ejemplo: llovió hoy y llueve mañana,{' '}
-          {TABLA.celdas[m.i][m.j]} días.</>}
+        caption={<>Recuentos de pares de días consecutivos de un año inventado. Las filas son el cielo
+          del día observado; las columnas, el del día siguiente. Señalada, la celda que da nombre al
+          ejemplo: llovió el día observado y llueve el siguiente, {TABLA.celdas[m.i][m.j]} pares.</>}
+      />
+
+      <h3>Las dos sumas de cada estado casi coinciden, y no es casualidad</h3>
+      <Prose>
+        <p>Miren los bordes. «{TABLA.margenes[0].estado}» suma {TABLA.margenes[0].observado} como día observado y{' '}
+          {TABLA.margenes[0].siguiente} como día siguiente. No es un descuido: es lo que tiene que
+          pasar. Cada día del año entra en la tabla <b>dos veces</b> —una como observado, en el
+          par que empieza con él, y otra como siguiente, en el par que termina con él— salvo dos:
+          el <b>día 1</b>, que nunca es siguiente, y el <b>día {ANIO.dias}</b>, que nunca es
+          observado. Así que la suma de una fila y la de su columna pueden diferir como máximo en
+          uno, y la diferencia la explican esos dos días.</p>
+      </Prose>
+
+      <NumTable
+        cols={['estado', 'como día observado', 'como día siguiente', 'diferencia']}
+        rows={TABLA.margenes.map(g => [g.estado, g.observado, g.siguiente,
+          g.diferencia > 0 ? `+${g.diferencia}` : g.diferencia === 0 ? '0' : f(g.diferencia)])}
+        marca={(i, j) => j === 2 && TABLA.margenes[i].diferencia !== 0}
+        caption={<>Las dos sumas de cada estado, lado a lado.{' '}
+          {TABLA.margenes.map((g, i, a) => (
+            <span key={g.estado}>{g.estado.charAt(0).toUpperCase() + g.estado.slice(1)}:{' '}
+              {g.explicacion}{i < a.length - 1 ? '. ' : '.'}</span>
+          ))} Una tabla de días consecutivos que no cumpla esto no salió de ningún año.</>}
       />
 
       <h3>Cada fila es una probabilidad condicional</h3>
       <Prose>
-        <p>Dividan cada fila por su suma. Lo que queda es el <b>perfil de la fila</b>: de los días
-          con ese cielo hoy, qué parte tuvo cada cielo mañana. Y eso tiene nombre propio: es la{' '}
-          <b>probabilidad condicional</b>, <b>P(A | B)</b> — «la probabilidad de A sabiendo que
-          B». Se lee sobre la celda señalada: de los <b>{TABLA.filas[m.i]}</b> días en que hoy hubo
-          «{R[m.i]}», <b>{TABLA.celdas[m.i][m.j]}</b> tuvieron «{K[m.j]}» al día siguiente. Así que
-          P(mañana = «{K[m.j]}» | hoy = «{R[m.i]}») = {TABLA.celdas[m.i][m.j]}/{TABLA.filas[m.i]} ={' '}
+        <p>Dividan cada fila por su suma. Lo que queda es el <b>perfil de la fila</b>: de los
+          pares con ese cielo el día observado, qué parte tuvo cada cielo el día siguiente. Y eso
+          tiene nombre propio: es la <b>probabilidad condicional</b>, <b>P(A | B)</b> — «la
+          probabilidad de A sabiendo que B». Se lee sobre la celda señalada: de los{' '}
+          <b>{TABLA.filas[m.i]}</b> días observados con «{R[m.i]}», <b>{TABLA.celdas[m.i][m.j]}</b>{' '}
+          tuvieron «{K[m.j]}» al día siguiente. Así que P(siguiente = «{K[m.j]}» | observado =
+          «{R[m.i]}») = {TABLA.celdas[m.i][m.j]}/{TABLA.filas[m.i]} ={' '}
           <b>{f(PERFILES.fila[m.i][m.j])}</b>. Esa es la respuesta a la pregunta del título, y
           es una probabilidad condicional.</p>
         <p>Cada fila suma uno, porque es un reparto. Y las columnas también se pueden dividir
-          por su suma: son los perfiles de columna, P(hoy | mañana) — de los días con lluvia
-          mañana, qué cielo tenían hoy —, la misma tabla leída al revés. Las dos lecturas son
-          legítimas y no dicen lo mismo.</p>
+          por su suma: son los perfiles de columna, P(observado | siguiente) — de los días
+          siguientes con lluvia, qué cielo tenía el día observado —, la misma tabla leída al
+          revés. Las dos lecturas son legítimas y no dicen lo mismo.</p>
       </Prose>
 
       <NumTable
-        cols={['P(mañana | hoy)', ...K, 'suma']}
+        cols={['P(siguiente | observado)', ...K, 'suma']}
         rows={R.map((r, i) => [r, ...PERFILES.fila[i].map(f), '1'])}
         marca={(i, j) => i === m.i && j === m.j}
         caption={<>Los perfiles de fila: cada recuento sobre la suma de su fila. Cada fila suma
@@ -88,43 +130,44 @@ export default function Intro({ id, tabId, block }) {
       />
 
       <Diagram fig={perfilesFila}>
-        Las mismas filas dibujadas: cada barra es un cielo de hoy estirado al 100 % y partido
-        por el cielo de mañana; el ancho es cuántos días hubo con ese cielo. La última barra es
-        el margen: si hoy no dijera nada de mañana, todas las barras se parecerían a esa.
+        Las mismas filas dibujadas: cada barra es un cielo del día observado estirado al 100 % y
+        partido por el cielo del día siguiente; el ancho es cuántos días hubo con ese cielo. La
+        última barra es el margen: si el día observado no dijera nada del siguiente, todas las
+        barras se parecerían a esa.
       </Diagram>
 
       <h3>Marginal contra condicional</h3>
       <Cards cols="c3">
-        <Card k="sin saber nada" t={`P(mañana = «${K[m.j]}») = ${f(TABLA.marginalColumna[m.j])}`}>
-          La probabilidad <b>marginal</b>: de los {TABLA.n} días, {TABLA.columnas[m.j]} tuvieron
-          «{K[m.j]}». Es el margen de la columna, y es lo que se sabe de mañana sin mirar el cielo
-          de hoy.
+        <Card k="sin saber nada" t={`P(siguiente = «${K[m.j]}») = ${f(TABLA.marginalColumna[m.j])}`}>
+          La probabilidad <b>marginal</b>: de los {TABLA.n} pares, {TABLA.columnas[m.j]} tuvieron
+          «{K[m.j]}» el día siguiente. Es el margen de la columna, y es lo que se sabe del día
+          siguiente sin mirar el día observado.
         </Card>
-        <Card k={`sabiendo que hoy = «${R[m.i]}»`} t={`P(… | …) = ${f(PERFILES.fila[m.i][m.j])}`}>
-          La probabilidad <b>condicional</b>: dentro de los {TABLA.filas[m.i]} días de esa fila,
+        <Card k={`sabiendo que observado = «${R[m.i]}»`} t={`P(… | …) = ${f(PERFILES.fila[m.i][m.j])}`}>
+          La probabilidad <b>condicional</b>: dentro de los {TABLA.filas[m.i]} pares de esa fila,
           la proporción {PERFILES.fila[m.i][m.j] > TABLA.marginalColumna[m.j] ? 'sube' : 'baja'}{' '}
-          a {f(PERFILES.fila[m.i][m.j])}. Saber el cielo de hoy cambió lo que esperamos del de
-          mañana.
+          a {f(PERFILES.fila[m.i][m.j])}. Saber el cielo del día observado cambió lo que esperamos
+          del siguiente.
         </Card>
         <Card red k="la diferencia" t="es la asociación">
-          Si para todas las filas la condicional fuera igual a la marginal, saber el cielo de hoy
-          no diría nada del de mañana: las dos variables serían <b>independientes</b>. Que
-          difieran es exactamente lo que significa que estén asociadas.
+          Si para todas las filas la condicional fuera igual a la marginal, saber el cielo del día
+          observado no diría nada del siguiente: las dos variables serían <b>independientes</b>.
+          Que difieran es exactamente lo que significa que estén asociadas.
         </Card>
       </Cards>
 
       <h3>La tabla que no existe: la independencia</h3>
       <Prose>
-        <p>Independencia se puede escribir como una tabla. Si el cielo de hoy no dijera nada del
-          de mañana, cada celda tendría <b>el producto de sus dos márgenes dividido por el
+        <p>Independencia se puede escribir como una tabla. Si el cielo del día observado no dijera
+          nada del siguiente, cada celda tendría <b>el producto de sus dos márgenes dividido por el
           total</b>: la celda señalada tendría {TABLA.filas[m.i]} · {TABLA.columnas[m.j]} / {TABLA.n} ={' '}
-          <b>{f(ESPERADAS[m.i][m.j])}</b> días, y tiene {TABLA.celdas[m.i][m.j]}. Esa tabla se
-          llama <b>esperada</b>, no existe —tiene decimales de día— y conserva los mismos
+          <b>{f(ESPERADAS[m.i][m.j])}</b> pares, y tiene {TABLA.celdas[m.i][m.j]}. Esa tabla se
+          llama <b>esperada</b>, no existe —tiene decimales de par— y conserva los mismos
           márgenes que la observada. La distancia entre las dos tablas es lo que vamos a medir.</p>
       </Prose>
 
       <NumTable
-        cols={['esperado \\ mañana', ...K, 'suma']}
+        cols={['esperado \\ siguiente', ...K, 'suma']}
         rows={R.map((r, i) => [r, ...ESPERADAS[i].map(f), TABLA.filas[i]])}
         pie={['suma', ...TABLA.columnas, TABLA.n]}
         marca={(i, j) => i === m.i && j === m.j}
@@ -136,16 +179,16 @@ export default function Intro({ id, tabId, block }) {
       <Prose>
         <p>Para cada celda: la diferencia entre lo observado y lo esperado, al cuadrado, dividida
           por lo esperado. Es una distancia en <b>unidades de lo esperado</b>, así que una celda
-          rara puede pesar mucho con pocos días. La suma de las {R.length * K.length} celdas
+          rara puede pesar mucho con pocos pares. La suma de las {R.length * K.length} celdas
           es el estadístico <b>χ² = {f(CHI2.total)}</b>. La celda señalada pone{' '}
-          <b>{f(CHI2.celdas[m.i][m.j])}</b>, porque hubo {TABLA.celdas[m.i][m.j]} días donde se
-          esperaban {f(ESPERADAS[m.i][m.j])}; la que más pone de todas es «hoy {R[g.i]}, mañana{' '}
-          {K[g.j]}», con {f(CHI2.celdas[g.i][g.j])}: {TABLA.celdas[g.i][g.j]} días donde se
-          esperaban {f(ESPERADAS[g.i][g.j])}.</p>
-        <p>El χ² crece con la tabla y con el número de días, así que solo no se interpreta.
+          <b>{f(CHI2.celdas[m.i][m.j])}</b>, porque hubo {TABLA.celdas[m.i][m.j]} pares donde se
+          esperaban {f(ESPERADAS[m.i][m.j])}; la que más pone de todas es «observado {R[g.i]},
+          siguiente {K[g.j]}», con {f(CHI2.celdas[g.i][g.j])}: {TABLA.celdas[g.i][g.j]} pares donde
+          se esperaban {f(ESPERADAS[g.i][g.j])}.</p>
+        <p>El χ² crece con la tabla y con el número de pares, así que solo no se interpreta.
           Dividido por n da <b>φ² = {f(CHI2.phi2)}</b>, y normalizado por lo máximo que podría
           valer con estas filas y columnas da la <b>V de Cramér = {f(CHI2.v)}</b>, que vive entre
-          0 y 1: cero si el cielo de hoy no dijera nada del de mañana, uno si lo dijera todo. Y
+          0 y 1: cero si el día observado no dijera nada del siguiente, uno si lo dijera todo. Y
           una advertencia que hay que decir en voz alta: esto es una <b>medida</b> de cuánto se
           asocian dos variables, no una <b>prueba</b> de que se asocien. Con días inventados no
           hay nada que probar; y con datos reales, el chi-cuadrado como prueba de hipótesis pide
@@ -165,7 +208,7 @@ export default function Intro({ id, tabId, block }) {
       <Prose>
         <p>En la sesión 4 dejamos plantada una figura incómoda: un medicamento, dos grupos de
           edad, y dentro de cada grupo más dosis iba con más mejoría, pero con los dos grupos
-          revueltos la asociación se daba la vuelta. Dijimos que se resolvía hoy. Se resuelve
+          revueltos la asociación se daba la vuelta. Dijimos que se resolvía en esta sesión. Se resuelve
           con lo que acabamos de aprender: es una tabla de contingencia, solo que de{' '}
           <b>tres</b> variables — dosis, mejoría y grupo de edad —, y la probabilidad
           condicional la explica entera. También son cifras inventadas para el ejemplo.

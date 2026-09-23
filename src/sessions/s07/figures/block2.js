@@ -131,6 +131,39 @@ export function fDistancia() {
     + 'sobre su frecuencia menos uno', s);
 }
 
+/* ═══════════ 2b · from the distances to the map ═══════════
+   The same three steps block 1 draws for the rain table, on the indicator matrix: the
+   cloud (a person per row of Z, mass 1/n, the chi-square rule), the axes (the direction
+   that keeps the most inertia, J − Q of them), the coordinates (projections, so that a
+   distance on the map approximates the chi-square one and equals it over every axis).
+   Verified on the farthest pair of people, three ways. */
+export function fSalto() {
+  const sl = MCA.salto;
+  let s = '', y = 40, parte;
+  [parte, y] = seccion(y, 'LA NUBE', 'cada persona es una fila de Z: un punto con J coordenadas, un 1 en sus Q categorías; pesa 1/n; entre dos personas se mide con la distancia chi-cuadrado de arriba',
+    yb => linea(X, yb, [{ t: 'z', sub: 'i' }, eq, { t: '(z', sub: 'i1' }, { t: ', …, z', sub: 'iJ' }, { t: ')' },
+      { t: 'masa', gap: 26, fill: C.ink2, fs: 15 }, { t: 'm', gap: 10, sub: 'i' }, eq], [{ t: '1' }], [{ t: 'n' }], null),
+    `en el ejemplo: ${MCA.n} puntos con J = ${MCA.J} coordenadas, ${MCA.Q} unos en cada fila, masa 1/${MCA.n} = ${num(MCA.masaFila)}`);
+  s += parte;
+  [parte, y] = seccion(y, 'LOS EJES', 'la dirección en la que la nube más se estira —la que más inercia conserva, pesando cada persona por su masa—; después las siguientes, perpendiculares. El mismo gesto que en la lluvia y que en el PCA de la sesión 6',
+    yb => linea(X, yb, [{ t: 'λ', sub: '1' }, { t: '≥', gap: 8 }, { t: 'λ', gap: 8, sub: '2' }, { t: '≥ … ≥', gap: 8 }, { t: 'λ', gap: 8, sub: 'K' },
+      { t: 'K', gap: 40 }, eq, { t: 'J − Q' }], null, null, null),
+    `en el ejemplo: K = ${MCA.J} − ${MCA.Q} = ${MCA.ejes}, λ = (${MCA.autovalores.map(num).join(', ')}); los dos ejes del mapa retienen ${num(MCA.acumulado[1])} %`);
+  s += parte;
+  [parte, y] = seccion(y, 'LAS COORDENADAS', 'la coordenada de una persona en un eje es su proyección sobre él; la distancia entre dos personas en el mapa aproxima la chi-cuadrado, y es exacta si se suman todos los ejes',
+    yb => linea(X, yb, [{ t: 'd', sup: '2' }, { t: '(i, i′)' }, { t: '≈', gap: 8, fill: C.ink2 }, { t: 'Σ', gap: 6, fs: 26, fill: C.ink2 }, { t: '(f', gap: 4, sub: 'ik' }, { t: '−', gap: 7 }, { t: 'f', gap: 7, sub: 'i′k' }, { t: ')', sup: '2' },
+      { t: 'con igualdad si k recorre los K ejes', gap: 30, fill: C.ink2, fs: 15 }], null, null, null)
+      + idx(X + measure([{ t: 'd', sup: '2' }, { t: '(i, i′)' }, { t: '≈', gap: 8 }], FS) + 10, yb + 20, 'k'),
+    `en el ejemplo, personas ${sl.personas[0]} y ${sl.personas[1]}: por Z, d = ${num(sl.dZ)}; por los ${sl.ejes} ejes, ${num(sl.dTodosLosEjes)}, la misma; por los ${sl.ejesMapa} del mapa, ${num(sl.dMapa)}: lo que falta es el ${num(Math.round((100 - sl.retenido) * 10) / 10)} % que el plano no retiene`);
+  s += parte;
+  return svg(W, y,
+    'Los tres pasos de las distancias al mapa en el MCA: la nube de personas de la tabla '
+    + 'disyuntiva con masa uno sobre n y la distancia chi-cuadrado; los ejes ordenados por la '
+    + 'inercia que conservan, J menos Q de ellos; y las coordenadas como proyecciones, con la '
+    + 'distancia entre dos personas en el mapa aproximando la chi-cuadrado y coincidiendo con '
+    + `ella sobre todos los ejes. Verificado sobre las personas ${sl.personas[0]} y ${sl.personas[1]}`, s);
+}
+
 /* ═══════════ 3 · the transition formulas ═══════════ */
 export function fTransicion() {
   const t = MCA.transicion;

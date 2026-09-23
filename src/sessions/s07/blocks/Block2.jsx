@@ -1,7 +1,7 @@
 import { Panel, Task, Options, Cards, Card, Diagram, Pair, Prose, List, NumTable }
   from '../../../components/content/index.jsx';
 import { PERSONAS, TABLA, TABLA_RARA, MCA, MCA_RARA, SUPL } from '../data/ejemplo.js';
-import { fIndicadora, fDistancia, fTransicion, fInercia, fContribucion, fSuplementaria,
+import { fIndicadora, fDistancia, fSalto, fTransicion, fInercia, fContribucion, fSuplementaria,
   mapaBase, mapaRara, mapaSuplementarias } from '../figures/block2.js';
 import { UMBRAL_COS2 } from '../figures/shared.js';
 
@@ -53,6 +53,7 @@ const D = SUPL.destinos;
 export default function Block1({ id, tabId, block }) {
   const cafe = cat(MCA, 'Café'), manana = cat(MCA, 'Mañana');
   const t = MCA.transicion;
+  const sl = MCA.salto;
   const b = MCA.benzecri;
   const ejeFab = MCA_RARA.categorias.slice().sort((a, c) => c.ctr[ejeF] - a.ctr[ejeF]);
 
@@ -176,6 +177,31 @@ export default function Block1({ id, tabId, block }) {
       <Diagram fig={fDistancia}>
         La métrica, y su consecuencia. El {MCA.n}/1 − 1 = {MCA.n - 1} de la última línea es
         lo que pasa cuando una categoría la tiene una sola persona, y es la Parte 3.
+      </Diagram>
+
+      <h3>Parte 1 · De las distancias al mapa</h3>
+      <Prose>
+        <p><b>La nube.</b> Cada persona es una fila de Z: un punto con {MCA.J} coordenadas —un 1
+          en sus {MCA.Q} categorías, un 0 en las demás—, con masa 1/{MCA.n}, y la regla para
+          medir entre dos personas es la distancia chi-cuadrado de arriba. Es la misma nube de
+          perfiles del bloque 1, con {MCA.n} puntos en vez de tres.</p>
+        <p><b>Los ejes.</b> El mismo salto que en la lluvia: la dirección en la que esa nube{' '}
+          <b>más se estira</b> —la que más inercia conserva, pesando cada persona por su masa y
+          midiendo con chi-cuadrado—, y después las siguientes, perpendiculares. El gesto es el
+          del PCA de la sesión 6; la nube y la regla son estas. Hay J − Q = <b>{MCA.ejes} ejes</b>.</p>
+        <p><b>Las coordenadas.</b> La de una persona en un eje es su <b>proyección</b> sobre él, y
+          por eso la distancia entre dos personas en el mapa aproxima su distancia chi-cuadrado.
+          Se comprueba sobre las personas {sl.personas[0]} y {sl.personas[1]}, las dos más
+          lejanas: por la tabla disyuntiva, d = <b>{f(sl.dZ)}</b>; por las coordenadas sobre los{' '}
+          {sl.ejes} ejes, <b>{f(sl.dTodosLosEjes)}</b>, la misma; por las {sl.ejesMapa} del mapa,{' '}
+          <b>{f(sl.dMapa)}</b>. Lo que falta es lo que el plano no retiene: el{' '}
+          {f(Math.round((100 - sl.retenido) * 10) / 10)} %. Es el mismo salto de la lluvia; cambia la
+          tabla.</p>
+      </Prose>
+
+      <Diagram fig={fSalto}>
+        Los mismos tres peldaños del bloque 1, sobre la tabla disyuntiva: la nube, los ejes, las
+        coordenadas.
       </Diagram>
 
       <h3>Parte 1 · Las fórmulas de transición</h3>

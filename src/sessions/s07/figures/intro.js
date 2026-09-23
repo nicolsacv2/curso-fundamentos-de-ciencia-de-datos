@@ -1,13 +1,14 @@
-import { C, svg, txt, wrap } from '../../../svg/kit.js';
-import { ESTADOS, TABLA, PERFILES, ESPERADAS, CHI2, SIMPSON } from '../data/lluvia.js';
+import { C, svg, txt, wrap, arrow } from '../../../svg/kit.js';
+import { ESTADOS, ANIO, TABLA, PERFILES, ESPERADAS, CHI2, SIMPSON } from '../data/lluvia.js';
 import { bar, pline, num, eje, ALTO_ROTULO, row, frac, measure, label, cuadrado,
   CATEGORICO } from './shared.js';
 
 /* Entrada of session 7 · the contingency table of the rain example. Every id carries the
    ar-s7-in- prefix. Every number comes out of src/sessions/s07/data/lluvia.js, which
-   scripts/ejemplo_lluvia.py wrote from a declared table of INVENTED days after asserting
-   its identities and its story: nothing here is typed. Rows are the sky today, columns
-   the sky tomorrow, and the states are the same three words everywhere. */
+   scripts/ejemplo_lluvia.py counted from a simulated year of INVENTED days after asserting
+   its identities and its story: nothing here is typed. Rows are the sky of the observed
+   day, columns the sky of the day after, and the states are the same three words
+   everywhere. */
 
 const W = 980;
 const FS = 20;
@@ -16,7 +17,7 @@ const X = 400;
 const idx = (x, y, t) => txt(x, y, t, { fs: 11, ff: 'serif', fill: C.ink3 });
 const F = ESTADOS, K = ESTADOS;
 
-/* The cell the example is named after — it rained today, it rains tomorrow — found by
+/* The cell the example is named after — it rained one day, it rains the next — found by
    its state's name, so that reordering the states cannot move the story to another cell. */
 export const LLUVIA = ESTADOS.indexOf('lluvia');
 export const celdaLluvia = () => ({ i: LLUVIA, j: LLUVIA });
@@ -50,6 +51,69 @@ function seccion(y0, tag, nota, dibuja, ejemplo) {
   return [s, yEj + lineas.length * 16 + 26];
 }
 
+/* ═══════════ 0 · the year, day by day ═══════════
+   365 cells in rows of thirty, each the colour of its state, the first and the last day
+   with a light border and a label. Under it, one pair of consecutive days blown up with
+   the arrow «día observado → día siguiente»: that pair is the UNIT the table counts, and
+   the reason 365 days give 364 pairs. It is the answer to «if 170 days had sun, why
+   would the next day not have at least 169?» — drawn, before the table says it. */
+export function anio() {
+  const POR_FILA = 30, celda = 22, x0 = 80, y0 = 92;
+  const dias = ANIO.estados;
+  const filas = Math.ceil(dias.length / POR_FILA);
+  const yGrid = y0 + filas * celda;
+  const yPar = yGrid + 58;
+  const H = yPar + 84 + ALTO_ROTULO;
+  let b = arrow('ar-s7-in-anio', C.ink2);
+  b += txt(30, 28, `EL AÑO INVENTADO, DÍA POR DÍA · ${ANIO.dias} DÍAS, ${ANIO.pares} PARES`, { fs: 11, fill: C.ask, ls: 1.8 });
+  wrap(`cada celda es un día, de izquierda a derecha y de arriba abajo · el color es el estado del cielo · sorteado con la semilla ${ANIO.semilla}, así que es siempre el mismo año`, 100)
+    .forEach((l, i) => b += txt(30, 50 + i * 14, l, { fs: 10.5, fill: C.ink3 }));
+
+  dias.forEach((estado, d) => {
+    const fila = Math.floor(d / POR_FILA), col = d % POR_FILA;
+    const x = x0 + col * celda, y = y0 + fila * celda;
+    const extremo = d === 0 || d === dias.length - 1;
+    b += `<rect x="${x + 1}" y="${y + 1}" width="${celda - 2}" height="${celda - 2}" rx="2"
+      fill="${CATEGORICO[ESTADOS.indexOf(estado)]}" opacity="0.85"${extremo ? ` stroke="${C.ink}" stroke-width="2"` : ''}/>`;
+    if (col === 0) b += txt(x0 - 10, y + celda / 2 + 4, `${d + 1}`, { fs: 9.5, fill: C.ink3, ta: 'end' });
+  });
+  /* the two ends of the year, named where they sit */
+  const ult = dias.length - 1;
+  const xu = x0 + (ult % POR_FILA) * celda, yu = y0 + Math.floor(ult / POR_FILA) * celda;
+  b += txt(x0 + celda / 2, y0 - 8, `día 1 · ${dias[0]}`, { fs: 10, fill: C.ink, ta: 'middle' });
+  b += txt(xu + celda + 8, yu + celda / 2 + 4, `día ${dias.length} · ${dias[ult]}`, { fs: 10, fill: C.ink });
+
+  /* legend */
+  const lx = 780, ly = y0;
+  b += txt(lx, ly - 8, 'estado del cielo', { fs: 10.5, fill: C.ask, ls: 1.6 });
+  ESTADOS.forEach((k, j) => {
+    b += cuadrado(lx + 6, ly + 12 + j * 22, 11, CATEGORICO[j]);
+    b += txt(lx + 20, ly + 16 + j * 22, k, { fs: 11, fill: C.ink2 });
+  });
+  b += `<rect x="${lx}" y="${ly + 12 + ESTADOS.length * 22 + 4}" width="12" height="12" rx="2" fill="none" stroke="${C.ink}" stroke-width="2"/>`;
+  wrap('borde claro: el primer y el último día', 22).forEach((l, i) =>
+    b += txt(lx + 20, ly + 16 + ESTADOS.length * 22 + 6 + i * 13, l, { fs: 10.5, fill: C.ink2 }));
+
+  /* the unit: one pair of consecutive days, blown up */
+  const G = 34;
+  b += txt(x0, yPar - 12, 'LA UNIDAD DE LA TABLA: UN PAR DE DÍAS CONSECUTIVOS', { fs: 10.5, fill: C.ask, ls: 1.6 });
+  [0, 1].forEach(d => {
+    const x = x0 + d * 200;
+    b += `<rect x="${x}" y="${yPar}" width="${G}" height="${G}" rx="3" fill="${CATEGORICO[ESTADOS.indexOf(dias[d])]}" opacity="0.9"${d === 0 ? ` stroke="${C.ink}" stroke-width="2"` : ''}/>`;
+    b += txt(x + G + 10, yPar + 14, d === 0 ? 'día observado' : 'día siguiente', { fs: 11, fill: C.ink });
+    b += txt(x + G + 10, yPar + 29, `día ${d + 1} · ${dias[d]}`, { fs: 10.5, fill: C.ink2 });
+  });
+  b += `<path d="M${x0 + 150},${yPar + G / 2} L${x0 + 190},${yPar + G / 2}" fill="none" stroke="${C.ink2}" stroke-width="1.4" marker-end="url(#ar-s7-in-anio)"/>`;
+  wrap(`Este par suma 1 en la celda «${dias[0]} → ${dias[1]}». El siguiente par es el día 2 con el día 3, y así hasta el día ${dias.length - 1} con el ${dias.length}: ${ANIO.pares} pares. Cada día es «observado» una vez y «siguiente» una vez, salvo el día 1, que nunca es siguiente, y el día ${dias.length}, que nunca es observado.`, 58)
+    .forEach((l, i) => b += txt(x0 + 430, yPar + 10 + i * 15, l, { fs: 11, fill: C.ink2 }));
+
+  b += eje('x', W - 30, H - 10, `los ${ANIO.dias} días del año inventado, en orden · color: el estado del cielo · un par de días consecutivos es una celda de la tabla`);
+  return svg(W, H,
+    `El año inventado de ${ANIO.dias} días, un cuadro por día coloreado según el estado del cielo, con el `
+    + `primer día (${dias[0]}) y el último (${dias[ult]}) señalados; debajo, un par de días consecutivos `
+    + `ampliado como la unidad que la tabla cuenta: ${ANIO.pares} pares`, b);
+}
+
 /* ═══════════ 1 · observed against expected, cell by cell ═══════════
    A grid: in every cell the count of days, the count independence would give, and a
    tint whose depth is the cell's share of the chi-square and whose hue says the sign —
@@ -58,12 +122,12 @@ export function tablaChi2() {
   const x0 = 250, y0 = 96, lado = 150, alto = 78;
   const H = y0 + F.length * alto + 130 + ALTO_ROTULO;
   const maxC = Math.max(...CHI2.celdas.flat());
-  let b = txt(30, 28, 'OBSERVADO CONTRA ESPERADO · EL CIELO DE HOY × EL CIELO DE MAÑANA',
+  let b = txt(30, 28, 'OBSERVADO CONTRA ESPERADO · EL DÍA OBSERVADO × EL DÍA SIGUIENTE',
     { fs: 11, fill: C.ask, ls: 1.8 });
-  b += txt(30, 50, `cada celda: cuántos días hubo, y cuántos habría si el cielo de hoy no dijera nada del de mañana · ${TABLA.n} días inventados`,
+  b += txt(30, 50, `cada celda: cuántos pares de días hubo, y cuántos habría si el día observado no dijera nada del siguiente · ${TABLA.n} pares de ${TABLA.dias} días inventados`,
     { fs: 10.5, fill: C.ink3 });
 
-  b += txt(x0 + (K.length * lado) / 2, y0 - 44, 'mañana', { fs: 10.5, fill: C.ask, ta: 'middle', ls: 1.6 });
+  b += txt(x0 + (K.length * lado) / 2, y0 - 44, 'día siguiente', { fs: 10.5, fill: C.ask, ta: 'middle', ls: 1.6 });
   K.forEach((k, j) => {
     const x = x0 + j * lado;
     b += txt(x + lado / 2, y0 - 26, k, { fs: 10.5, fill: C.ink2, ta: 'middle' });
@@ -71,7 +135,7 @@ export function tablaChi2() {
   });
   b += txt(x0 + K.length * lado + 14, y0 - 26, 'suma', { fs: 10.5, fill: C.ink3 });
   b += txt(x0 - 12, y0 + F.length * alto + 18, 'suma', { fs: 10.5, fill: C.ink3, ta: 'end' });
-  b += txt(x0 - 12, y0 - 26, 'hoy', { fs: 10.5, fill: C.ask, ta: 'end', ls: 1.6 });
+  b += txt(x0 - 12, y0 - 26, 'día observado', { fs: 10.5, fill: C.ask, ta: 'end', ls: 1.6 });
 
   F.forEach((f, i) => {
     const y = y0 + i * alto;
@@ -93,36 +157,36 @@ export function tablaChi2() {
 
   const yl = y0 + F.length * alto + 48;
   b += bar(30, yl - 9, 12, 12, C.ask, { op: 0.6 });
-  b += txt(50, yl, 'más días de los que habría si hoy y mañana fueran independientes', { fs: 11, fill: C.ink2 });
+  b += txt(50, yl, 'más pares de los que habría si el día observado y el siguiente fueran independientes', { fs: 11, fill: C.ink2 });
   b += bar(30, yl + 11, 12, 12, C.reveal, { op: 0.6 });
   b += txt(50, yl + 20, 'menos · cuanto más intenso el color, más pone la celda al χ²', { fs: 11, fill: C.ink2 });
   b += txt(30, yl + 46, `χ² = ${num(CHI2.total)} · φ² = χ²/n = ${num(CHI2.phi2)} · V de Cramér = ${num(CHI2.v)}`,
     { fs: 12.5, fill: C.ink });
-  b += eje('x', W - 30, H - 10, `filas: el cielo de hoy · columnas: el cielo de mañana · recuentos de días, ${TABLA.n} en total, inventados`);
+  b += eje('x', W - 30, H - 10, `filas: el cielo del día observado · columnas: el del día siguiente · recuentos de pares de días consecutivos, ${TABLA.n} en total, inventados`);
 
   return svg(W, H,
-    'Tabla de contingencia del cielo de hoy contra el cielo de mañana, en un año inventado: en '
-    + 'cada celda el número de días observado y el esperado bajo independencia, coloreada según '
+    'Tabla de contingencia del cielo del día observado contra el del día siguiente, en un año inventado: en '
+    + 'cada celda el número de pares de días observado y el esperado bajo independencia, coloreada según '
     + 'cuánto aporta al chi-cuadrado y si hay más o menos de lo esperado. Chi-cuadrado '
     + `${num(CHI2.total)}, V de Cramér ${num(CHI2.v)}`, b);
 }
 
 /* ═══════════ 2 · row profiles: each row as a bar to 100 % ═══════════
-   A bar per state of the sky today, stretched to 100 %, split by the sky tomorrow, as
-   wide as the row's count of days. The last bar is the column margin — what every bar
-   would look like if today said nothing about tomorrow. */
+   A bar per state of the observed day, stretched to 100 %, split by the sky of the day
+   after, as wide as the row's count of pairs. The last bar is the column margin — what
+   every bar would look like if the observed day said nothing about the next. */
 export function perfilesFila() {
   const H = 436 + ALTO_ROTULO;
   const x0 = 60, y0 = 100, alto = 210, ancho = 640;
-  let b = txt(30, 28, 'P(MAÑANA | HOY) · UNA BARRA POR CADA CIELO DE HOY',
+  let b = txt(30, 28, 'P(SIGUIENTE | OBSERVADO) · UNA BARRA POR CADA CIELO DEL DÍA OBSERVADO',
     { fs: 11, fill: C.ask, ls: 1.8 });
-  wrap(`cada barra es un estado del cielo de hoy estirado al 100 % · su ancho, cuántos días hubo con ese cielo · la última barra es el margen: lo que valdría cualquier fila si el cielo de hoy no dijera nada del de mañana · ${TABLA.n} días inventados`, 118)
+  wrap(`cada barra es un estado del cielo del día observado estirado al 100 % · su ancho, cuántos días hubo con ese cielo · la última barra es el margen: lo que valdría cualquier fila si el día observado no dijera nada del siguiente · ${TABLA.n} pares de días inventados`, 118)
     .forEach((l, i) => b += txt(30, 50 + i * 15, l, { fs: 10.5, fill: C.ink3 }));
   const HUECO = 10;
   const total = TABLA.n;
   const util = ancho - HUECO * F.length;
   let cx = x0;
-  const barras = [...F.map((f, i) => ({ t: `hoy ${f}`, n: TABLA.filas[i], perfil: PERFILES.fila[i] })),
+  const barras = [...F.map((f, i) => ({ t: `observado ${f}`, n: TABLA.filas[i], perfil: PERFILES.fila[i] })),
     { t: 'margen', n: total, perfil: TABLA.marginalColumna, margen: true }];
   barras.forEach(bq => {
     const bw = bq.margen ? 70 : (bq.n / total) * (util - 70);
@@ -137,18 +201,18 @@ export function perfilesFila() {
     b += txt(cx + bw / 2, y0 + alto + 48, `${bq.n} días`, { fs: 10, fill: C.ink3, ta: 'middle' });
     cx += bw + HUECO;
   });
-  /* the legend: the sky tomorrow */
+  /* the legend: the sky of the day after */
   let ly = y0;
-  b += txt(760, ly - 14, 'mañana', { fs: 10.5, fill: C.ask, ls: 1.6 });
+  b += txt(760, ly - 14, 'día siguiente', { fs: 10.5, fill: C.ask, ls: 1.6 });
   K.forEach((k, j) => {
     b += cuadrado(766, ly + 4 + j * 22, 11, CATEGORICO[j]);
     b += txt(780, ly + 8 + j * 22, k, { fs: 11, fill: C.ink2 });
   });
   b += eje('y', x0 - 30, y0 - 14, 'proporción dentro de cada fila', '0 a 100 %');
-  b += eje('x', W - 30, H - 10, 'el cielo de hoy, un estado por barra · dentro, el reparto del cielo de mañana');
+  b += eje('x', W - 30, H - 10, 'el cielo del día observado, un estado por barra · dentro, el reparto del cielo del día siguiente');
   return svg(W, H,
-    'Los perfiles de fila de la tabla: una barra por estado del cielo de hoy, estirada al '
-    + 'cien por ciento y partida en los tres estados del cielo de mañana, con el ancho '
+    'Los perfiles de fila de la tabla: una barra por estado del cielo del día observado, estirada al '
+    + 'cien por ciento y partida en los tres estados del cielo del día siguiente, con el ancho '
     + 'proporcional a cuántos días hubo con ese cielo; la última barra es el margen de columna', b);
 }
 
@@ -249,12 +313,12 @@ export function fCondicional() {
       [{ t: '=', gap: 20, fill: C.ink2 }])
       + frac(X + measure([{ t: 'P(A | B)' }, eq], FS) + 10 + 118 + 10 + 20 + 40, yb - 7,
         [{ t: 'n', sub: 'AB' }], [{ t: 'n', sub: 'B' }], FS),
-    `en el ejemplo: P(mañana = «${K[m.j]}» | hoy = «${F[m.i]}») = ${nij}/${nfila} = ${num(PERFILES.fila[m.i][m.j])}, contra P(mañana = «${K[m.j]}») = ${ncol}/${TABLA.n} = ${num(TABLA.marginalColumna[m.j])} sin saber nada del cielo de hoy`);
+    `en el ejemplo: P(siguiente = «${K[m.j]}» | observado = «${F[m.i]}») = ${nij}/${nfila} = ${num(PERFILES.fila[m.i][m.j])}, contra P(siguiente = «${K[m.j]}») = ${ncol}/${TABLA.n} = ${num(TABLA.marginalColumna[m.j])} sin saber nada del día observado`);
   s += parte;
   [parte, y] = seccion(y, 'LO ESPERADO BAJO INDEPENDENCIA',
-    'si el cielo de hoy no dijera nada del de mañana, cada celda tendría el producto de sus márgenes sobre el total',
+    'si el día observado no dijera nada del siguiente, cada celda tendría el producto de sus márgenes sobre el total',
     yb => linea(X, yb, [{ t: 'E', sub: 'ij' }, eq], [{ t: 'n', sub: 'i·' }, { t: '·', gap: 6 }, { t: 'n', gap: 6, sub: '·j' }], [{ t: 'n' }], null),
-    `en esa celda: ${nfila} · ${ncol} / ${TABLA.n} = ${num(ESPERADAS[m.i][m.j])} días esperados, y hubo ${nij}`);
+    `en esa celda: ${nfila} · ${ncol} / ${TABLA.n} = ${num(ESPERADAS[m.i][m.j])} pares esperados, y hubo ${nij}`);
   s += parte;
   [parte, y] = seccion(y, 'EL CHI-CUADRADO, CELDA POR CELDA',
     'cuánto se aleja cada celda de lo esperado, en unidades de lo esperado; la suma es el estadístico',
@@ -267,7 +331,7 @@ export function fCondicional() {
     'la V de Cramér: el chi-cuadrado sobre lo máximo que podría valer con estas filas y columnas',
     yb => linea(X, yb, [{ t: 'V' }, eq, { t: '√', gap: 4, fs: 26 }],
       [{ t: 'χ', sup: '2' }], [{ t: 'n · min(filas − 1, columnas − 1)' }], null),
-    `en el ejemplo: √(${num(CHI2.total)} / (${TABLA.n} · ${Math.min(F.length, K.length) - 1})) = ${num(CHI2.v)}. Es una medida de cuánto se asocian el cielo de hoy y el de mañana, no una prueba: los días son inventados.`);
+    `en el ejemplo: √(${num(CHI2.total)} / (${TABLA.n} · ${Math.min(F.length, K.length) - 1})) = ${num(CHI2.v)}. Es una medida de cuánto se asocian el cielo de un día y el del siguiente, no una prueba: los días son inventados.`);
   s += parte;
   return svg(W, y,
     'Cuatro fórmulas: la probabilidad condicional como la probabilidad conjunta sobre la del '
@@ -275,5 +339,5 @@ export function fCondicional() {
     + 'independencia como el producto de los márgenes sobre el total; el chi-cuadrado como la '
     + 'suma sobre las celdas de la diferencia al cuadrado sobre lo esperado; y la V de Cramér '
     + 'como la raíz del chi-cuadrado sobre n por el menor de filas menos uno y columnas menos uno. '
-    + 'Con la celda de lluvia hoy y lluvia mañana como ejemplo', s);
+    + 'Con la celda de lluvia el día observado y lluvia el día siguiente como ejemplo', s);
 }
